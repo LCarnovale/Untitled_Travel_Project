@@ -1,0 +1,18 @@
+Week 2
+    Group formed.
+
+    Created a trello group.
+    
+    Started project proposal, with some empty headings etc.
+
+Week 3
+    After complications in attempting to setup project 2 we decided to switch to project 7.
+    A new repo has been made and the project proposal has been started.
+
+Week 4
+    Finished and submitted project proposal for project 7.
+
+    Assigned tasks to each member. 
+
+    I am working on flask and helping with the backend if needed.
+    Aiming to have a minimal working backend version by next week.
