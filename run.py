@@ -1,5 +1,4 @@
-import sys
-sys.path.append("./src/")
+
 from routes import app
 
 if __name__ == '__main__':
