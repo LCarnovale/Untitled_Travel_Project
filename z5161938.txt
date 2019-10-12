@@ -1,0 +1,58 @@
+Week 2
+
+Group formed with Leo, Bryan and Kittipat. Added on facebook so we can communicate.
+
+Decided that I (Ian) am the Scrum master and that we are going to do project 2.
+
+Set up github repo (private, duplicated from the given repo) and added team members.
+
+Leo set up a trello for us to organise work.
+
+To do: Waiting on response from lecturer re: intro to existing software
+
+Until then, read on the project details we've been given and start thinking about the epics/project scope.
+
+After, we will designate work, next week's lab at the latest) we will start writing the document.
+
+
+
+Week 3
+
+Decision made to change to project 7, due to difficulties setting up project 2.
+New repo set up.
+Google doc set up for creating the proposal: https://docs.google.com/document/d/1P5_uXV8AZ4QzptUo9QInDAijFSVfst84ZG21mW1tKek/edit#
+Headings set up and planned at a high level, along with conceptual design of the website:
+ - We want the website to be simple, user-oriented
+ - We want it to be most accessible to people looking to book rooms, as this will be the most common type of user
+
+Split up work for proposal:
+- Background/aim - Kittipat
+- Software architecture - Leo
+- Planned Flow of website/design (frontend mostly) -  Bryan
+- Technical details/Features - Ian
+- Ad Epic - Kittipat
+- Book Epic - Kittipat
+- Search Epic - Bryan
+- Review Epic - Leo
+- Stand up/sprint schedule - Ian
+
+Each person's sections should be done by THURSDAY NIGHT, and reviewed by everyone on FRIDAY before 11 (latest).
+Cleaning up/Submission after 11 on friday (or earlier, time allowing)
+
+
+
+Week 4
+
+Switched to provided github repo (in the classroom, not our own private one)
+Proposal completed and submitted (Monday)
+
+Initial work split up:
+ - Html (Ian/Bryan)
+ - Flask interface (Leo)
+ - Backend (Ince)
+
+Aim is to make a very simple two-page website with the core features
+ - Add new accommodation
+ - Book accommodation
+
+We will have another standup meeting on Monday, to see how people have gone and to work out which features to add next.
