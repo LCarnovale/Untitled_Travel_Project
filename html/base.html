@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flask Template Example</title>
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style type="text/css">
+      .container {
+        max-width: 500px;
+        padding-top: 100px;
+      }
+    </style>
+  </head>
+  <body>
+	<nav>
+	  <div>
+		<div>
+		  <a href="/"> LOGO </a>
+		</div>
+
+		<div>
+		  <ul>
+			<li><a href="#">Booking</a></li>
+			<li><a href="#">Post Ad</a></li>
+		  </ul>
+		</div>
+	  </div>
+	</nav>
+    <div class="container">
+      <br>
+      {% block content %}{% endblock %}
+      <br>
+    </div>
+	
+  </body>
+</html>
