@@ -31,16 +31,21 @@ To use pip in the virtual environment, the normal `pip`
 command may work, but if not, use the following to 
 install - for example - flask:
 ```bash
-(project_venv) $ python3 -m pip install numpy
+(project_venv) $ python -m pip install flask
 ```
 List dependencies with the command:
 ```bash
-(project_venv) $ python3 -m pip list
+(project_venv) $ python -m pip list
 ```
+In your initial setup, or if the requirements change, update your virtual environment with:
+```bash
+(project_venv) $ python -m pip install -r requirements.txt
+```
+
 If you install a new library with pip,
 add it to the requirements with:
 ```bash
-(project_venv) $ python3 -m pip freeze > requirements.txt
+(project_venv) $ python -m pip freeze > requirements.txt
 ```
 Any libraries you had installed out of the virtual 
 environment will not be available in the virtual 
