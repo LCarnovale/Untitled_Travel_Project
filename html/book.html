@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+	<p>Accommodation name: {{acc_name}}</p>
+	<p>Address: {{acc_addr}}</p>
+	<p>Additional details:</p>
+	<ul>
+		{% for n in acc_list %}
+			<li>{{n}}</li>
+		{% endfor %}
+	</ul>
+	<form name='book_acc' method='POST'>
+		<input type="submit" value="Confirm Booking"/> 
+	</form>
+{% endblock %}

@@ -1,0 +1,11 @@
+Week 2 
+Formed group with Kittipat, Ian and Leo. Cloned the repo and joined the Facebook group.
+While waiting for Ian's email to be replied, I am planning to run the OnTask and see how we can extend it for the project.
+By next week, hopefully, we can figure out what needs to be done.
+
+Week 3
+Decided to change to project 7 instead because we might not be able to get OnTask running. 
+We are starting the project proposal this week. I'll be working on the search module and the system designs.
+
+Week 4
+Decided to work on an MVP with only two modules. Me and Ian will be working on HTML. 
