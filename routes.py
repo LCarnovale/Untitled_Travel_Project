@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect
-from accommodation import Accommodation
-from accommodation_system import AccommodationSystem
+from src.accommodation import Accommodation
+from src.accommodation_system import AccommodationSystem
 from server import system
 from server import app
 
