@@ -75,6 +75,18 @@ available outside the virtual environment.
 
 To deactivate the virtual environment, run the following command:
 ```bash
-(project_venv) $ deactivate
+(project_venv) deactivate
 ```
 
+# Running the program
+Currently the backend is configured to run in debug mode. Start the server by running `run.py`:
+
+On windows:
+```cmd
+(project_venv) run.py
+```
+
+On posix systems:
+```bash
+(project_venv) ./run.py
+```
