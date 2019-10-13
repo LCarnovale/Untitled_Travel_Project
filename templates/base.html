@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Flask Template Example</title>
+    <title>Untitled Travel</title>
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style type="text/css">
       .container {
@@ -9,6 +9,7 @@
         padding-top: 100px;
       }
     </style>
+    {% block head %}{% endblock %}
   </head>
   <body>
 	<nav>
@@ -19,8 +20,8 @@
 
 		<div>
 		  <ul>
-			<li><a href="#">Booking</a></li>
-			<li><a href="#">Post Ad</a></li>
+			<li><a href="{{url_for('book_main', id = 0)}}">Booking</a></li>
+			<li><a href="{{url_for('ad_main')}}">Post Ad</a></li>
 		  </ul>
 		</div>
 	  </div>

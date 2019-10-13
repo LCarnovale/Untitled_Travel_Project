@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Post Accommodation</title>
+{% endblock %}
+
+{% block content %}
+    <h2> Please enter the details of your accommodation: </h2>
+	<form name='post_ad' method='POST'>
+        <table>
+        <tr>
+            <td> Accommodation name: </td>
+            <td> <input name = "acc_name"> </td>
+        </tr>
+        <tr>
+            <td> Address: </td>
+            <td><input name = "acc_addr"></td>
+        </tr>
+        </table>
+		<input type="submit" value="Confirm"/>
+	</form>
+{% endblock %}
