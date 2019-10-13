@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Booking Success</title>
+{% endblock %}
+
+{% block content %}
+    <h2> Your booking of {{acc_name}} was successful! </h2>
+    <h3> What to do now: </h3>
+    <ol>
+	    <li>TODO</li>
+	    <li>I will put stuff here, probably including contact details of the person who posted the ad.</li>
+	    <li>Also maybe a check-in time?</li>
+	</ol>
+    <p> <a href = {{url_for('home')}}> Home </a> </p>
+{% endblock %}

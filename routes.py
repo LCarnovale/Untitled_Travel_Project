@@ -16,10 +16,23 @@ def home():
 '''
 Main Booking page
 '''  
-@app.route('/book', methods=['GET', 'POST'])
-def book_main():
+@app.route('/book/<id>', methods=['GET', 'POST'])
+def book_main(id):
     if request.method == 'POST':
-        pass
+        pass #TODO
+        return render_template('book_confirm.html')
 
     return render_template('book.html')
+
+
+'''
+Main Post accommodation page
+'''  
+@app.route('/post_ad', methods=['GET', 'POST'])
+def ad_main():
+    if request.method == 'POST':
+        pass #TODO
+        return render_template('ad_confirm.html', ad_id = 0)
+
+    return render_template('new_ad.html')
 
