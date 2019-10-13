@@ -5,6 +5,6 @@
 
 {% block content %}
     <h2> Your accommodation has been posted! </h2>
-    <p> <a href = {{url_for('book_main', id = ad_id)}}> Preview your ad </a> </p>
+    <p> <a href ="{{url_for('book_main', id=id)}}"> Preview your ad </a> </p>
     <p> <a href = {{url_for('home')}}> Home </a> </p>
 {% endblock %}

@@ -19,3 +19,6 @@ Worked on the Advertisement booking, which allows certain users to be able to ad
 
 7/10/19
 We made a group call on facebook to discuss the project proposal before it was due. I re-did some of my part (Aim and the epics) to better describe our aim and restructed the format of the epics to make it easier to understand. We also worked on the sprint schedule and did a rough work of the total schedule for the project. We also decided to add a part where we describe our skills for the project and prices on using google maps API and azure cloud on our project.
+
+13/10/19
+New gitHub was set up using the repository given. Our team made a minimum value product and took a look at the code. Added code to backend such as Accommodation class and making an instance when creating an ad. Also made an accommodation system class to store all accommodations. We can find each accommadation via a unique ID given when creating an accommodation. Successfully can post an ad (name of place and address) and can book it.
