@@ -4,18 +4,42 @@
 {% endblock %}
 
 {% block content %}
-    <h2> Please enter the details of your accommodation: </h2>
-	<form name='post_ad' method='POST'>
-        <table>
-        <tr>
-            <td> Accommodation name: </td>
-            <td> <input name = "acc_name"> </td>
-        </tr>
-        <tr>
-            <td> Address: </td>
-            <td><input name = "acc_addr"></td>
-        </tr>
-        </table>
-		<input type="submit" value="Confirm"/>
+	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+	<h2> Please enter the details of your accommodation: </h2>
+	<form name='post_ad' id = "regForm" method='POST'>
+		<div class = "tab">Place Details
+			<p><input name = "acc_name" placeholder = "Name" id = "required"></p>
+			<p><input name = "acc_addr" placeholder = "Address" id = "required"></p>
+			<p><input name = "acc_nbed" placeholder = "Beds" id = "required" type = number></p>
+			<p><input name = "acc_nbath" placeholder = "Bathrooms" id = "required" type = number></p>
+			<p><input name = "acc_details" placeholder = "Additional details"></p>		
+		</div> 
+		<div class = "tab">Owner Details
+			<p><input name = "own_name" placeholder = "Name" id = "required"></p>
+			<p><input name = "own_email" placeholder = "Email" type = "email" id = "required"></p>
+			<p><input name = "own_phone" placeholder = "Mobile" id = "required"></p>
+			<p><input name = "own_details" placeholder = "Owner details"></p>
+		</div>
+		<div class = "tab">Stay Details
+			<p><input name = "price" placeholder = "Price" id = "required" type = number step = 0.01></p>
+			<p><input name = "avail_start" placeholder = "Start Availability" id = "required" type = date></p>
+			<p><input name = "avail_end" placeholder = "End Availability" id = "required" type = date></p>
+			<p><input name = "min_stay" placeholder = "Min. Stay" type = number></p>
+			<p><input name = "max_stay" placeholder = "Max. Stay" type = number></p>
+			<p><input name = "stay_details" placeholder = "Additional Details"></p>
+		</div>
+		<div style="overflow:auto;">
+			<div style="float:right;">
+				<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+				<button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+			</div>
+		</div>
+		<div style="text-align:center;margin-top:40px;">
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+		</div>
 	</form>
+
+	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
 {% endblock %}
