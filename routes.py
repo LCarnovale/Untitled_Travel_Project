@@ -28,8 +28,7 @@ def book_main(id):
         
         return render_template('book_confirm.html')
 
-    return render_template('book.html', acc_name=acc.name,
-                           acc_addr=acc.addr)
+    return render_template('book.html', acc = acc)
 
 
 '''
