@@ -1,0 +1,48 @@
+body {
+    font-size: 2em;
+}
+
+.addr_details {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+.booking_details {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+.addr_details td {
+    border: 1px solid black;
+}
+
+.booking_details td {
+    border: 1px solid black;
+}
+
+.addr_details th {
+    font-size: 70%;
+    background-color: rgba(128, 128, 128, 0.5);
+    text-align: inherit;
+    border: 1px solid black;
+}
+
+.booking_details th {
+    font-size: 70%;
+    background-color: rgba(128, 128, 128, 0.5);
+    text-align: inherit;
+    border: 1px solid black;
+}
+
+.good_msg {
+    color: #22AA22;
+    text-align: center;
+}
+
+.bad_msg {
+    color: #CC1111;
+    text-align: center;
+}
