@@ -12,6 +12,7 @@ class User:
         self._addr = addr
         self._id += 1
         self._bookings = []
+
         if self.checkEmail(email) is None:
             raise EmailError("Please enter a valid email address")
         else:
@@ -29,10 +30,7 @@ class User:
         return self._desc
 
     def getDetails(self):
-        print(self._email)
-        print(self._mobile)
         return "Email: " + self._email + "Mobile: " + self._mobile
-
 
     def checkEmail(self, email):
         x = re.search("[\w0-9]+@[\w0-9]+\.com", email)
