@@ -22,3 +22,6 @@ We made a group call on facebook to discuss the project proposal before it was d
 
 13/10/19
 New gitHub was set up using the repository given. Our team made a minimum value product and took a look at the code. Added code to backend such as Accommodation class and making an instance when creating an ad. Also made an accommodation system class to store all accommodations. We can find each accommadation via a unique ID given when creating an accommodation. Successfully can post an ad (name of place and address) and can book it.
+
+18/10/19
+Worked on backend --- Accommodation functions

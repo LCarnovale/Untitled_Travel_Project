@@ -44,7 +44,7 @@
     {% endif %}
 
 
-    {% if acc.getOwnerDesc() %}
+    {% if acc.getOwnerDesc() != null%}
         <h2> About the owner </h2>
         <p> {{acc.getOwnerDesc()}} </p>
     {% endif %}
