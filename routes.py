@@ -17,7 +17,7 @@ def home():
     if request.method == 'POST':
         pass
 
-    return render_template('base.html')
+    return render_template('home.html')
 
 
 '''
