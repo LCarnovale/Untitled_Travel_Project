@@ -1,6 +1,5 @@
+-- Select all
 SELECT * FROM dbo.dbTable
 
-INSERT INTO dbo.dbTable (UserID, Name)
-VALUES (5, 'Ian')
-
-SELECT * FROM dbo.dbTable
+-- Select Ian rows
+SELECT * FROM dbo.dbTable WHERE (name = 'Ian')
