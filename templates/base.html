@@ -34,15 +34,20 @@
 		form {
 			display: inline-block;
 		}	
-    </style>
+	</style>
     {% block head %}{% endblock %}
   </head>
-  <body>
+  <body>	
+
 	<nav class = "topnav">
 	  <div>
 		<div>
 		  <a href="/"> <img src = "/static/nsw1.png" style = "width: 100px;height: 100px"></a>
 		</div>
+
+		Dev info <br>
+		Database Connected: {{is_connected}} <br>
+		Current commit: {{current_commit}} <br>
 
 		<div>
 		  <ul>

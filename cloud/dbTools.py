@@ -11,15 +11,22 @@ class FailedConnectionHandler:
     def __getattr__(self, attr):
         return lambda *x: None
 
-try: 
-    import connect_config
-    cnxn = connect_config.get_connection()
-except:
-    print("Unable to connect to database. Function calls will do nothing.")
-    cursor = FailedConnectionHandler()
-else:
-    print("Successfully connected to database.")
-    cursor = cnxn.cursor()
+
+cursor = None
+is_connected = False
+def init():
+    global cursor
+    global is_connected
+    try: 
+        import connect_config
+        cnxn = connect_config.get_connection()
+    except:
+        print("Unable to connect to database. Function calls will do nothing.")
+        cursor = FailedConnectionHandler()
+    else:
+        print("Successfully connected to database.")
+        cursor = cnxn.cursor()
+        is_connected = True
 
 ########
 # If returning a direct cursor object or cursor attribute, it's good to check if a
