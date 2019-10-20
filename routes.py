@@ -7,12 +7,10 @@ from src.stayDetails import StayDetails
 from server import accSystem
 from server import userSystem
 from server import app
-from server import DBG_current_commit # To be removed when suitable
 import cloud.dbTools as dbTools
 
 default_kwargs = {
     "is_connected": dbTools.is_connected,
-    "current_commit": DBG_current_commit ###
 }
 
 @app.errorhandler(404)
