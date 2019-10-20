@@ -33,5 +33,5 @@ class User:
         return "Email: " + self._email + "Mobile: " + self._mobile
 
     def checkEmail(self, email):
-        x = re.search("[\w0-9]+@[\w0-9]+\.com", email)
+        x = re.search(r"[\w0-9]+@[\w0-9]+\.com", email)
         return x
