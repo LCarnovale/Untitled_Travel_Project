@@ -1,27 +1,54 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Untitled Travel</title>
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style type="text/css">
       .container {
         max-width: 500px;
         padding-top: 100px;
+		margin-left: auto; 
+		margin-right: auto; 
+		display:block;
+		text-align: center;
       }
+		.topnav ul{
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color: #333333;
+		}
+		.topnav li {
+			float: left;
+		}
+		.topnav li a {
+			display: block;
+			color: white;
+			text-align: center;
+			padding: 5px 60px;
+			text-decoration: none;
+		}
+		.topnav li a:hover {
+			background-color: #4CAF50;	
+		}
+		form {
+			display: inline-block;
+		}	
     </style>
     {% block head %}{% endblock %}
   </head>
   <body>
-	<nav>
+	<nav class = "topnav">
 	  <div>
 		<div>
-		  <a href="/"> LOGO </a>
+		  <a href="/"> <img src = "/static/nsw1.png" style = "width: 100px;height: 100px"></a>
 		</div>
 
 		<div>
 		  <ul>
 			<li><a href="{{url_for('book_main', id=id)}}">Booking</a></li>
 			<li><a href="{{url_for('ad_main')}}">Post Ad</a></li>
+			<li style= "float:right"> <a href="/">Login</a></li>
 		  </ul>
 		</div>
 	  </div>
