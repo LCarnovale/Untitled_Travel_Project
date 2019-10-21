@@ -1,16 +1,59 @@
-# Tools to interact with our database.
-# import pyodbc
+"""
+This module handles all interaction with the database.
 
-# This handles making calls to cursor when a connection was not made.
-# This is useful for development and debugging but a failed connection
-# will be a genuine problem if it occurs on the main server.
+Table structures:
+
+VenuDB:
+
+    Venue:
+        id            int           Identity   PRIMARY KEY
+        ownerid       int           not null
+        addressid     int           not null
+        name          varchar(200)  not null
+        bedCount      tinyint
+        bathCount     tinyint
+        carCount      tinyint
+        description   text
+        rate          smallmoney
+        availStart    date
+        availEnd      date
+        minStay       int           DEFAULT 1
+        maxStay       int
+        details       text
+
+    Owners and Users:
+        id           int          Identity   PRIMARY KEY
+        name         varchar(50)  not null
+        userName     varchar(50)
+        email        varchar(100)
+        phone        varchar(20)
+        description  text
+
+    Addresses:
+        id          int        Identity  PRIMARY KEY
+        location    text
+
+    Bookings:
+        id          int        Identity  PRIMARY KEY
+        venueid     int        not null
+        userid      int        not null
+        startDate   date       not null
+        endDate     date       not null
+"""
+
+
+
+"""
+This handles making calls to cursor when a connection was not made.
+This is useful for development and debugging but a failed connection
+will be a genuine problem if it occurs on the main server.
+"""
 class FailedConnectionHandler:
     def __init__(self):
         pass
 
     def __getattr__(self, attr):
         return lambda *x: None
-
 
 cursor = None
 is_connected = False
@@ -57,12 +100,11 @@ def get_user(id):
 
 def insert_user(name, userName, email=None, phone=None, description=None):
     cursor.execute(
-        "INSERT INTO users (name, userName, email, phone, description)   \
+        "INSERT INTO Users (name, userName, email, phone, description)   \
          VALUES (?, ?, ?, ?, ?)"
     )
 
 
-    
 
 
 
