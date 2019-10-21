@@ -27,3 +27,8 @@ Week 5
     By Friday's meeting I have got an SQL database setup and have been able to
     read and write to the databse manually from my computer. Now working on
     modifying the database programatically.
+
+Week 6
+    Got a functioning database api that can connect to the database when run from the
+    azure cloud based virtual machine. Now we need to complete the database and work
+    on functions for querying it.
