@@ -1,4 +1,8 @@
 # Initialise the backend in this program
+import server
+
 
 def bootstrap_system():
-    pass
+    import cloud.dbTools as db
+    db.init()
+    

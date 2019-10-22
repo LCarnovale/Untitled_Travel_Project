@@ -7,17 +7,26 @@ from src.stayDetails import StayDetails
 from server import accSystem
 from server import userSystem
 from server import app
+import cloud.dbTools as dbTools
 
+default_kwargs = {
+    "is_connected": dbTools.is_connected,
+}
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html', **default_kwargs)
 
 '''
 Landing page
 '''
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    
     if request.method == 'POST':
         pass
 
-    return render_template('home.html')
+    return render_template('home.html', **default_kwargs)
 
 '''
 Login page
@@ -49,7 +58,7 @@ def book_main(id):
     if request.method == 'POST':
         pass #TODO
 
-    return render_template('book.html', acc=acc)
+    return render_template('book.html', acc=acc, **default_kwargs)
 
 
 
@@ -78,5 +87,5 @@ def ad_main():
         userSystem.addUser(owner)
         return render_template('ad_confirm.html', id=acc.getID())
 
-    return render_template('new_ad.html')
+    return render_template('new_ad.html', **default_kwargs)
 

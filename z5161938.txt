@@ -56,3 +56,42 @@ Aim is to make a very simple two-page website with the core features
  - Book accommodation
 
 We will have another standup meeting on Monday, to see how people have gone and to work out which features to add next.
+
+
+
+Week 5
+
+Website was completed with ability to make and book accommodation
+However, it currently only stores a name and description for each ad.
+
+We have decided to include the following information for each place:
+Name, Address, #Beds, #Bathrooms, Details of place, Owner name, Owner email/mobile, Owner description, Price (rate), Availability dates, Min/max stay (days), Additional rules.
+
+In order to implement this, we have decided on the following workload split:
+
+ - Booking page displays new info (Ian)
+ - Posting an ad is a multi-stage form with new details (Bryan)
+ - Backend stores new info (Ince)
+
+Additionally, Leo has decided to look into azure databases and connecting them to the app.
+
+
+
+Week 6
+
+The website is now operational and hosted on azure. Everyone completed what they were supposed to for sprint 1, and the only task that was unassigned and incomplete is the ability to make a booking.
+
+For sprint 2, we plan on finishing the above, as well as:
+ - Setting up a more solid database schema and integrating it with the existing classes
+ - Integrating google maps on frontend and backend
+ - Implementing keyword search
+ - Implementing advanced search (including search by location using gmaps)
+
+To start the work is split up as follows:
+
+ - Backend for keyword search (Ian)
+ - Finalising DB schema (Leo)
+ - Frontend for search (Bryan)
+ - Booking backend (Ince)
+
+If this goes smoothly, we will begin the google maps integration before the end of the week. If time allows, we will also consider implementing feedback/recommendations

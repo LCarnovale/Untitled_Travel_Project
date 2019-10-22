@@ -16,3 +16,19 @@ Week 4
 
     I am working on flask and helping with the backend if needed.
     Aiming to have a minimal working backend version by next week.
+
+Week 5
+    Worked on setting up an Azure cloud storage database and server.
+
+    Over the week I got a cloud storage service working and running and am now
+    in the process of connecting to it through various api's from a python
+    backend. 
+
+    By Friday's meeting I have got an SQL database setup and have been able to
+    read and write to the databse manually from my computer. Now working on
+    modifying the database programatically.
+
+Week 6
+    Got a functioning database api that can connect to the database when run from the
+    azure cloud based virtual machine. Now we need to complete the database and work
+    on functions for querying it.
