@@ -1,12 +1,44 @@
 {% extends "base.html" %}
 {% block head %}
 	<title>Untitled Travels</title>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+      $(function() {
+        $("#startdate").datepicker();
+		$("#enddate").datepicker();
+      });
+    </script>
 {% endblock %}
 
 {% block content %}
+	<script>
+	function myFunction() {
+	  var x = document.getElementById("advancesearch");
+	  if (x.style.display === "none") {
+		x.style.display = "block";
+	  } else {
+		x.style.display = "none";
+	  }
+	}
+	</script>
+	
     <p> <img src = "/static/nsw1.png"  > </p>
 	<form name = 'search' method = 'POST' >
 		<input type = "text" placeholder = "Search..">
 		<button type = "submit">Submit</button>
 	</form>
+	<br><br>
+	<p><button onclick="myFunction()">Advance Search</button></p>
+	<div id = advancesearch style = "display:none;">
+		<form name = advancesearch>
+			Start date: <input type="text" id="startdate" name = "startdate">
+			End date: <input type="text" id="enddate" name = "enddate">
+			Beds: <input type= "number" name = "beds" max = "5" min = "1">
+			Bathrooms: <input type= "number" name = "bathrooms" max  = "5" min = "1" >
+			Parking Spaces: <input type= "number" name = "bathrooms" max  = "3" min = "0" >
+			
+		</form>
+	</div>
 {% endblock %}

@@ -19,6 +19,25 @@ def home():
 
     return render_template('home.html')
 
+'''
+Login page
+'''
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        pass
+
+    return render_template('login.html')
+
+'''
+Signup page
+'''
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        pass
+
+    return render_template('signup.html')
 
 '''
 Main Booking page

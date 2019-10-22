@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Post Accommodation</title>
+{% endblock %}
+
+{% block content %}
+	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+	<h2> Please enter your details: </h2>
+	<form name='post_ad' id = "regForm" method='POST'>
+		<div class = "tab">Personal Details
+			<p><input name = "account_fname" placeholder = "First Name" class = "required"></p>
+			<p><input name = "account_lname" placeholder = "Last Name" class = "required"></p>
+			<p><input name = "account_dob" placeholder = "Date Of Birth" class = "required" type = "date"></p>
+		</div> 
+		<div class = "tab">
+			<p><input name = "account_username" placeholder = "Username" class = "required"></p>
+			<p><input name = "account_email" placeholder = "Email" type = "email" class = "required"></p>
+			<p><input name = "account_phone" placeholder = "Mobile" class = "required"></p>
+		</div>
+		<div style="overflow:auto;">
+			<div style="float:right;">
+				<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+				<button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+			</div>
+		</div>
+		<div style="text-align:center;margin-top:40px;">
+			<span class="step"></span>
+			<span class="step"></span>
+		</div>
+	</form>
+
+	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
+{% endblock %}
