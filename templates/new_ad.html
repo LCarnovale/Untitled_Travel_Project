@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block head %}
 	<title>Post Accommodation</title>
+	<style>#map {
+        height: 400px;
+		width: 400px;
+		margin-left: auto;
+		margin-right: auto;
+      }</style>
 {% endblock %}
 
 {% block content %}
@@ -13,7 +19,11 @@
 			<p><input name = "acc_nbed" placeholder = "Beds" class = "required" type = number></p>
 			<p><input name = "acc_nbath" placeholder = "Bathrooms" class = "required" type = number></p>
 			<p><input name = "acc_details" placeholder = "Additional details"></p>		
-		</div> 
+		</div>
+		<div class = "tab">Location Details
+			<p><input name = "acc_location" id = "hiddenlocation" class = "required" type = "hidden"></p>
+			<div id="map"></div>
+		</div>		
 		<div class = "tab">Owner Details
 			<p><input name = "own_name" placeholder = "Name" class = "required"></p>
 			<p><input name = "own_email" placeholder = "Email" type = "email" class = "required"></p>
@@ -28,6 +38,7 @@
 			<p><input name = "max_stay" placeholder = "Max. Stay" type = number></p>
 			<p><input name = "stay_details" placeholder = "Additional Details"></p>
 		</div>
+		
 		<div style="overflow:auto;">
 			<div style="float:right;">
 				<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
@@ -38,8 +49,30 @@
 			<span class="step"></span>
 			<span class="step"></span>
 			<span class="step"></span>
+			<span class="step"></span>
 		</div>
 	</form>
-
+	<script>
+      var map;
+	  var markerlist = [];
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -33.91538902145825 , lng: 151.11207767686824},
+          zoom: 13
+        });
+		google.maps.event.addListener(map, 'click', function( event ){
+			document.getElementById("hiddenlocation").value = event.latLng.lat()+", "+event.latLng.lng();
+			
+			for (i = 0;i<markerlist.length;i++){
+				markerlist[i].setMap(null);
+			}
+			var marker = new google.maps.Marker({position: event.latLng, map: map});
+			markerlist.push(marker)
+});
+			
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"
+    async defer></script>
 	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
 {% endblock %}

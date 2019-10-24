@@ -47,29 +47,47 @@
 			<br><br><br>
 			Location:
 			<input type = "hidden" name = "location" id = "hiddenlocation">
+			<br>
+			Distance Radius:<output name="radiusrange" id="radiusrange">100</output> m
+			<br>
+			<input type = "range" name= "distance" id = "radiuschange" min = "100" max = "2000" value = "100" oninput = "changeCircle(this.value)">
 			<div id="map"></div>
 		<div >	
 	</form>
 	
     <script>
-      var map;
-	  var markerlist = [];
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -33.91538902145825 , lng: 151.11207767686824},
-          zoom: 13
-        });
-		google.maps.event.addListener(map, 'click', function( event ){
-			document.getElementById("hiddenlocation").value = event.latLng.lat()+", "+event.latLng.lng();
-			console.log(markerlist); 
-			for (i = 0;i<markerlist.length;i++){
-				markerlist[i].setMap(null);
-			}
-			var marker = new google.maps.Marker({position: event.latLng, map: map});
-			markerlist.push(marker)
-});
+		var map;
+		var markerlist = [];
+		var circlelist = [];
+	
+		function initMap() {
+			map = new google.maps.Map(document.getElementById('map'), {
+			  center: {lat: -33.91538902145825 , lng: 151.11207767686824},
+			  zoom: 13
+			});
+			google.maps.event.addListener(map, 'click', function( event ){
+				document.getElementById("hiddenlocation").value = event.latLng.lat()+", "+event.latLng.lng();
+				
+				for (i = 0;i<markerlist.length;i++){
+					markerlist[i].setMap(null);
+					circlelist[i].setMap(null);
+				}
+				var marker = new google.maps.Marker({position: event.latLng, map: map});
+				markerlist.push(marker)
+				var circle = new google.maps.Circle({map: map, radius: parseInt(document.getElementById("radiuschange").value), fillColor: '#AA0000'});
+				circle.bindTo('center', marker, 'position');
+				circlelist.push(circle)
+			});
 			
-      }
+		}
+		function changeCircle(newval){
+			document.getElementById("radiusrange").value = newval;
+			for (i = 0;i<circlelist.length;i++){
+				if(circlelist[i]==null)
+					continue;
+				circlelist[i].setRadius(parseInt(newval));
+			}
+		}
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"
     async defer></script>
