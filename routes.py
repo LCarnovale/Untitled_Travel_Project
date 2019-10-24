@@ -96,8 +96,8 @@ def ad_main():
         addr = Address(request.form['acc_addr'])
 
         # Make a stay class
-        stay = StayDetails(request.form['price'], request.form['avail_start'],
-                        request.form['avail_end'], request.form['min_stay'],
+        stay = StayDetails(request.form['price'], request.form['avail_date'],
+                        request.form['min_stay'],
                         request.form['max_stay'], request.form['stay_details'])
         # Make an accommodation class
         acc = Accommodation(request.form['acc_name'], addr,

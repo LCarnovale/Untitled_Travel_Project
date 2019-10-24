@@ -44,12 +44,6 @@ class Accommodation:
     def getPrice(self):
         return self._stayDetails.getPrice()
 
-    def getAvailStart(self):
-        return self._stayDetails.getAvailStart()
-
-    def getAvailEnd(self):
-        return self._stayDetails.getAvailEnd()
-
     def getMinStay(self):
         return self._stayDetails.getMinStay()
 
@@ -61,11 +55,19 @@ class Accommodation:
 
     # True if not booked and in availability period, otherwise False
     def isAvailable(self):
-        #TODO
-        return True
+        return self._stayDetails.isAvailable()
 
     def getDesc(self):
         return self._details
+
+    def getDates(self):
+        return self._stayDetails.getDates()
+
+    def getAvailStart(self):
+        pass
+
+    def getAvailEnd(self):
+        pass
 
 
 
