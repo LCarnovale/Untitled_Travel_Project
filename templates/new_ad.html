@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block head %}
-	<title>Post Accommodation</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  	<link rel="stylesheet" href="/resources/demos/style.css">
+  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script  src = "{{ url_for('static',filename = 'multidatespicker.js')}}"></script>
+	<script  src = "{{ url_for('static',filename = 'calendar.js')}}"></script>
 {% endblock %}
 
 {% block content %}
@@ -22,8 +30,11 @@
 		</div>
 		<div class = "tab">Stay Details
 			<p><input name = "price" placeholder = "Price" class = "required" type = number step = 0.01></p>
-			<p><input name = "avail_start" placeholder = "Start Availability" class = "required" type = date></p>
-			<p><input name = "avail_end" placeholder = "End Availability" class = "required" type = date></p>
+
+			<p>Date: <input name="avail_date" type="text" id="avail_date">
+				<button type="button" id="reset">Reset</button>
+			</p>
+
 			<p><input name = "min_stay" placeholder = "Min. Stay" type = number></p>
 			<p><input name = "max_stay" placeholder = "Max. Stay" type = number></p>
 			<p><input name = "stay_details" placeholder = "Additional Details"></p>
@@ -42,4 +53,7 @@
 	</form>
 
 	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
+
+
+
 {% endblock %}
