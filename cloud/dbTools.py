@@ -60,18 +60,24 @@ class _FailedConnectionHandler:
     The return values are based on the context they will be used in.
     """
     def __getattr__(self, attr):
-        return lambda *x: (-1, None)
+        return None
 
-    def __getitem__(self, item):
-        return 0
+    def execute(self, *args, **kwargs):
+        return self
+
+    def _default(self):
+        return None
+
+    commit = _default
+    close  = _default
+    fetchone = _default
+    fetchall = _default
 
 class _UninitialisedConnectionHandler:
     def __getattr__(self, attr):
         print("Connection has not been established yet. Call dbTools.init() to connect.")
-        return _FailedConnectionHandler.__getattr__(self, attr)
-    def __getitem__(self, item):
-        print("Connection has not been established yet. Call dbTools.init() to connect.")
-        return _FailedConnectionHandler.__getitem__(self, item)
+        return _FailedConnectionHandler.__getattribute__(self, attr)
+    
 
 
 
@@ -82,11 +88,9 @@ def init():
     """
     Establish a connection to the database. This must be called
     before any other methods can be used. 
-    If a connection can not
-    be established then a FailedConnectionHandler will be used instead,
-    which will give the same default value of (-1, None) when any
-    attribute is requested from it. (the default value was picked to work
-    best in the context of all the other functions in the module.)
+    If a connection can not be established then a FailedConnectionHandler 
+    will be used instead, which is designed to handle the same requests as
+    a cursor but instead will safely fail for all requests. 
     """
     global cursor
     global is_connected
@@ -134,7 +138,6 @@ def get_user(id):
     """
     cursor.execute("SELECT * FROM Users WHERE id=?", id)
     result = cursor.fetchone()
-    # if result is None:
     return result
 
 def get_user_from_uname(userName):
@@ -204,7 +207,11 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
         print("Duplicate username on insert.")
         raise e
 
-    return int(cursor.fetchone()[0]) 
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
 
 def insert_owner(name, userName, password, email=None, phone=None, description=None):
     """
@@ -226,7 +233,11 @@ def insert_owner(name, userName, password, email=None, phone=None, description=N
         print("Duplicate username on insert.")
         raise e
 
-    return int(cursor.fetchone()[0]) 
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
 
 def insert_booking(venueid, userid, startDate, endDate):
     """
@@ -250,7 +261,11 @@ def insert_booking(venueid, userid, startDate, endDate):
         print("Invalid venueid or userid on insert.")
         raise e
     
-    return int(cursor.fetchone()[0]) 
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
     
 def insert_venue(ownerid, addressid, name, bedCount, bathCount, 
         carCount, description, rate, availStart, availEnd,
@@ -288,7 +303,11 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
     except pyodbc.IntegrityError as e:
         print("Invalid venueid or userid on insert.")
         raise e
-    return int(cursor.fetchone()[0]) 
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
 
 def insert_address(location):
     """
@@ -298,7 +317,12 @@ def insert_address(location):
     """
     cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.id VALUES (?)", location)
 
-    return int(cursor.fetchone()[0]) 
+
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
 
 def check_user_pass(username, password_text):
     """

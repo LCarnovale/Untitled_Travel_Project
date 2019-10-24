@@ -63,7 +63,9 @@ def signup():
 
         if uid is not None:
             print("User successfully added.")
-            
+        else:
+            print("User insert failed.")
+
 
     return render_template('signup.html')
 
