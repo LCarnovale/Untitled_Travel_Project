@@ -4,13 +4,14 @@ from src.accommodationSystem import AccommodationSystem
 from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
+import src.userSystem
 from server import accSystem
 from server import userSystem
 from server import app
-import cloud.dbTools as dbTools
+import cloud.dbTools as db
 
 default_kwargs = {
-    "is_connected": dbTools.is_connected,
+    "is_connected": db.is_connected,
 }
 
 @app.errorhandler(404)
@@ -34,7 +35,12 @@ Login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        pass
+        # Attempt a Login
+        result = db.check_user_pass(request.form['username'], request.form['password'])
+        if result is None:
+            print("Login failed")
+        else:
+            print(f"Log in for {result[1]} ({result[2]}) successful.")
 
     return render_template('login.html')
 
@@ -44,7 +50,20 @@ Signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        pass
+        # Create user.
+        form = request.form
+        uid = src.userSystem.create_user(
+            form['account_name'],
+            form['account_username'],
+            form['account_password'],
+            form['account_email'],
+            form['account_phone'],
+            form['account_description']
+        )
+
+        if uid is not None:
+            print("User successfully added.")
+            
 
     return render_template('signup.html')
 

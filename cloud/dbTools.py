@@ -1,9 +1,11 @@
 """
 This module handles all interaction with the database.
 
-Table structures:
-
-VenuDB:
+Table structures: 
+    Indexes match the index of values in the rows
+    returned for each table. ie, when calling get_user(n),
+    a row from the user table will be returned, which will be 
+    a tuple of values in the order shown below.
 
     Venue:
     0   id            int           Identity   PRIMARY KEY
@@ -28,6 +30,7 @@ VenuDB:
     3   email        varchar(100)
     4   phone        varchar(20)
     5   description  text
+    6   pwdhash      bytes
 
     Addresses:
     0   id          int        Identity  PRIMARY KEY
@@ -49,33 +52,42 @@ VenuDB:
 # object. You will probably want to instead return None in these cases.  
 ########
 
-"""
-This handles making calls to cursor when a connection was not made.
-This is useful for development and debugging but a failed connection
-will be a genuine problem if it occurs on the main server.
-The return values are based on the context they will be used in.
-"""
-class FailedConnectionHandler:
+class _FailedConnectionHandler:
+    """
+    This handles making calls to cursor when a connection was not made.
+    This is useful for development and debugging but a failed connection
+    will be a genuine problem if it occurs on the main server.
+    The return values are based on the context they will be used in.
+    """
     def __getattr__(self, attr):
-        return lambda *x: None
+        return lambda *x: (-1, None)
 
     def __getitem__(self, item):
         return 0
 
-class UninitialisedConnectionHandler:
+class _UninitialisedConnectionHandler:
     def __getattr__(self, attr):
         print("Connection has not been established yet. Call dbTools.init() to connect.")
-        return FailedConnectionHandler.__getattr__(self, attr)
+        return _FailedConnectionHandler.__getattr__(self, attr)
     def __getitem__(self, item):
         print("Connection has not been established yet. Call dbTools.init() to connect.")
-        return FailedConnectionHandler.__getitem__(self, item)
+        return _FailedConnectionHandler.__getitem__(self, item)
 
 
 
-cursor = UninitialisedConnectionHandler()
+cursor = _UninitialisedConnectionHandler()
 is_connected = False
-pyodbc = FailedConnectionHandler()
+pyodbc = _FailedConnectionHandler()
 def init():
+    """
+    Establish a connection to the database. This must be called
+    before any other methods can be used. 
+    If a connection can not
+    be established then a FailedConnectionHandler will be used instead,
+    which will give the same default value of (-1, None) when any
+    attribute is requested from it. (the default value was picked to work
+    best in the context of all the other functions in the module.)
+    """
     global cursor
     global is_connected
     try: 
@@ -83,7 +95,7 @@ def init():
         cnxn = connect_config.get_connection()
     except:
         print("Unable to connect to database. Function calls will do nothing.")
-        cursor = FailedConnectionHandler()
+        cursor = _FailedConnectionHandler()
     else:
         print("Successfully connected to database.")
         cursor = cnxn.cursor()
@@ -96,7 +108,9 @@ def close():
     Other programs might have trouble connecting to the database
     with two connections open.
     """
+    global cursor
     cursor.close()
+    cursor = _UninitialisedConnectionHandler()
 
 def commit():
     """
@@ -132,7 +146,6 @@ def get_user_from_uname(userName):
     result = cursor.fetchone()
     return result
 
-
 def get_owner(id):
     """
     Return an owner with the matching id.
@@ -141,7 +154,6 @@ def get_owner(id):
     """
     cursor.execute("SELECT * FROM Owners WHERE id=?", id)
     return cursor.fetchone()
-    
 
 def get_venue(id):
     """
@@ -164,9 +176,11 @@ def get_address(id):
     cursor.execute("SELECT * FROM Addresses WHERE id=?", id)
     return cursor.fetchone()
 
-def insert_user(name, userName, email=None, phone=None, description=None):
+def insert_user(name, userName, password, email=None, phone=None, description=None):
     """
     Insert a user into the database with the given details. 
+    Give the raw text password and the SHA2_512 hash will be stored,
+    calculated with HASHBYTES('SHA2_512', '<password>').
 
     Attempting to add duplicate usernames raises a pyodbc.IntegrityError.
 
@@ -182,9 +196,9 @@ def insert_user(name, userName, email=None, phone=None, description=None):
     #  description  text 
     try:
         cursor.execute(
-            "INSERT INTO Users (name, userName, email, phone, description)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?)", 
-            (name, userName, email, phone, description)
+            "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
+            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            (name, userName, email, phone, description, password)
         )
     except pyodbc.IntegrityError as e:
         print("Duplicate username on insert.")
@@ -192,9 +206,11 @@ def insert_user(name, userName, email=None, phone=None, description=None):
 
     return int(cursor.fetchone()[0]) 
 
-def insert_owner(name, userName, email=None, phone=None, description=None):
+def insert_owner(name, userName, password, email=None, phone=None, description=None):
     """
     Insert an owner into the database with the given details. 
+    Give the raw text password and the SHA2_512 hash will be stored,
+    calculated with HASHBYTES('SHA2_512', '<password>').
 
     Attempting to add duplicate usernames raises a pyodbc.IntegrityError.
 
@@ -202,8 +218,9 @@ def insert_owner(name, userName, email=None, phone=None, description=None):
     """
     try:
         cursor.execute(
-            "INSERT INTO Owners (name, userName, email, phone, description)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?)", (name, userName, email, phone, description)
+            "INSERT INTO Owners (name, userName, email, phone, description, pwdhash)   \
+            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            (name, userName, email, phone, description, password)
         )
     except pyodbc.IntegrityError as e:
         print("Duplicate username on insert.")
@@ -283,17 +300,42 @@ def insert_address(location):
 
     return int(cursor.fetchone()[0]) 
 
+def check_user_pass(username, password_text):
+    """
+    Search users for a user with the matching username and password.
+    
+    If username and password match, return that row.
+    Otherwise return None.
+    """
+
+    cursor.execute("SELECT * FROM Users \
+        WHERE userName=? AND pwdhash=HASHBYTES('SHA2_512', ?)", (username, password_text))
+    
+    return cursor.fetchone()
+
+def check_owner_pass(username, password_text):
+    """
+    Search owners for an owner with the matching username and password.
+    
+    If username and password match, return that row.
+    Otherwise return None.
+    """
+
+    cursor.execute("SELECT * FROM Owners \
+        WHERE userName=? AND pwdhash=HASHBYTES('SHA2_512', ?)", (username, password_text))
+    
+    return cursor.fetchone()
+
 def select_venues(**patterns):
     """
     Provide patterns of the form {"column":"pattern"} 
     referring to the following fields,
     and a query will be constructed like:
 
-    ```SQL
         SELECT * FROM Venues WHERE 
         column1 LIKE pattern1 AND
         column2 LIKE pattern2 ...
-    ```    
+        
     For example: 
         select_venues(name="test%", details="%d%") 
     will return all venues with names starting with test,
@@ -335,10 +377,10 @@ def select_bookings(**patterns):
     referring to the following fields,
     and a query will be constructed like:
     
-    SELECT * FROM Bookings 
-    WHERE 
-    column1 LIKE pattern1 AND
-    column2 LIKE pattern2 ...
+        SELECT * FROM Bookings 
+        WHERE 
+        column1 LIKE pattern1 AND
+        column2 LIKE pattern2 ...
 
     See https://www.w3schools.com/sql/sql_like.asp for 
     information on patterns.
