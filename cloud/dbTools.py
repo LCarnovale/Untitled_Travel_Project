@@ -8,7 +8,7 @@ Table structures:
     a tuple of values in the order shown below.
 
     Venue:
-    0   id            int           Identity   PRIMARY KEY
+    0   venueid       int           Identity   PRIMARY KEY
     1   ownerid       int           not null   FK -> Owners(id)
     2   addressid     int           not null   FK -> Addresses(id)
     3   name          varchar(200)  not null
@@ -19,25 +19,25 @@ Table structures:
     8   rate          smallmoney
     9   availStart    date
     10  availEnd      date
-    11  minStay       int           DEFAULT 1
+    11  minStay       int
     12  maxStay       int
     13  details       text
 
     Owners and Users:
-    0   id           int          Identity   PRIMARY KEY
-    1   name         varchar(50)  not null
-    2   userName     varchar(50)             UNIQUE
-    3   email        varchar(100)
-    4   phone        varchar(20)
-    5   description  text
-    6   pwdhash      bytes
+    0   ownerid/userid  int          Identity   PRIMARY KEY
+    1   name            varchar(50)  not null
+    2   userName        varchar(50)             UNIQUE
+    3   email           varchar(100)
+    4   phone           varchar(20)
+    5   description     text
+    6   pwdhash         bytes
 
     Addresses:
-    0   id          int        Identity  PRIMARY KEY
+    0   aid         int        Identity  PRIMARY KEY
     1   location    text
 
     Bookings:
-    0   id          int        Identity  PRIMARY KEY
+    0   bookid      int        Identity  PRIMARY KEY
     1   venueid     int        not null  FK -> Venues(id)
     2   userid      int        not null  FK -> Users(id)
     3   startDate   date       not null
@@ -77,13 +77,11 @@ class _UninitialisedConnectionHandler:
     def __getattr__(self, attr):
         print("Connection has not been established yet. Call dbTools.init() to connect.")
         return _FailedConnectionHandler.__getattribute__(self, attr)
-    
-
-
 
 cursor = _UninitialisedConnectionHandler()
 is_connected = False
 pyodbc = _FailedConnectionHandler()
+
 def init():
     """
     Establish a connection to the database. This must be called
@@ -97,7 +95,13 @@ def init():
     try: 
         import connect_config
         cnxn = connect_config.get_connection()
-    except:
+    except Exception as e:
+        if ("IP address" in str(e)): 
+            # Could check for this exception properly with pyodbc.ProgrammingError,
+            # but pyodbc may not be installed.
+            msg = str(e).split("IP address '")[1]
+            msg = msg.split("' is not")[0]
+            print("Your ip (" + msg + ") was not allowed.")
         print("Unable to connect to database. Function calls will do nothing.")
         cursor = _FailedConnectionHandler()
     else:
@@ -200,7 +204,7 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
     try:
         cursor.execute(
             "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            OUTPUT INSERTED.userid VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
     except pyodbc.IntegrityError as e:
@@ -226,7 +230,7 @@ def insert_owner(name, userName, password, email=None, phone=None, description=N
     try:
         cursor.execute(
             "INSERT INTO Owners (name, userName, email, phone, description, pwdhash)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            OUTPUT INSERTED.ownerid VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
     except pyodbc.IntegrityError as e:
@@ -256,7 +260,7 @@ def insert_booking(venueid, userid, startDate, endDate):
     #  endDate     date       not null
     try:
         cursor.execute("INSERT INTO Bookings (venueid, userid, startDate, endDate) \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
+            OUTPUT INSERTED.bookid VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
     except pyodbc.IntegrityError as e:
         print("Invalid venueid or userid on insert.")
         raise e
@@ -294,7 +298,7 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
     try:
         cursor.execute("INSERT INTO Venues (ownerid, addressid, name, bedCount, \
             bathCount, carCount, description, rate, availStart, availEnd,       \
-            minStay, maxStay, details) OUTPUT INSERTED.id                       \
+            minStay, maxStay, details) OUTPUT INSERTED.venueid                       \
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
             (ownerid, addressid, name, bedCount, bathCount, 
             carCount, description, rate, availStart, availEnd,
@@ -315,7 +319,7 @@ def insert_address(location):
 
     Return the id of the inserted address.
     """
-    cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.id VALUES (?)", location)
+    cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.aid VALUES (?)", location)
 
 
     res = cursor.fetchone()
@@ -359,6 +363,8 @@ def select_venues(**patterns):
         SELECT * FROM Venues WHERE 
         column1 LIKE pattern1 AND
         column2 LIKE pattern2 ...
+
+    Returns a list of matching rows.    
         
     For example: 
         select_venues(name="test%", details="%d%") 
@@ -369,7 +375,7 @@ def select_venues(**patterns):
     information on patterns.
 
     Available fields:
-        id            int          
+        venueid       int          
         ownerid       int          
         addressid     int          
         name          varchar(200) 
@@ -406,11 +412,13 @@ def select_bookings(**patterns):
         column1 LIKE pattern1 AND
         column2 LIKE pattern2 ...
 
+    Returns a list of matching rows.
+
     See https://www.w3schools.com/sql/sql_like.asp for 
     information on patterns.
 
     Available fields:
-        id          int    
+        bookid      int    
         venueid     int    
         userid      int    
         startDate   date   

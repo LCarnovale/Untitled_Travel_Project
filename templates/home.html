@@ -37,7 +37,7 @@
 		<input type = "text" placeholder = "Search..">
 		<button type = "submit">Submit</button>
 		<br><br>
-		<p><button type = "button" onclick="myFunction()">Advance Search</button></p>
+		<p><button type = "button" onclick="myFunction()">Advanced Search</button></p>
 		<div id = advancesearch style = "display:none;">
 			Start date: <input type="text" id="startdate" name = "startdate">
 			End date: <input type="text" id="enddate" name = "enddate">
@@ -48,7 +48,7 @@
 			Location:
 			<input type = "hidden" name = "location" id = "hiddenlocation">
 			<br>
-			Distance Radius:<output name="radiusrange" id="radiusrange">100</output> m
+			Distance Radius: <output name="radiusrange" id="radiusrange">100</output> m
 			<br>
 			<input type = "range" name= "distance" id = "radiuschange" min = "100" max = "2000" value = "100" oninput = "changeCircle(this.value)">
 			<div id="map"></div>
