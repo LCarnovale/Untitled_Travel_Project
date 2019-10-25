@@ -2,7 +2,7 @@ class NegativeNumberError(Exception):
     pass
 
 class Accommodation:
-    _id = -1
+    _id = 0
 
     def __init__(self, name, address, numBeds, numBath, owner,
                  stayDetail, details=None):
@@ -11,7 +11,8 @@ class Accommodation:
         self._owner = owner
         self._details = details
         self._stayDetails = stayDetail
-        self._id += 1
+        self._id = Accommodation._id
+        Accommodation._id += 1
 
         if int(numBeds) < 0 or int(numBath) < 0:
             raise NegativeNumberError("Please enter a positive number")
@@ -44,6 +45,12 @@ class Accommodation:
     def getPrice(self):
         return self._stayDetails.getPrice()
 
+    def getAvailStart(self):
+        return self._stayDetails.getAvailStart()
+
+    def getAvailEnd(self):
+        return self._stayDetails.getAvailEnd()
+
     def getMinStay(self):
         return self._stayDetails.getMinStay()
 
@@ -55,19 +62,11 @@ class Accommodation:
 
     # True if not booked and in availability period, otherwise False
     def isAvailable(self):
-        return self._stayDetails.isAvailable()
+        #TODO
+        return True
 
     def getDesc(self):
         return self._details
-
-    def getDates(self):
-        return self._stayDetails.getDates()
-
-    def getAvailStart(self):
-        pass
-
-    def getAvailEnd(self):
-        pass
 
 
 
