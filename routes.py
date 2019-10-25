@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, abort
 from src.accommodation import Accommodation
 from src.accommodationSystem import AccommodationSystem
 from src.address import Address
@@ -76,6 +76,9 @@ Main Booking page
 def book_main(id):
     acc = accSystem.getAcc(id)
     print(acc)
+    if acc == None:
+        abort(404)
+
     if request.method == 'POST':
         pass #TODO
 
