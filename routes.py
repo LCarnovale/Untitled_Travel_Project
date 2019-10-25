@@ -24,7 +24,10 @@ Landing page
 def home():
     
     if request.method == 'POST':
-        pass
+        search = request.form.get('search')
+        if (search):
+            results = accSystem.keywordSearch(search)
+            return render_template('search_results.html', results = results)
 
     return render_template('home.html', **default_kwargs)
 
