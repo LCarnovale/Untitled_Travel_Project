@@ -50,13 +50,20 @@
 		<div class = "tab">Location Details
 			<p><input name = "acc_location" id = "hiddenlocation" class = "required" type = "hidden"></p>
 			<div id="map"></div>
-		</div>		
+		</div>
+		{%if 'username' not in session%}
 		<div class = "tab">Owner Details
 			<p><input name = "own_name" placeholder = "Name" class = "required"></p>
 			<p><input name = "own_email" placeholder = "Email" type = "email" class = "required"></p>
 			<p><input name = "own_phone" placeholder = "Mobile" class = "required"></p>
 			<p><input name = "description" placeholder = "Owner details"></p>
 		</div>
+		{%else%}
+			<p><input name = "own_name" placeholder = "Name" class = "required" type=hidden value = '{{session["username"]}}'></p>
+			<p><input name = "own_email" placeholder = "Email" class = "required" type=hidden value = '{{session["email"]}}'></p>
+			<p><input name = "own_phone" placeholder = "Mobile" class = "required" type=hidden value = '{{session["mobile"]}}'></p>
+			<p><input name = "own_details" placeholder = "Owner details" type = "hidden"></p>
+		{%endif%}
 		<div class = "tab">Availability Details
 			<p><input name = "price" placeholder = "Price" class = "required" type = number step = 0.01></p>
 
@@ -86,7 +93,10 @@
 			<span class="step"></span>
 			<span class="step"></span>
 			<span class="step"></span>
+			
+			{%if 'username' not in session%}
 			<span class="step"></span>
+			{%endif%}
 		</div>
 	</form>
 
@@ -190,10 +200,9 @@
 		// }
 	</script>
 	<!-- Actual link: -->
-	<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" -->
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"async defer></script>
 	<!-- Use a wrong link when map isn't needed: -->
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"
-    async defer></script>
+	<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"></script> -->
 	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
 
 

@@ -40,7 +40,7 @@
             <th>Availability</th>
         </tr>
         <tr>
-            <td>${{acc.rate}}/night</td>
+            <td>${{acc.rate}} / night</td>
             <td><div id="avail_dates" align="center">
                 Fix me
             </div></td>
@@ -51,30 +51,28 @@
         </tr>
     </table>
 
-    {% if acc.isAvailable() %}
-        <p class = "good_msg">This place is currently available!</p>
-        <p> TODO: This will have more information, like choosing when the booking is and how many people are staying </p>
-        <form name='book_acc' method='POST'>
-            <table>
-            <tr>
-                <td>
-                    <p>From:</p>
-                    <p><input name = "avail_start" placeholder = "Start Availability" id = "required" type = date></p>
-                </td>
-                <td>
-                    <p>To:</p>
-			        <p><input name = "avail_end" placeholder = "End Availability" id = "required" type = date></p>
-                </td>
-            </tr>
-            </table>
-            <input type="submit" value="Book this room"/> 
-        </form>
-    {% else %}
-        <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p>
-    {% endif %}
+    <p class = "good_msg">This place is currently available!</p>
+    <p> TODO: This will have more information, like choosing when the booking is and how many people are staying </p>
+    <form name='book_acc' method='POST'>
+        <table>
+        <tr>
+            <td>
+                <p>From:</p>
+                <p><input name = "avail_start" placeholder = "Start Availability" id = "required" type = date></p>
+            </td>
+            <td>
+                <p>To:</p>
+                <p><input name = "avail_end" placeholder = "End Availability" id = "required" type = date></p>
+            </td>
+        </tr>
+        </table>
+        <input type="submit" value="Book this room"/> 
+    </form>
+
+    <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
 
 
-    {% if acc.description != null%}
+    {% if acc.ownerid %}
         <h2> About the owner </h2>
         <p> (Put owner details here) </p>
     {% endif %}
