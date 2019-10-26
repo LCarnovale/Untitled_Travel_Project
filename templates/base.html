@@ -33,6 +33,9 @@
 		form {
 			display: inline-block;
 		}
+		#hiuser{
+			color : #ffffff;
+		}
 	</style>
     {% block head %}{% endblock %}
   </head>
@@ -51,7 +54,9 @@
 		  <ul>
 			<li><a href="{{url_for('book_main', id=id)}}">Booking</a></li>
 			<li><a href="{{url_for('ad_main')}}">Post Ad</a></li>
-			<li style= "float:right"> <a href="{{url_for('login')}}">Login</a></li>
+			{% if 'username' in session %}<li style= "float:right"><a href="{{url_for('login')}}">Logout</a></li>
+			<li style= "float:right"><a href="{{url_for('login')}}">Edit Profile</a></li>
+			{%else%}<li style= "float:right"> <a href="{{url_for('login')}}">Login</a></li>{%endif%}
 		  </ul>
 		</div>
 	  </div>

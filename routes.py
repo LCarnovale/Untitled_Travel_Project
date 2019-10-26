@@ -1,4 +1,5 @@
-from flask import render_template, request, redirect, abort
+from flask import render_template, request, redirect, abort, flash, session
+from flask_login import LoginManager,login_user
 from src.accommodation import Accommodation
 from src.accommodationSystem import AccommodationSystem
 from src.address import Address
@@ -13,7 +14,7 @@ import cloud.dbTools as db
 default_kwargs = {
     "is_connected": db.is_connected,
 }
-
+	
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html', **default_kwargs)
@@ -34,15 +35,25 @@ Login page
 '''
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        # Attempt a Login
-        result = db.check_user_pass(request.form['username'], request.form['password'])
-        if result is None:
-            print("Login failed")
-        else:
-            print(f"Log in for {result[1]} ({result[2]}) successful.")
+	if request.method == 'POST':
+	# Attempt a Login
+	#result = db.check_user_pass(request.form['username'], request.form['password'])
+	#if result is None:
+	#    print("Login failed")
+	#else:
+	#    print(f"Log in for {result[1]} ({result[2]}) successful.")
+		if request.form['password'] == 'admin' and request.form['username'] == 'admin':
+			user = User(
+				"admin",
+				"admin@temp.com",
+				"0456123456",
+			)
+			session['username'] = user._name
+			session['email'] = user._email
+			session['mobile']=user._mobile
+			session['id'] = user._id
 
-    return render_template('login.html')
+	return render_template('login.html')
 
 '''
 Signup page

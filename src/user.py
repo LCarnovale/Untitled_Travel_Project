@@ -12,7 +12,7 @@ class User:
         self._addr = addr
         self._id += 1
         self._bookings = []
-
+        self._authenticated = False
         if self.checkEmail(email) is None:
             raise EmailError("Please enter a valid email address")
         else:
