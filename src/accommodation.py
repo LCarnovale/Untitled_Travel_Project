@@ -23,8 +23,6 @@ class Accommodation:
         self._car_count,       \
         self._description,     \
         self._rate,            \
-        self._avail_start,     \
-        self._avail_end,       \
         self._min_stay,        \
         self._max_stay,        \
         self._details =     args
@@ -37,6 +35,13 @@ class Accommodation:
         if self._car_count < 0:
             raise NegativeNumberError("Invalid car count")
         
+    def getDates(self):
+        # TODO
+        return None
+
+    def isAvailable(self, startDate, endDate=None):
+        # TODO
+        return True
 
     '''
     Properties
@@ -73,14 +78,6 @@ class Accommodation:
     @property
     def rate(self):
         return self._rate
-
-    @property
-    def avail_start(self):
-        return self._avail_start
-
-    @property
-    def avail_end(self):
-        return self._avail_end
 
     @property
     def min_stay(self):

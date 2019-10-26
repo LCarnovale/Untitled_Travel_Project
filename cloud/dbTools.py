@@ -1,3 +1,5 @@
+import pyodbc
+
 """
 This module handles all interaction with the database.
 
@@ -17,11 +19,15 @@ Table structures:
     6   carCount      tinyint
     7   description   text
     8   rate          smallmoney
-    9   availStart    date
-    10  availEnd      date
-    11  minStay       int
-    12  maxStay       int
-    13  details       text
+    9   minStay       int
+    10  maxStay       int
+    11  details       text
+
+    Availabilities:
+    0   avId          int        Identity  PRIMARY KEY
+    1   venueid       int                  FK -> Venues(id)
+    2   startDate     date
+    3   endDate       date
 
     Owners and Users:
     0   ownerid/userid  int          Identity   PRIMARY KEY
@@ -85,7 +91,6 @@ class _UninitialisedConnectionHandler(_FailedConnectionHandler):
 
 cursor = _UninitialisedConnectionHandler()
 is_connected = False
-pyodbc = _FailedConnectionHandler()
 
 def init():
     """
@@ -112,7 +117,6 @@ def init():
     else:
         print("Successfully connected to database.")
         cursor = cnxn.cursor()
-        pyodbc = connect_config.pyodbc
         is_connected = True
 
 def close():
@@ -167,6 +171,13 @@ def get_owner(id):
     cursor.execute("SELECT * FROM Owners WHERE ownerid=?", id)
     return cursor.fetchone()
 
+def get_owner_from_uname(userName):
+    """
+    Return an owner matching the given userName.
+    """
+    cursor.execute("SELECT * FROM Owners WHERE userName=?", userName)
+    return cursor.fetchone()
+
 def get_venue(id):
     """
     Return a venue with the matching id.
@@ -187,6 +198,33 @@ def get_address(id):
     """
     cursor.execute("SELECT * FROM Addresses WHERE aid=?", id)
     return cursor.fetchone()
+
+def get_availability(id):
+    """
+    Get an availability matching the given id.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE avId=?", id)
+    return cursor.fetchone()
+
+def get_overlapping_availability(startDate, endDate):
+    """
+    Get all availabilities that contain the given period in their
+    start and end dates.
+    Returns a list of availability rows.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE \
+        startDate<? AND endDate>?", (startDate, endDate))
+    return cursor.fetchall()
+
+def get_overlapping_availability_venue(venueid, startDate, endDate):
+    """
+    Get availabilities that contain the given period in their
+    start and end dates for a given venue id.
+    Returns a list of availability rows.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE \
+        venueid=? AND startDate<? AND endDate>?", (venueid, startDate, endDate))
+    return cursor.fetchall()
 
 def insert_user(name, userName, password, email=None, phone=None, description=None):
     """
@@ -276,9 +314,9 @@ def insert_booking(venueid, userid, startDate, endDate):
     else:
         return None
     
-def insert_venue(ownerid, addressid, name, bedCount, bathCount, 
-        carCount, description, rate, availStart, availEnd,
-        minStay, maxStay, details):
+def insert_venue(ownerid, addressid, name, bedCount, bathCount,
+                 carCount, description, rate,
+                 minStay, maxStay, details):
     """
     Insert a venue.
     ** Dates should be type datetime.date
@@ -295,18 +333,16 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
     # carCount      tinyint
     # description   text
     # rate          smallmoney
-    # availStart    date
-    # availEnd      date
     # minStay       int           DEFAULT 1
     # maxStay       int
     # details       text
     try:
-        cursor.execute("INSERT INTO Venues (ownerid, addressid, name, bedCount, \
-            bathCount, carCount, description, rate, availStart, availEnd,       \
-            minStay, maxStay, details) OUTPUT INSERTED.venueid                       \
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-            (ownerid, addressid, name, bedCount, bathCount, 
-            carCount, description, rate, availStart, availEnd,
+        cursor.execute("INSERT INTO Venues (ownerid, addressid, name,     \
+            bedCount, bathCount, carCount, description, rate, minStay,    \
+            maxStay, details) OUTPUT INSERTED.venueid                     \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (ownerid, addressid, name, bedCount, bathCount,
+            carCount, description, rate,
             minStay, maxStay, details)
         )
     except pyodbc.IntegrityError as e:
@@ -324,8 +360,8 @@ def update_venue(venueid, *args):
     and all arguments used in insert_venue(...)
     and the id of the venue to be updated (venueid).
     """
-    if len(args) != 13:
-        raise ArgumentException("Expected 14 arguments, got " + (1 + len(args)))
+    if len(args) != 10:
+        raise ArgumentException("Expected 11 arguments, got " + str(1 + len(args)))
     query = """UPDATE Venues SET 
     ownerid      = ?,
     addressid    = ?,
@@ -335,8 +371,6 @@ def update_venue(venueid, *args):
     carCount     = ?,
     description  = ?,
     rate         = ?,
-    availStart   = ?,
-    availEnd     = ?,
     minStay      = ?,
     maxStay      = ?,
     details      = ?
@@ -353,6 +387,20 @@ def insert_address(location):
     cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.aid VALUES (?)", location)
 
 
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
+
+def insert_availability(venueid, startDate, endDate):
+    """
+    Insert an availability and return the id of the new availability.
+    """
+    cursor.execute(
+        "INSERT INTO Availabilities (venueid, startDate, endDate) OUTPUT INSERTED.avId VALUES (?, ?, ?)", (
+            venueid, startDate, endDate)
+    )
     res = cursor.fetchone()
     if res is not None:
         return int(res[0])

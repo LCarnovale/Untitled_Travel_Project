@@ -35,11 +35,11 @@ class AccommodationSystem:
         Takes the arguments for a venue defined in dbTools.py, excluding venueid.        
         """
         # args = (ownerid, addressid, name, bedCount,
-        #         bathCount, carCount, description, rate, availStart,
-        #         availEnd, minStay, maxStay, details)                
+        #         bathCount, carCount, description, rate, minStay, maxStay, details)                
         new_venueid = db.insert_venue(*args)
         new_venue = Accommodation(*args)
         self.addAcc(new_venueid, new_venue)
+        return new_venueid
 
     def clean_system(self):
         """Remove all stored venues (Not from database)"""

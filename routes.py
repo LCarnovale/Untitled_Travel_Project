@@ -75,7 +75,6 @@ Main Booking page
 @app.route('/book/<id>', methods=['GET', 'POST'])
 def book_main(id):
     acc = accSystem.getAcc(id)
-    print(acc)
     if acc == None:
         abort(404)
 
@@ -92,24 +91,51 @@ Main Post accommodation page
 @app.route('/post_ad', methods=['GET', 'POST'])
 def ad_main():
     if request.method == "POST":
-        # Make an owner class
-        owner = User(request.form['own_name'], request.form['own_email'],
-                    request.form['own_phone'], request.form['own_details'])
-        # Make an address class
-        addr = Address(request.form['acc_addr'])
+        form = request.form
+        # form elements:
+        # acc_name
+        # acc_addr
+        # acc_nbed
+        # acc_nbath
+        # acc_ncar
+        # acc_details
+        # acc_location
+        # own_name
+        # own_email
+        # own_phone
+        # description
+        # price
+        # dateCount 
+        # dateRange_0
+        # dateRange_1 ... (up to dateCount - 1)
+        # min_stay
+        # max_stay
+        # details
 
-        # Make a stay class
-        stay = StayDetails(request.form['price'], request.form['avail_date'],
-                        request.form['min_stay'],
-                        request.form['max_stay'], request.form['stay_details'])
-        # Make an accommodation class
-        acc = Accommodation(request.form['acc_name'], addr,
-                        request.form['acc_nbed'], request.form['acc_nbath'],owner, stay, request.form['acc_details'],)
-        # Add the accommodation into the system
-        accSystem.addAcc(acc)
-        # Add the user into the system
-        userSystem.addUser(owner)
-        return render_template('ad_confirm.html', id=acc.getID())
+        # Find owner:
+        # (We haven't asked for enough info, pick a test owner)
+        owner = db.get_owner(1)
+        # Create Address info:
+        aid = db.insert_address(form['acc_location'])
+
+        # Send to accommodationSystem
+        venueid = accSystem.create_accomodation(
+            int(owner[0]),         int(aid),               form['acc_name'], 
+            int(form['acc_nbed']), int(form['acc_nbath']), int(form['acc_ncar']), 
+            form['description'],   float(form['price']),   int(form['min_stay']), 
+            int(form['max_stay']), form['details']
+        )
+
+        # Create associated date ranges
+        # This could be moved to another module?
+        for i in range(0, int(form['dateCount']), 2):
+            newav = db.insert_availability(
+                venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
+            )
+
+        # Done
+
+        return render_template('ad_confirm.html', id=venueid, **default_kwargs)
 
     return render_template('new_ad.html', **default_kwargs)
 

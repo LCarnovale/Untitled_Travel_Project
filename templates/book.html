@@ -15,22 +15,24 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{acc.getName()}}</h1>
+    <h1>{{acc.name}}</h1>
     <table class = "addr_details">
         <tr>
-            <th style = "width:50%">Address</th>
+            <!-- <th style = "width:50%">Address</th> -->
             <th>Beds</th>
             <th>Bathrooms</th>
+            <th>Car Spaces</th>
         </tr>
         <tr>
-            <td>{{acc.getAddr()}}</td>
-            <td>{{acc.getBeds()}}</td>
-            <td>{{acc.getBathrooms()}}</td>
+            <!-- <td>{{acc.location}}</td> -->
+            <td>{{acc.bed_count}}</td>
+            <td>{{acc.bath_count}}</td>
+            <td>{{acc.car_count}}</td>
         </tr>
     </table>
 
     <h2>About the place</h2>
-    <p>{{acc.getDesc()}}</p>
+    <p>{{acc.description}}</p>
 
     <table class = "booking_details">
         <tr>
@@ -38,12 +40,14 @@
             <th>Availability</th>
         </tr>
         <tr>
-            <td>${{acc.getPrice()}}/night</td>
-            <td><div id="avail_dates" align="center"></div></td>
-            <script>
+            <td>${{acc.rate}}/night</td>
+            <td><div id="avail_dates" align="center">
+                Fix me
+            </div></td>
+            <!-- <script>
             var dates = {{ acc.getDates()|tojson }}
-            getDates(dates
-            )</script>
+            getDates(dates)
+            </script> -->
         </tr>
     </table>
 
@@ -70,11 +74,11 @@
     {% endif %}
 
 
-    {% if acc.getOwnerDesc() != null%}
+    {% if acc.description != null%}
         <h2> About the owner </h2>
-        <p> {{acc.getOwnerDesc()}} </p>
+        <p> (Put owner details here) </p>
     {% endif %}
 
-    <p> Have any questions? Contact the owner at {{acc.getOwnerDetails()}} </p>
+    <p> Have any questions? Contact the owner at (put owner contact here) </p>
 
 {% endblock %}
