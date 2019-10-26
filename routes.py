@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, abort, flash, session
-from flask_login import LoginManager,login_user
+from flask_login import LoginManager, login_user
 from src.accommodation import Accommodation
 from src.accommodationSystem import AccommodationSystem
 from src.address import Address
@@ -8,13 +8,14 @@ from src.stayDetails import StayDetails
 import src.userSystem
 from server import accSystem
 from server import userSystem
+from server import bookingSystem
 from server import app
 import cloud.dbTools as db
 
 default_kwargs = {
     "is_connected": db.is_connected,
 }
-	
+    
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html', **default_kwargs)
@@ -35,25 +36,36 @@ Login page
 '''
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-	if request.method == 'POST':
-	# Attempt a Login
-	#result = db.check_user_pass(request.form['username'], request.form['password'])
-	#if result is None:
-	#    print("Login failed")
-	#else:
-	#    print(f"Log in for {result[1]} ({result[2]}) successful.")
-		if request.form['password'] == 'admin' and request.form['username'] == 'admin':
-			user = User(
-				"admin",
-				"admin@temp.com",
-				"0456123456",
-			)
-			session['username'] = user._name
-			session['email'] = user._email
-			session['mobile']=user._mobile
-			session['id'] = user._id
+    if request.method == 'POST':
+    # Attempt a Login
+        login_id = -1
+        if db.is_connected:
+            result = db.check_user_pass(request.form['username'], request.form['password'])
+            if result is None:
+                print("Login failed")
+            else:
+                print(f"Log in for {result[1]} ({result[2]}) successful.")
+                login_id = result[0]
+                user = User(*result[1:])
+        else:
+            result = (request.form['password'] == 'admin' and request.form['username'] == 'admin')
+            if result:
+                print("Logged in as admin")
+                user = User(
+                    "Developer",
+                    "admin",
+                    "admin@temp.com",
+                    "0456123456")
+            else:
+                print("Try admin & admin")
+        if result:
+            session['name'] = user.name
+            session['username'] = user.username
+            session['email'] = user.email
+            session['mobile'] = user.mobile
+            session['id'] = login_id
 
-	return render_template('login.html')
+    return render_template('login.html')
 
 '''
 Signup page
@@ -63,7 +75,7 @@ def signup():
     if request.method == 'POST':
         # Create user.
         form = request.form
-        uid = src.userSystem.create_user(
+        uid = userSystem.create_user(
             form['account_name'],
             form['account_username'],
             form['account_password'],
@@ -85,12 +97,16 @@ Main Booking page
 '''  
 @app.route('/book/<id>', methods=['GET', 'POST'])
 def book_main(id):
-    acc = accSystem.getAcc(id)
+    acc = accSystem.get_acc(id)
     if acc == None:
         abort(404)
 
     if request.method == 'POST':
-        pass #TODO
+        form = request.form
+        if session['id']:
+            bookingSystem.create_booking(
+                id, session['id'], form['book_start'], form['book_end']
+            )
 
     return render_template('book.html', acc=acc, **default_kwargs)
 

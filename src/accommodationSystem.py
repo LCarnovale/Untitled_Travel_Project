@@ -6,12 +6,12 @@ class AccommodationSystem:
     def __init__(self):
         self._accommodations = {}
 
-    def addAcc(self, id, acc):
+    def add_acc(self, id, acc):
         '''Adds accommodations into the system'''
         self._accommodations[id] = acc
 
 
-    def getAcc(self, id):
+    def get_acc(self, id):
         '''
         Finds an accommodation by a unique ID
         Returns None if none are found.
@@ -24,7 +24,7 @@ class AccommodationSystem:
             acc = db.get_venue(id)
             if acc is not None:
                 new_acc = Accommodation(*acc[1:])
-                self.addAcc(id, new_acc)
+                self.add_acc(id, new_acc)
                 return new_acc
             else:
                 return None
@@ -38,7 +38,7 @@ class AccommodationSystem:
         #         bathCount, carCount, description, rate, minStay, maxStay, details)                
         new_venueid = db.insert_venue(*args)
         new_venue = Accommodation(*args)
-        self.addAcc(new_venueid, new_venue)
+        self.add_acc(new_venueid, new_venue)
         return new_venueid
 
     def clean_system(self):
