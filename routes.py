@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, abort, flash, session
+from flask import render_template, request, redirect, abort, flash, session, url_for
 from flask_login import LoginManager, login_user
 from src.accommodation import Accommodation
 from src.accommodationSystem import AccommodationSystem
@@ -37,7 +37,7 @@ Login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-    # Attempt a Login
+        # Attempt a Login
         login_id = -1
         if db.is_connected:
             result = db.check_user_pass(request.form['username'], request.form['password'])
@@ -66,6 +66,18 @@ def login():
             session['id'] = login_id
 
     return render_template('login.html')
+
+'''
+Logout
+'''
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    # Remove any existing sessions
+    print(session)
+    session.pop('username', None)
+    session.pop('id', None)
+
+    return redirect(url_for('home'))
 
 '''
 Signup page
