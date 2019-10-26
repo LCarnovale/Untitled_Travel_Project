@@ -60,11 +60,13 @@ def login():
                 print("Try admin & admin")
         if result:
             session['name'] = user.name
-            session['username'] = user.username
-            session['email'] = user.email
-            session['mobile'] = user.mobile
+            session['username'] = user._username
+            session['email'] = user._email
+            session['mobile'] = user._mobile
             session['id'] = login_id
-
+            session['desc'] = user._desc
+        print(session['mobile'])
+        return render_template('home.html')
     return render_template('login.html')
 
 '''
@@ -104,6 +106,24 @@ def signup():
 
     return render_template('signup.html')
 
+'''
+Edit profile page
+'''
+@app.route('/edit', methods=['GET', 'POST'])
+def editprofile():
+    if request.method == 'POST':
+        # Create user.
+        form = request.form
+        uid = userSystem.get_user(session['id'])
+
+        if uid is not None:
+            user._email = form['account_email']
+            user._phone = form['account_phone']
+            user._desc = form['account_description']
+        else:
+            print("Error user not found")
+    return render_template('edit.html')
+	
 '''
 Main Booking page
 '''  
