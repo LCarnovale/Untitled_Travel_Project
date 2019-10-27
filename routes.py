@@ -5,6 +5,7 @@ from src.accommodationSystem import AccommodationSystem
 from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
+from src.booking import Booking
 import src.userSystem
 from server import accSystem
 from server import userSystem
@@ -123,6 +124,7 @@ Main Booking page
 '''  
 @app.route('/book/<id>', methods=['GET', 'POST'])
 def book_main(id):
+
     acc = accSystem.get_acc(id)
     if acc == None:
         abort(404)
@@ -195,7 +197,7 @@ def ad_main():
             )
 
         # Done
-
+        print(request.form['avail_date'])
         return render_template('ad_confirm.html', id=venueid, **default_kwargs)
 
     return render_template('new_ad.html', **default_kwargs)

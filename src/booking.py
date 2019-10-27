@@ -1,4 +1,6 @@
 class Booking:
+
+    #_bookingID = -1
     '''
         acc is the accommodation
         period is the time period for the booking
