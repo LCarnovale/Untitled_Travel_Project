@@ -1,16 +1,17 @@
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, abort
 from src.accommodation import Accommodation
 from src.accommodationSystem import AccommodationSystem
 from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
+import src.userSystem
 from server import accSystem
 from server import userSystem
 from server import app
-import cloud.dbTools as dbTools
+import cloud.dbTools as db
 
 default_kwargs = {
-    "is_connected": dbTools.is_connected,
+    "is_connected": db.is_connected,
 }
 
 @app.errorhandler(404)
@@ -31,6 +32,45 @@ def home():
 
     return render_template('home.html', **default_kwargs)
 
+'''
+Login page
+'''
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Attempt a Login
+        result = db.check_user_pass(request.form['username'], request.form['password'])
+        if result is None:
+            print("Login failed")
+        else:
+            print(f"Log in for {result[1]} ({result[2]}) successful.")
+
+    return render_template('login.html')
+
+'''
+Signup page
+'''
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        # Create user.
+        form = request.form
+        uid = src.userSystem.create_user(
+            form['account_name'],
+            form['account_username'],
+            form['account_password'],
+            form['account_email'],
+            form['account_phone'],
+            form['account_description']
+        )
+
+        if uid is not None:
+            print("User successfully added.")
+        else:
+            print("User insert failed.")
+
+
+    return render_template('signup.html')
 
 '''
 Main Booking page
@@ -39,6 +79,9 @@ Main Booking page
 def book_main(id):
     acc = accSystem.getAcc(id)
     print(acc)
+    if acc == None:
+        abort(404)
+
     if request.method == 'POST':
         pass #TODO
 
@@ -59,8 +102,8 @@ def ad_main():
         addr = Address(request.form['acc_addr'])
 
         # Make a stay class
-        stay = StayDetails(request.form['price'], request.form['avail_start'],
-                        request.form['avail_end'], request.form['min_stay'],
+        stay = StayDetails(request.form['price'], request.form['avail_date'],
+                        request.form['min_stay'],
                         request.form['max_stay'], request.form['stay_details'])
         # Make an accommodation class
         acc = Accommodation(request.form['acc_name'], addr,

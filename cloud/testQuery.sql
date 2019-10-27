@@ -1,5 +1,4 @@
--- Select all
-SELECT * FROM dbo.dbTable
-
--- Select Ian rows
-SELECT * FROM dbo.dbTable WHERE (name = 'Ian')
+-- Insert 
+INSERT into Addresses (location) VALUES ('here2') 
+-- Get 
+SELECT * FROM Addresses 

@@ -2,7 +2,7 @@ class NegativeNumberError(Exception):
     pass
 
 class Accommodation:
-    _id = -1
+    _id = 0
 
     def __init__(self, name, address, numBeds, numBath, owner,
                  stayDetail, details=None):
@@ -11,7 +11,8 @@ class Accommodation:
         self._owner = owner
         self._details = details
         self._stayDetails = stayDetail
-        self._id += 1
+        self._id = Accommodation._id
+        Accommodation._id += 1
 
         if int(numBeds) < 0 or int(numBath) < 0:
             raise NegativeNumberError("Please enter a positive number")

@@ -1,4 +1,4 @@
-import cloud.dbTools as dbTools
+import cloud.dbTools as db
 
 class UserSystem:
     def __init__(self):
@@ -8,7 +8,7 @@ class UserSystem:
         self._users.append(user)
 
         # TODO: Naughty use of '_' properties here
-        dbTools.insert_user(user._name, 
+        db.insert_user(user._name, 
             "sample_username", 
             user._email, 
             user._mobile, 
@@ -20,3 +20,15 @@ class UserSystem:
         for user in self._users:
             if int(userID) == int(user.getID()):
                 return user
+
+def create_user(name, username, pwd, email, phone, description):
+    """
+    Attempt to create a user.
+    Return the new user's id on success.
+    Return None on failure.
+    """
+    
+    # TODO: Verify user input in here
+    uid = db.insert_user(name, username, pwd, email, phone, description)
+    return uid
+    
