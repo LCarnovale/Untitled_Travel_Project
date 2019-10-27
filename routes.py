@@ -25,10 +25,29 @@ Landing page
 def home():
     
     if request.method == 'POST':
-        search = request.form.get('search')
-        if (search):
-            results = accSystem.keywordSearch(search)
-            return render_template('search_results.html', results = results)
+        try:
+            search = request.form.get('search')
+            startdate = request.form.get('startdate')
+            enddate = request.form.get('enddate')
+            beds = request.form.get('beds')
+            bathrooms = request.form.get('bathrooms')
+            parking = request.form.get('parking')
+            location = request.form.get('location')
+            distance = request.form.get('distance')
+
+            if (search or startdate or enddate or beds or
+                bathrooms or parking or location or distance):
+
+                results = accSystem.advancedSearch(search, startdate, enddate, beds,
+                                                   bathrooms, parking, location, distance)
+                return render_template('search_results.html', results = results)
+        except Exception as e:
+            print('----------------------------------')
+            print('INVALID DATA WAS ENTERED TO SEARCH')
+            print('Error as follows:')
+            print(e)
+            print('----------------------------------')
+            return render_template('search_results.html', results = [])
 
     return render_template('home.html', **default_kwargs)
 

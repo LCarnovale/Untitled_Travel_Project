@@ -31,10 +31,10 @@ class Accommodation:
         return self._addr.getAddr()
 
     def getBeds(self):
-        return self._numBeds
+        return int(self._numBeds)
 
     def getBathrooms(self):
-        return self._numBath
+        return int(self._numBath)
 
     def getOwnerDetails(self):
         return self._owner.getDetails()

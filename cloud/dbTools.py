@@ -94,10 +94,20 @@ def init():
     """
     global cursor
     global is_connected
+    from server import USE_DATABASE
     try: 
+        if not USE_DATABASE:
+            print('Please set USE_DATABASE in server.py to True for database.')
+            raise Exception("Not using database")
         import connect_config
         cnxn = connect_config.get_connection()
-    except:
+    except Exception as e:
+        if ("IP address" in str(e)): 
+            # Could check for this exception properly with pyodbc.ProgrammingError,
+            # but pyodbc may not be installed.
+            msg = str(e).split("IP address '")[1]
+            msg = msg.split("' is not")[0]
+            print("Your ip (" + msg + ") was not allowed.")
         print("Unable to connect to database. Function calls will do nothing.")
         cursor = _FailedConnectionHandler()
     else:
@@ -197,13 +207,14 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
     #  email        varchar(100)
     #  phone        varchar(20)
     #  description  text 
+    import pyodbc as pyodbc_module
     try:
         cursor.execute(
             "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
             OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
-    except pyodbc.IntegrityError as e:
+    except pyodbc_module.IntegrityError as e:
         print("Duplicate username on insert.")
         raise e
 
@@ -223,13 +234,14 @@ def insert_owner(name, userName, password, email=None, phone=None, description=N
 
     Returns the id of the inserted owner.
     """
+    import pyodbc as pyodbc_module
     try:
         cursor.execute(
             "INSERT INTO Owners (name, userName, email, phone, description, pwdhash)   \
             OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
-    except pyodbc.IntegrityError as e:
+    except pyodbc_module.IntegrityError as e:
         print("Duplicate username on insert.")
         raise e
 
@@ -254,10 +266,11 @@ def insert_booking(venueid, userid, startDate, endDate):
     #  userid      int        not null  FK -> Users(id)
     #  startDate   date       not null
     #  endDate     date       not null
+    import pyodbc as pyodbc_module
     try:
         cursor.execute("INSERT INTO Bookings (venueid, userid, startDate, endDate) \
             OUTPUT INSERTED.id VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
-    except pyodbc.IntegrityError as e:
+    except pyodbc_module.IntegrityError as e:
         print("Invalid venueid or userid on insert.")
         raise e
     
