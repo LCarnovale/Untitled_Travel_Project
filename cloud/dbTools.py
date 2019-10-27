@@ -206,6 +206,16 @@ def get_availability(id):
     cursor.execute("SELECT * FROM Availabilities WHERE avId=?", id)
     return cursor.fetchone()
 
+def get_venue_availabilities(venueid):
+    """
+    Return all availabilities for a venue with the
+    given venueid.
+    """
+    cursor.execute("SELECT * FROM Availabilities  \
+        WHERE venueid=?", venueid)
+    
+    return cursor.fetchall()
+
 def get_overlapping_availability(startDate, endDate):
     """
     Get all availabilities that contain the given period in their
