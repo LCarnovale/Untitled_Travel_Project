@@ -1,3 +1,5 @@
+import pyodbc
+
 """
 This module handles all interaction with the database.
 
@@ -8,7 +10,7 @@ Table structures:
     a tuple of values in the order shown below.
 
     Venue:
-    0   id            int           Identity   PRIMARY KEY
+    0   venueid       int           Identity   PRIMARY KEY
     1   ownerid       int           not null   FK -> Owners(id)
     2   addressid     int           not null   FK -> Addresses(id)
     3   name          varchar(200)  not null
@@ -17,27 +19,31 @@ Table structures:
     6   carCount      tinyint
     7   description   text
     8   rate          smallmoney
-    9   availStart    date
-    10  availEnd      date
-    11  minStay       int           DEFAULT 1
-    12  maxStay       int
-    13  details       text
+    9   minStay       int
+    10  maxStay       int
+    11  details       text
+
+    Availabilities:
+    0   avId          int        Identity  PRIMARY KEY
+    1   venueid       int                  FK -> Venues(id)
+    2   startDate     date
+    3   endDate       date
 
     Owners and Users:
-    0   id           int          Identity   PRIMARY KEY
-    1   name         varchar(50)  not null
-    2   userName     varchar(50)             UNIQUE
-    3   email        varchar(100)
-    4   phone        varchar(20)
-    5   description  text
-    6   pwdhash      bytes
+    0   ownerid/userid  int          Identity   PRIMARY KEY
+    1   name            varchar(50)  not null
+    2   userName        varchar(50)             UNIQUE
+    3   email           varchar(100)
+    4   phone           varchar(20)
+    5   description     text
+    6   pwdhash         bytes
 
     Addresses:
-    0   id          int        Identity  PRIMARY KEY
+    0   aid         int        Identity  PRIMARY KEY
     1   location    text
 
     Bookings:
-    0   id          int        Identity  PRIMARY KEY
+    0   bookid      int        Identity  PRIMARY KEY
     1   venueid     int        not null  FK -> Venues(id)
     2   userid      int        not null  FK -> Users(id)
     3   startDate   date       not null
@@ -51,6 +57,11 @@ Table structures:
 # cursor.attr will return a lambda func, or cursor will be a FailedConnectionHandler
 # object. You will probably want to instead return None in these cases.  
 ########
+
+class ArgumentException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
 
 class _FailedConnectionHandler:
     """
@@ -73,17 +84,14 @@ class _FailedConnectionHandler:
     fetchone = _default
     fetchall = _default
 
-class _UninitialisedConnectionHandler:
-    def __getattr__(self, attr):
+class _UninitialisedConnectionHandler(_FailedConnectionHandler):
+    def __getattribute__(self, attr, *args, **kwargs):
         print("Connection has not been established yet. Call dbTools.init() to connect.")
-        return _FailedConnectionHandler.__getattribute__(self, attr)
-    
-
-
+        return super().__getattribute__(attr)
 
 cursor = _UninitialisedConnectionHandler()
 is_connected = False
-pyodbc = _FailedConnectionHandler()
+
 def init():
     """
     Establish a connection to the database. This must be called
@@ -97,13 +105,18 @@ def init():
     try: 
         import connect_config
         cnxn = connect_config.get_connection()
-    except:
+    except Exception as e:
+        if ("IP address" in str(e)): 
+            # Could check for this exception properly with pyodbc.ProgrammingError,
+            # but pyodbc may not be installed.
+            msg = str(e).split("IP address '")[1]
+            msg = msg.split("' is not")[0]
+            print("Your ip (" + msg + ") was not allowed.")
         print("Unable to connect to database. Function calls will do nothing.")
         cursor = _FailedConnectionHandler()
     else:
         print("Successfully connected to database.")
         cursor = cnxn.cursor()
-        pyodbc = connect_config.pyodbc
         is_connected = True
 
 def close():
@@ -136,7 +149,7 @@ def get_user(id):
 
     Returns None if the user does not exist.
     """
-    cursor.execute("SELECT * FROM Users WHERE id=?", id)
+    cursor.execute("SELECT * FROM Users WHERE userid=?", id)
     result = cursor.fetchone()
     return result
 
@@ -155,29 +168,63 @@ def get_owner(id):
 
     Return None if the owner does not exist.
     """
-    cursor.execute("SELECT * FROM Owners WHERE id=?", id)
+    cursor.execute("SELECT * FROM Owners WHERE ownerid=?", id)
+    return cursor.fetchone()
+
+def get_owner_from_uname(userName):
+    """
+    Return an owner matching the given userName.
+    """
+    cursor.execute("SELECT * FROM Owners WHERE userName=?", userName)
     return cursor.fetchone()
 
 def get_venue(id):
     """
     Return a venue with the matching id.
     """
-    cursor.execute("SELECT * FROM Venues WHERE id=?", id)
+    cursor.execute("SELECT * FROM Venues WHERE venueid=?", id)
     return cursor.fetchone()
 
 def get_booking(id):
     """
     Return a booking with the matching id.
     """
-    cursor.execute("SELECT * FROM Bookings WHERE id=?", id)
+    cursor.execute("SELECT * FROM Bookings WHERE bookid=?", id)
     return cursor.fetchone()
 
 def get_address(id):
     """
     Return an address with the matching id.
     """
-    cursor.execute("SELECT * FROM Addresses WHERE id=?", id)
+    cursor.execute("SELECT * FROM Addresses WHERE aid=?", id)
     return cursor.fetchone()
+
+def get_availability(id):
+    """
+    Get an availability matching the given id.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE avId=?", id)
+    return cursor.fetchone()
+
+def get_overlapping_availability(startDate, endDate):
+    """
+    Get all availabilities that contain the given period in their
+    start and end dates.
+    Returns a list of availability rows.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE \
+        startDate<? AND endDate>?", (startDate, endDate))
+    return cursor.fetchall()
+
+def get_overlapping_availability_venue(venueid, startDate, endDate):
+    """
+    Get availabilities that contain the given period in their
+    start and end dates for a given venue id.
+    Returns a list of availability rows.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE \
+        venueid=? AND startDate<? AND endDate>?", (venueid, startDate, endDate))
+    return cursor.fetchall()
 
 def insert_user(name, userName, password, email=None, phone=None, description=None):
     """
@@ -200,7 +247,7 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
     try:
         cursor.execute(
             "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            OUTPUT INSERTED.userid VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
     except pyodbc.IntegrityError as e:
@@ -226,7 +273,7 @@ def insert_owner(name, userName, password, email=None, phone=None, description=N
     try:
         cursor.execute(
             "INSERT INTO Owners (name, userName, email, phone, description, pwdhash)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            OUTPUT INSERTED.ownerid VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
     except pyodbc.IntegrityError as e:
@@ -256,7 +303,7 @@ def insert_booking(venueid, userid, startDate, endDate):
     #  endDate     date       not null
     try:
         cursor.execute("INSERT INTO Bookings (venueid, userid, startDate, endDate) \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
+            OUTPUT INSERTED.bookid VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
     except pyodbc.IntegrityError as e:
         print("Invalid venueid or userid on insert.")
         raise e
@@ -267,9 +314,9 @@ def insert_booking(venueid, userid, startDate, endDate):
     else:
         return None
     
-def insert_venue(ownerid, addressid, name, bedCount, bathCount, 
-        carCount, description, rate, availStart, availEnd,
-        minStay, maxStay, details):
+def insert_venue(ownerid, addressid, name, bedCount, bathCount,
+                 carCount, description, rate,
+                 minStay, maxStay, details):
     """
     Insert a venue.
     ** Dates should be type datetime.date
@@ -286,18 +333,16 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
     # carCount      tinyint
     # description   text
     # rate          smallmoney
-    # availStart    date
-    # availEnd      date
     # minStay       int           DEFAULT 1
     # maxStay       int
     # details       text
     try:
-        cursor.execute("INSERT INTO Venues (ownerid, addressid, name, bedCount, \
-            bathCount, carCount, description, rate, availStart, availEnd,       \
-            minStay, maxStay, details) OUTPUT INSERTED.id                       \
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-            (ownerid, addressid, name, bedCount, bathCount, 
-            carCount, description, rate, availStart, availEnd,
+        cursor.execute("INSERT INTO Venues (ownerid, addressid, name,     \
+            bedCount, bathCount, carCount, description, rate, minStay,    \
+            maxStay, details) OUTPUT INSERTED.venueid                     \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (ownerid, addressid, name, bedCount, bathCount,
+            carCount, description, rate,
             minStay, maxStay, details)
         )
     except pyodbc.IntegrityError as e:
@@ -309,15 +354,53 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
     else:
         return None
 
+def update_venue(venueid, *args):
+    """
+    Update a venue record. Takes the id of the venue to be updated (venueid)
+    and all arguments used in insert_venue(...)
+    and the id of the venue to be updated (venueid).
+    """
+    if len(args) != 10:
+        raise ArgumentException("Expected 11 arguments, got " + str(1 + len(args)))
+    query = """UPDATE Venues SET 
+    ownerid      = ?,
+    addressid    = ?,
+    name         = ?,
+    bedCount     = ?,
+    bathCount    = ?,
+    carCount     = ?,
+    description  = ?,
+    rate         = ?,
+    minStay      = ?,
+    maxStay      = ?,
+    details      = ?
+    WHERE venueid=?
+    """
+    cursor.execute(query, (*args, venueid))
+
 def insert_address(location):
     """
     Insert the given location into the database.
 
     Return the id of the inserted address.
     """
-    cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.id VALUES (?)", location)
+    cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.aid VALUES (?)", location)
 
 
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
+
+def insert_availability(venueid, startDate, endDate):
+    """
+    Insert an availability and return the id of the new availability.
+    """
+    cursor.execute(
+        "INSERT INTO Availabilities (venueid, startDate, endDate) OUTPUT INSERTED.avId VALUES (?, ?, ?)", (
+            venueid, startDate, endDate)
+    )
     res = cursor.fetchone()
     if res is not None:
         return int(res[0])
@@ -359,6 +442,8 @@ def select_venues(**patterns):
         SELECT * FROM Venues WHERE 
         column1 LIKE pattern1 AND
         column2 LIKE pattern2 ...
+
+    Returns a list of matching rows.    
         
     For example: 
         select_venues(name="test%", details="%d%") 
@@ -369,7 +454,7 @@ def select_venues(**patterns):
     information on patterns.
 
     Available fields:
-        id            int          
+        venueid       int          
         ownerid       int          
         addressid     int          
         name          varchar(200) 
@@ -406,11 +491,13 @@ def select_bookings(**patterns):
         column1 LIKE pattern1 AND
         column2 LIKE pattern2 ...
 
+    Returns a list of matching rows.
+
     See https://www.w3schools.com/sql/sql_like.asp for 
     information on patterns.
 
     Available fields:
-        id          int    
+        bookid      int    
         venueid     int    
         userid      int    
         startDate   date   

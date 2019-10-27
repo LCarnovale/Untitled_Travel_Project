@@ -1,15 +1,15 @@
 // Calendar in new_ad
-  $( function() {
+$( function() {
     $( "#avail_date" ).multiDatesPicker({
         minDate: 0,
-    	dateFormat: 'd-m-yy'
+        dateFormat: 'd-m-yy'
     });
-  });
+ });
 
 // Button in new_ad to reset dates selected
 $(document).ready(function() {
 	$( "#reset" ).click(function() {
-    		$( "#avail_date" ).multiDatesPicker('resetDates', 'picked');
+    	$( "#avail_date" ).multiDatesPicker('resetDates', 'picked');
 	});
 });
 // calendar in book.html to show the available days
@@ -19,7 +19,7 @@ function getDates(dates) {
         dateFormat: 'd-m-yy',
         addDates: dates
     });
-
+}
 // union two sets
 function union(setA, setB) {
     var union = new Set(setA);
@@ -43,8 +43,8 @@ function getDaysInMonth(month, year) {
      var date = new Date(Date.UTC(year, month, 1));
      var days = new Set();
      while (date.getMonth() === month) {
-  			var day = (date.getDate() < 10 ? '0' : '').toString() + date.getDate().toString()
-  			 + "-" +((date.getMonth() + 1) < 10 ? '0' : '').toString() + (date.getMonth() + 1) +"-"+ date.getFullYear().toString();
+  		var day = (date.getDate() < 10 ? '0' : '').toString() + date.getDate().toString()
+  	    + "-" +((date.getMonth() + 1) < 10 ? '0' : '').toString() + (date.getMonth() + 1) +"-"+ date.getFullYear().toString();
         days.add(day);
         date.setDate(date.getDate() + 1);
      }
@@ -77,8 +77,8 @@ function disableDates(dates) {
     // convert to list
 	const disable = [...toDisable];
 	// Put into calendar
-       $("#mdp-demo").multiDatesPicker({
+    $("#mdp-demo").multiDatesPicker({
         dateFormat: 'd-m-yy',
         addDisabledDates: disable
-    	});
+    });
 }

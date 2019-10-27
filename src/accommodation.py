@@ -1,73 +1,94 @@
 class NegativeNumberError(Exception):
     pass
 
+
 class Accommodation:
-    _id = -1
+    def __init__(self, *args):
+        """
+        args should follow the layout (schema) of the venue table
+        defined in dbTools.py
 
-    def __init__(self, name, address, numBeds, numBath, owner,
-                 stayDetail, details=None):
-        self._name = name
-        self._addr = address
-        self._owner = owner
-        self._details = details
-        self._stayDetails = stayDetail
-        self._id += 1
+        The output from eg. db.get_venue(n) has the form
+            get_venue(n) --> (id, *args)
+        so it is easiest to pass around a collection of the return values after
+        the id instead of track each of dozen or so fields individually.
+        """ 
+        # XXX: Changes to the layout of the venue table will need
+        #      to be reflected here
+        self._aid,             \
+        self._ownerid,         \
+        self._name,            \
+        self._bed_count,       \
+        self._bath_count,      \
+        self._car_count,       \
+        self._description,     \
+        self._rate,            \
+        self._min_stay,        \
+        self._max_stay,        \
+        self._details =     args
 
-        if int(numBeds) < 0 or int(numBath) < 0:
-            raise NegativeNumberError("Please enter a positive number")
-        else:
-            self._numBeds = numBeds
-            self._numBath = numBath
+        ### Data validation  ### TODO: Add more tests?
+        if self._bed_count < 0:
+            raise NegativeNumberError("Invalid bed count")
+        if self._bath_count < 0:
+            raise NegativeNumberError("Invalid bath count")
+        if self._car_count < 0:
+            raise NegativeNumberError("Invalid car count")
+        
+    def getDates(self):
+        # TODO
+        return None
 
-    '''Returns unique ID for the accommodation'''
-    def getID(self):
-        return self._id
+    def isAvailable(self, startDate, endDate=None):
+        # TODO
+        return True
 
-    def getName(self):
+    '''
+    Properties
+    '''
+    
+    @property
+    def aid(self):
+        return self._aid
+
+    @property
+    def ownerid(self):
+        return self._ownerid
+
+    @property
+    def name(self):
         return self._name
 
-    def getAddr(self):
-        return self._addr.getAddr()
+    @property
+    def bed_count(self):
+        return self._bed_count
 
-    def getBeds(self):
-        return self._numBeds
+    @property
+    def bath_count(self):
+        return self._bath_count
 
-    def getBathrooms(self):
-        return self._numBath
+    @property
+    def car_count(self):
+        return self._car_count
 
-    def getOwnerDetails(self):
-        return self._owner.getDetails()
+    @property
+    def description(self):
+        return self._description
 
-    def getOwnerDesc(self):
-        return self._owner.getDesc()
+    @property
+    def rate(self):
+        return self._rate
 
-    def getPrice(self):
-        return self._stayDetails.getPrice()
+    @property
+    def min_stay(self):
+        return self._min_stay
 
-    def getMinStay(self):
-        return self._stayDetails.getMinStay()
+    @property
+    def max_stay(self):
+        return self._max_stay
 
-    def getMaxStay(self):
-        return self._stayDetails.getMaxStay()
-
-    def getStayDetail(self):
-        return self._stayDetails.getDetails()
-
-    # True if not booked and in availability period, otherwise False
-    def isAvailable(self):
-        return self._stayDetails.isAvailable()
-
-    def getDesc(self):
+    @property
+    def details(self):
         return self._details
-
-    def getDates(self):
-        return self._stayDetails.getDates()
-
-    def getAvailStart(self):
-        pass
-
-    def getAvailEnd(self):
-        pass
-
 
 

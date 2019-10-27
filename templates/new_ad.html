@@ -1,44 +1,94 @@
 {% extends "base.html" %}
 {% block head %}
+
+	<title>Post Accommodation</title>
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  	<meta charset="utf-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1">
-  	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  	<link rel="stylesheet" href="/resources/demos/style.css">
-  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script  src = "{{ url_for('static',filename = 'multidatespicker.js')}}"></script>
-	<script  src = "{{ url_for('static',filename = 'calendar.js')}}"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="{{ url_for('static',filename = 'multidatespicker.js')}}"></script>
+	<script src="{{ url_for('static',filename = 'calendar.js')}}"></script>
+	<style>#map {
+        height: 400px;
+		width: 400px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	</style>
+	<style>
+		table {
+			width: 100%;
+			font: 17px Calibri;
+		}
+
+		table,
+		th,
+		td {
+			border: solid 1px #DDD;
+			border-collapse: collapse;
+			padding: 2px 3px;
+			text-align: center;
+		}
+	</style>
+
+
 {% endblock %}
 
 {% block content %}
+	<body onload="createTable()">
 	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+
 	<h2> Please enter the details of your accommodation: </h2>
-	<form name='post_ad' id = "regForm" method='POST'>
+	<form name='post_ad' id = "regForm" method='POST' formaction='submit()'>
 		<div class = "tab">Place Details
 			<p><input name = "acc_name" placeholder = "Name" class = "required"></p>
 			<p><input name = "acc_addr" placeholder = "Address" class = "required"></p>
 			<p><input name = "acc_nbed" placeholder = "Beds" class = "required" type = number></p>
 			<p><input name = "acc_nbath" placeholder = "Bathrooms" class = "required" type = number></p>
-			<p><input name = "acc_details" placeholder = "Additional details"></p>		
-		</div> 
+			<p><input name = "acc_ncar" placeholder = "Car spaces" class = "required" type = number></p>
+			<p><input name = "acc_details" placeholder = "Accommodation description" type = text></p>		
+		</div>
+		<div class = "tab">Location Details
+			<p><input name = "acc_location" id = "hiddenlocation" class = "required" type = "hidden"></p>
+			<div id="map"></div>
+		</div>
+		{%if 'username' not in session%}
 		<div class = "tab">Owner Details
 			<p><input name = "own_name" placeholder = "Name" class = "required"></p>
 			<p><input name = "own_email" placeholder = "Email" type = "email" class = "required"></p>
 			<p><input name = "own_phone" placeholder = "Mobile" class = "required"></p>
-			<p><input name = "own_details" placeholder = "Owner details"></p>
+			<p><input name = "description" placeholder = "Owner details"></p>
 		</div>
-		<div class = "tab">Stay Details
-			<p><input name = "price" placeholder = "Price" class = "required" type = number step = 0.01></p>
+		{%else%}
+			<p><input name = "own_name" placeholder = "Name" class = "required" type=hidden value = '{{session["username"]}}'></p>
+			<p><input name = "own_email" placeholder = "Email" class = "required" type=hidden value = '{{session["email"]}}'></p>
+			<p><input name = "own_phone" placeholder = "Mobile" class = "required" type=hidden value = '{{session["mobile"]}}'></p>
+			<p><input name = "own_details" placeholder = "Owner details" type = "hidden"></p>
+		{%endif%}
+		<div class = "tab">Availability Details
 
-			<p>Date: <input name="avail_date" type="text" id="avail_date">
-				<button type="button" id="reset">Reset</button>
+			<p><input name = "price" placeholder = "Price" class = "required" type = number step = 0.01></p>
+			<div id="avail_date" align="center"></div>
+			<button type="button" id="reset">Reset</button>
+			<p>
+				<input id="dateCountOut" name=dateCount type=hidden value=0 method='POST'>
+
+				<div id="t_cont">
+					<!-- The table will be put here by the js below -->
+					Available Date Ranges:
+				</div>
+			<input type="button" id="addRangeButton" value="Add Range" onclick="addRange()"/>
 			</p>
 
-			<p><input name = "min_stay" placeholder = "Min. Stay" type = number></p>
-			<p><input name = "max_stay" placeholder = "Max. Stay" type = number></p>
-			<p><input name = "stay_details" placeholder = "Additional Details"></p>
+			<p><input name = "min_stay" placeholder = "Minimum Stay" type = number></p>
+			<p><input name = "max_stay" placeholder = "Maximum Stay" type = number></p>
+			<p><input name = "details" placeholder = "Additional Details (Noise policy, etc.)"></p>
 		</div>
+		
 		<div style="overflow:auto;">
 			<div style="float:right;">
 				<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
@@ -49,11 +99,116 @@
 			<span class="step"></span>
 			<span class="step"></span>
 			<span class="step"></span>
+			
+			{%if 'username' not in session%}
+			<span class="step"></span>
+			{%endif%}
 		</div>
 	</form>
 
+	<!-------------------------- Scripts \/ /\ HTML --------------------------------->
+	
+	<script type="text/javascript">
+		var map;
+		var markerlist = [];
+		function initMap() {
+			map = new google.maps.Map(
+				document.getElementById('map'), {
+					center: {lat: -33.91538902145825 , lng: 151.11207767686824},
+					zoom: 13
+				}
+			);
+			google.maps.event.addListener(
+				map, 'click', function( event ) {
+
+					document.getElementById("hiddenlocation").value =
+						event.latLng.lat() + ", " + event.latLng.lng();
+
+					for (i = 0;i<markerlist.length;i++){
+						markerlist[i].setMap(null);
+					}
+					var marker = new google.maps.Marker({position: event.latLng, map: map});
+					markerlist.push(marker);
+				}
+			);
+		}
+		var tableHeaders = new Array();
+		var dateCount = 0;
+		tableHeaders = ['Start Date', 'End Date', ''];
+
+		function createTable() {
+			var dateTable = document.createElement('table');
+			dateTable.setAttribute('id', 'dateTable');
+			// dateTable.setAttribute('name', 'dateRangeTable');
+			var tr = dateTable.insertRow(-1);
+
+			for (var h = 0; h < tableHeaders.length; h++) {
+				var th = document.createElement('th');
+				th.innerHTML = tableHeaders[h];
+				tr.appendChild(th);
+			}
+
+			var div = document.getElementById('t_cont');
+			div.appendChild(dateTable);
+			dateCount = 0;
+			addRange();
+
+		}
+		function addRange() {
+			var dateTable = document.getElementById('dateTable');
+
+			var rowCount = dateTable.rows.length;
+			var tr = dateTable.insertRow(-1); // Add row to end of table
+
+			for (var c = 0; c < tableHeaders.length; c++) {
+				var td = document.createElement('td');
+
+				td = tr.insertCell(c);
+
+				if (c == 2) {
+					if (rowCount > 1) {
+						// Add a remove button
+						var removeButton = document.createElement('input');
+
+						removeButton.setAttribute('type', 'button');
+						removeButton.setAttribute('value', 'Remove');
+						removeButton.setAttribute('onclick', 'removeRange(this)');
+
+						td.appendChild(removeButton);
+					}
+				} else {
+					// Add a date input field
+					var dateBox = document.createElement('input');
+
+					dateBox.setAttribute('type', 'date');
+					dateBox.setAttribute('name', 'dateRange_'+dateCount);
+					dateBox.setAttribute('value', '');
+
+					td.appendChild(dateBox);
+					dateCount++;
+					document.getElementById("dateCountOut").setAttribute('value', dateCount);
+
+				}
+			}
+		}
+
+		function removeRange(buttonObj) {
+			var dateTable = document.getElementById('dateTable');
+			// button <- td <- tr , tr has row index.
+			dateTable.deleteRow(buttonObj.parentNode.parentNode.rowIndex);
+			dateCount -= 2;
+			document.getElementById("dateCountOut").setAttribute('value', dateCount);
+
+		}
+
+			//function submit() {
+		 	//window.prompt("prompt");
+		 	//console.log("Submitting");
+			//}
+	</script>
+	<!-- Actual link: -->
+<!--	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"async defer></script>-->
+	<!-- Use a wrong link when map isn't needed: -->
+	 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"></script>
 	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
-
-
-
 {% endblock %}

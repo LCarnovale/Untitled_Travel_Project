@@ -32,3 +32,10 @@ Week 6
     Got a functioning database api that can connect to the database when run from the
     azure cloud based virtual machine. Now we need to complete the database and work
     on functions for querying it.
+
+    Saturday:
+    Databse has almost been finished and querying the database is working well with the api.
+    Now need to work on getting the front end and backend working properly.
+    Classes for representing users, venues etc. have been completed and
+    are working well. I managed to make a booking on a venue from the website,
+    which stored the relevant information in the database.

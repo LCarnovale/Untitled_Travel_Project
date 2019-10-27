@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Edit details</title>
+{% endblock %}
+
+{% block content %}
+	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+	<h2> Please enter your details: </h2>
+	<form name='post_ad' id = "regForm" method='POST'>
+		<div class = "tab"> Edit details
+				<p><input name = "account_email" placeholder = "Email" type = "email" value = "{{session['email']}}"></p>
+				<p><input name = "account_phone" placeholder = "Mobile" value = "{{session['mobile']}}"></p>
+				<p><input name = "account_description" placeholder = "Description" type = "paragraph" value = "{{session['desc']}}">
+		</div>
+	</form>
+
+	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
+{% endblock %}

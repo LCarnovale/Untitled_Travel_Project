@@ -1,37 +1,52 @@
-import re
-
-class EmailError(Exception):
-    pass
-
 class User:
-    _id = -1
-    def __init__(self, name, email, mobile, desc=None, addr=None):
+    def __init__(self, name, userName, email, mobile, desc=None, pwdhash=None):
         self._name = name
+        self._username = userName
+        self._email = email
         self._mobile = mobile
         self._desc = desc
-        self._addr = addr
-        self._id += 1
-        self._bookings = []
+        self._pwdhash = pwdhash
+        self._authenticated = False
+        # self._bookings = [] Use this or use the database?
 
-        if self.checkEmail(email) is None:
-            raise EmailError("Please enter a valid email address")
-        else:
-            self._email = email
+    # '''Return unique ID for each user'''
+    # def getID(self):
+    #     return self._id
 
-    '''Return unique ID for each user'''
-    def getID(self):
-        return self._id
+    # ''' Adds a booking into the user'''
+    # def addBooking(self, booking):
+    #     self._bookings.append(booking)
 
-    ''' Adds a booking into the user'''
-    def addBooking(self, booking):
-        self._bookings.append(booking)
+    '''
+    Properties
+    '''
+    @property
+    def name(self):
+        self._name
+        
+    @property
+    def username(self):
+        self._username
+        
+    @property
+    def email(self):
+        self._email
+        
+    @property
+    def mobile(self):
+        self._mobile
+        
+    @property
+    def desc(self):
+        self._desc
+        
+    @property
+    def pwdhash(self):
+        self._pwdhash
+        
+    @property
+    def authenticated(self):
+        self._authenticated
+        
 
-    def getDesc(self):
-        return self._desc
 
-    def getDetails(self):
-        return "Email: " + self._email + "Mobile: " + self._mobile
-
-    def checkEmail(self, email):
-        x = re.search(r"[\w0-9]+@[\w0-9]+\.com", email)
-        return x
