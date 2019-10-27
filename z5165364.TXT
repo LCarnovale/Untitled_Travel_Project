@@ -37,3 +37,6 @@ Tried to figure out how to get a calendar and use jquery to select dates instead
 
 24/10/19
 Changed the way we store availability. We now have a calendar where the user can select dates that their accommodation will be available. This will be stored as an array in python. Users that want to book can view the calendar and the availability will be highlighted on the calendar(the calendar will be disabled when viewing only). One trouble I had was finding the correct format when extracting the python array into the javascript so the correct dates will be highlighted.
+
+25/10/19
+When viewing an ad, users will see a calendar with the available dates highlighted but not selectable. When booking an ad, only the available dates will be selectable and the next 3 months will be disabled. It was difficult to only have the available dates since the only way to disable dates were to add them to a list. So I had to use sets to get all dates that should be disabled.

@@ -23,7 +23,6 @@ class StayDetails:
             self._min_stay = min_stay
             self._max_stay = max_stay
 
-        #
         now = datetime.now()
         # Dates are given as a string separated by commas
         # Dates are already sorted
@@ -35,10 +34,6 @@ class StayDetails:
             raise TimeError("Please enter a dates after today")
         else:
             self._avail_dates = dates
-
-
-
-
 
     def getPrice(self):
         return self._price
@@ -59,23 +54,6 @@ class StayDetails:
             return False
 
     def getDates(self):
-        print(self._avail_dates)
         return self._avail_dates
 
-'''
-        # Checks if the dates are correct
-
-        end = datetime.strptime(avail_end, '%Y-%m-%d')
-
-        print(now)
-        # Check if starting date is before today
-        if start < now:
-            raise TimeError("Please enter a date after today")
-        # Check if the start date is after the end date
-        elif start > end:
-            raise TimeError("Please enter a valid availability period")
-        else:
-            self._avail_start = start
-            self._avail_end = end
-'''
 

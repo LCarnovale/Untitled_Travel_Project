@@ -4,6 +4,7 @@ from src.accommodationSystem import AccommodationSystem
 from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
+from src.booking import Booking
 import src.userSystem
 from server import accSystem
 from server import userSystem
@@ -76,8 +77,14 @@ Main Booking page
 def book_main(id):
     acc = accSystem.getAcc(id)
     print(acc)
+    user = userSystem.getUser(id)
+    print(user)
     if request.method == 'POST':
         pass #TODO
+        period = None
+        booking = Booking(acc, period, user)
+
+        return render_template('book_confirm.html', acc=acc, **default_kwargs)
 
     return render_template('book.html', acc=acc, **default_kwargs)
 
