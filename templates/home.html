@@ -34,8 +34,9 @@
 	
     <p> <img src = "/static/nsw1.png"  > </p>
 	<form name = 'search' method = 'POST' >
-		<input type = "text" placeholder = "Search..">
-		<button type = "submit">Submit</button>
+		<input type = "text" placeholder = "Search.." id = "searchkeyword" >
+		<input type = "hidden" id = "geocodedvalue" readonly>
+		<button type = "button" onclick = "getgeocode()">Submit</button>
 		<br><br>
 		<p><button type = "button" onclick="myFunction()">Advanced Search</button></p>
 		<div id = advancesearch style = "display:none;">
@@ -87,6 +88,25 @@
 					continue;
 				circlelist[i].setRadius(parseInt(newval));
 			}
+		}
+		function getgeocode(){
+			var geocoder = new google.maps.Geocoder;
+			geocoder.geocode({'address': document.getElementById("searchkeyword").value}, function(results, status) {
+						if (status === 'OK') {
+							if (results[0]) {
+								var bounds = results[0].geometry.bounds.getSouthWest().lat()+","+results[0].geometry.bounds.getSouthWest().lng()+"+"+results[0].geometry.bounds.getNorthEast().lat()+","+results[0].geometry.bounds.getNorthEast().lng()
+								//format = southwest bound+northeast bound
+								document.getElementById("geocodedvalue").value = bounds;
+								alert(document.getElementById("geocodedvalue").value)
+							} 
+							else {
+								alert('No results found');
+							}
+						} 
+						else {
+							alert('Geocoder failed due to: ' + status);
+						}
+					});
 		}
 	</script>
 	<!-- Actual link: -->	

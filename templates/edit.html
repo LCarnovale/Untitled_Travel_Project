@@ -12,6 +12,11 @@
 				<p><input name = "account_phone" placeholder = "Mobile" value = "{{session['mobile']}}"></p>
 				<p><input name = "account_description" placeholder = "Description" type = "paragraph" value = "{{session['desc']}}">
 		</div>
+		<div style="overflow:auto;">
+			<div style="float:right;">
+				<button type="submit">Submit</button>
+			</div>
+		</div>
 	</form>
 
 	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>

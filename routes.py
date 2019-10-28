@@ -122,6 +122,7 @@ def editprofile():
             user._desc = form['account_description']
         else:
             print("Error user not found")
+        return render_template('confirm_edit.html')
     return render_template('edit.html')
 	
 '''
