@@ -112,6 +112,8 @@ def init():
             msg = str(e).split("IP address '")[1]
             msg = msg.split("' is not")[0]
             print("Your ip (" + msg + ") was not allowed.")
+        else:
+            print(e)
         print("Unable to connect to database. Function calls will do nothing.")
         cursor = _FailedConnectionHandler()
     else:

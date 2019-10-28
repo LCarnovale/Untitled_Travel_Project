@@ -79,7 +79,7 @@
     <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
 
     <script>
-        var avails={{acc.get_dates()|list()}};
+        var avails={{acc.get_dates()|tojson}};
         console.log(avails);
     </script>
 
