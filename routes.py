@@ -5,6 +5,7 @@ from src.accommodationSystem import AccommodationSystem
 from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
+from src.booking import Booking
 import src.userSystem
 from server import accSystem
 from server import userSystem
@@ -41,16 +42,12 @@ def login():
         login_id = -1
         if db.is_connected:
             result = db.check_user_pass(request.form['username'], request.form['password'])
-            if result is None:
-                print("Login failed")
-            else:
-                print(f"Log in for {result[1]} ({result[2]}) successful.")
+            if result is not None:
                 login_id = result[0]
                 user = User(*result[1:])
         else:
             result = (request.form['password'] == 'admin' and request.form['username'] == 'admin')
             if result:
-                print("Logged in as admin")
                 user = User(
                     "Developer",
                     "admin",
@@ -60,12 +57,11 @@ def login():
                 print("Try admin & admin")
         if result:
             session['name'] = user.name
-            session['username'] = user._username
-            session['email'] = user._email
-            session['mobile'] = user._mobile
+            session['username'] = user.username
+            session['email'] = user.email
+            session['mobile'] = user.mobile
             session['id'] = login_id
-            session['desc'] = user._desc
-        print(session['mobile'])
+            session['desc'] = user.desc
         return render_template('home.html')
     return render_template('login.html')
 
@@ -75,7 +71,6 @@ Logout
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     # Remove any existing sessions
-    print(session)
     session.pop('username', None)
     session.pop('id', None)
 
@@ -130,6 +125,7 @@ Main Booking page
 '''  
 @app.route('/book/<id>', methods=['GET', 'POST'])
 def book_main(id):
+
     acc = accSystem.get_acc(id)
     if acc == None:
         abort(404)
@@ -140,8 +136,16 @@ def book_main(id):
             bookingSystem.create_booking(
                 id, session['id'], form['book_start'], form['book_end']
             )
+            return render_template('book_confirm.html', acc=acc, **default_kwargs)
 
-    return render_template('book.html', acc=acc, **default_kwargs)
+    # Get owner details, address details, availabilities.
+    owner = db.get_owner(acc.ownerid)
+    # address = db.get_address(acc.aid)
+    address = Address(*db.get_address(acc.aid))
+    # avails = [[str(x[2]), str(x[3])] for x in db.get_venue_availabilities(id)]
+    
+    return render_template('book.html', acc=acc, owner=owner, 
+        address=address, **default_kwargs)
 
 
 
@@ -194,7 +198,7 @@ def ad_main():
             )
 
         # Done
-
+        print(request.form['avail_date'])
         return render_template('ad_confirm.html', id=venueid, **default_kwargs)
 
     return render_template('new_ad.html', **default_kwargs)

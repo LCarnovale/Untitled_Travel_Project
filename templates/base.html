@@ -5,70 +5,69 @@
     <style type="text/css">
       .container {
         padding-top: 100px;
-		margin-left: auto; 
-		margin-right: auto; 
-		display:block;
-		text-align: center;
+        margin-left: auto; 
+        margin-right: auto; 
+        display:block;
+        text-align: center;
       }
-		.topnav ul{
-			list-style-type: none;
-			margin: 0;
-			padding: 0;
-			overflow: hidden;
-			background-color: #333333;
-		}
-		.topnav li {
-			float: left;
-		}
-		.topnav li a {
-			display: block;
-			color: white;
-			text-align: center;
-			padding: 5px 60px;
-			text-decoration: none;
-		}
-		.topnav li a:hover {
-			background-color: #4CAF50;	
-		}
-		form {
-			display: inline-block;
-		}
-		#hiuser{
-			color : #ffffff;
-		}
-	</style>
+        .topnav ul{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333333;
+        }
+        .topnav li {
+            float: left;
+        }
+        .topnav li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 5px 60px;
+            text-decoration: none;
+        }
+        .topnav li a:hover {
+            background-color: #4CAF50;	
+        }
+        form {
+            display: inline-block;
+        }
+        #hiuser{
+            color : #ffffff;
+        }
+    </style>
     {% block head %}{% endblock %}
   </head>
   <body>	
 
-	<nav class = "topnav">
-	  <div>
-		<div>
-		  <a href="/"> <img src = "/static/nsw1.png" style = "width: 100px;height: 100px"></a>
-		</div>
+    <nav class = "topnav">
+      <div>
+        <div>
+          <a href="/"> <img src = "/static/nsw1.png" style = "width: 100px;height: 100px"></a>
+        </div>
 
-		Dev info <br>
-		Database Connected: {{is_connected}} <br>
+        Dev info <br>
+        Database Connected: {{is_connected}} <br>
 
-		<div>
-		  <ul>
-			<li><a href="{{url_for('book_main', id=id)}}">Booking</a></li>
-			<li><a href="{{url_for('ad_main')}}">Post Ad</a></li>
-			{% if 'username' in session %}
-			<li style= "float:right"><a href="{{url_for('logout')}}">Logout</a></li>
-			<li style= "float:right"><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
-			{% else %}
-			<li style= "float:right"> <a href="{{url_for('login')}}">Login</a></li>
-			{%endif%}
-		  </ul>
-		</div>
-	  </div>
-	</nav>
+        <div><ul>
+            <li><a href="{{url_for('home')}}">Home</a></li>
+            <li><a href="{{url_for('book_main', id=id)}}">Booking</a></li>
+            <li><a href="{{url_for('ad_main')}}">Post Ad</a></li>
+            {% if 'username' in session %}
+            <li style= "float:right"><a href="{{url_for('logout')}}">Logout</a></li>
+            <li style= "float:right"><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
+            {% else %}
+            <li style= "float:right"> <a href="{{url_for('login')}}">Login</a></li>
+            {%endif%}
+        </ul></div>
+      </div>
+    </nav>
     <div class="container">
       <br>
       {% block content %}{% endblock %}
       <br>
     </div>
-	
+    
   </body>
 </html>

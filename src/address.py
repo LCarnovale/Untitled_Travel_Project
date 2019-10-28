@@ -8,3 +8,25 @@ class Address:
 
     def getAddr(self):
         return self._street
+
+    '''
+    Properties
+    '''
+
+
+    @property
+    def street(self):
+        return self._street
+        
+    @property
+    def postcode(self):
+        return self._postcode
+        
+    @property
+    def state(self):
+        return self._state
+        
+    @property
+    def aptNum(self):
+        return self._aptNum
+        

@@ -1,3 +1,5 @@
+import cloud.dbTools as db
+
 class NegativeNumberError(Exception):
     pass
 
@@ -35,9 +37,16 @@ class Accommodation:
         if self._car_count < 0:
             raise NegativeNumberError("Invalid car count")
         
-    def getDates(self):
-        # TODO
-        return None
+    def get_dates(self):
+        """
+        Return a list of date ranges representing this venues
+        availability.
+        """
+        avails = db.get_address(self.aid)
+        # avails = 
+
+        # return avails
+        return ['2019-10-27', '2019-11-01']
 
     def isAvailable(self, startDate, endDate=None):
         # TODO

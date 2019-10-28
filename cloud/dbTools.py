@@ -112,6 +112,8 @@ def init():
             msg = str(e).split("IP address '")[1]
             msg = msg.split("' is not")[0]
             print("Your ip (" + msg + ") was not allowed.")
+        else:
+            print(e)
         print("Unable to connect to database. Function calls will do nothing.")
         cursor = _FailedConnectionHandler()
     else:
@@ -205,6 +207,16 @@ def get_availability(id):
     """
     cursor.execute("SELECT * FROM Availabilities WHERE avId=?", id)
     return cursor.fetchone()
+
+def get_venue_availabilities(venueid):
+    """
+    Return all availabilities for a venue with the
+    given venueid.
+    """
+    cursor.execute("SELECT * FROM Availabilities  \
+        WHERE venueid=?", venueid)
+    
+    return cursor.fetchall()
 
 def get_overlapping_availability(startDate, endDate):
     """
