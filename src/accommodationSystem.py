@@ -9,6 +9,7 @@ class AccommodationSystem:
     def add_acc(self, id, acc):
         '''Adds accommodations into the system'''
         self._accommodations[id] = acc
+        acc.__id = id
 
 
     def get_acc(self, id):
