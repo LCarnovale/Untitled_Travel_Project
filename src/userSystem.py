@@ -3,9 +3,11 @@ import re
 import cloud.dbTools as db
 from user import User
 
+class UserSystemError(Exception):
+    def __init__(self, msg):
+        super().__init__(msg)
 
-class EmailError(Exception):
-    pass
+
 
 class UserSystem:
     def __init__(self):
@@ -13,6 +15,7 @@ class UserSystem:
 
     def add_user(self, uid, user):
         self._users[uid] = user
+        user.__id = uid
 
     def get_user(self, userid):
         '''Finds user given the userID'''
@@ -35,15 +38,53 @@ class UserSystem:
         Return the new user's id on success.
         Return None on failure.
         """
-        if self.checkEmail(email) is None:
-            raise EmailError("Please enter a valid email address")
-        else:
-            self._email = email
         # TODO: Verify user input in here
+        # Might not be needed since the setters in User() are already checking
 
         uid = db.insert_user(name, username, pwd, email, phone, description)
         return uid
 
-    def checkEmail(self, email):
-        x = re.search(r"[\w0-9]+@[\w0-9]+\.com", email)
-        return x
+    def set_password(self, uid, new_password):
+        """
+        Change the password for a user. The plain password is not
+        kept in the user object so the database will be updated when
+        this is called, and then the updated user will be reloaded from 
+        the database.
+
+        Returns the new user object, which will also be available in
+        userSystem under the original id.
+        """
+        try:
+            uid = int(uid)
+        except ValueError:
+            raise ValueError("uid must be an integer.")
+        
+        self._users.pop(uid, None)
+        db.update_user(uid, pwdplain=new_password)
+        return self.get_user(uid)
+
+    def update_user(self, uid):
+        """
+        Updates a database record for a user with information
+        in the user object from this userSystem. If uid does
+        not exist in userSystem an error is raised, because
+        there should not be a reason to edit a user that was never loaded.
+        """
+        if uid not in self._users:
+            raise UserSystemError("Attempt to edit a user that has not been loaded.")
+
+        user = self.get_user(uid)
+
+        db.update_user(uid,
+            name=user.name,
+            userName=user.username,
+            email=user.email,
+            phone=user.mobile,
+            description=user.desc
+        )
+
+        
+
+
+
+

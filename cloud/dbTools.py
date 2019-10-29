@@ -366,30 +366,6 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
     else:
         return None
 
-def update_venue(venueid, *args):
-    """
-    Update a venue record. Takes the id of the venue to be updated (venueid)
-    and all arguments used in insert_venue(...)
-    and the id of the venue to be updated (venueid).
-    """
-    if len(args) != 10:
-        raise ArgumentException("Expected 11 arguments, got " + str(1 + len(args)))
-    query = """UPDATE Venues SET 
-    ownerid      = ?,
-    addressid    = ?,
-    name         = ?,
-    bedCount     = ?,
-    bathCount    = ?,
-    carCount     = ?,
-    description  = ?,
-    rate         = ?,
-    minStay      = ?,
-    maxStay      = ?,
-    details      = ?
-    WHERE venueid=?
-    """
-    cursor.execute(query, (*args, venueid))
-
 def insert_address(location):
     """
     Insert the given location into the database.
@@ -418,6 +394,100 @@ def insert_availability(venueid, startDate, endDate):
         return int(res[0])
     else:
         return None
+
+def update_venue(venueid, **fields):
+    """
+    Update a venue record. Takes the id of the venue to be updated (venueid)
+    and keyword arguments corresponding to the table's schema.
+
+    valid fields are:
+        ownerid, addressid, name, bedCount, bathCount, 
+        carCount, description, rate, minStay, maxStay, details     
+
+    Usage:
+        update_venue(1, bedCount=3) # Set the bedCount value to 3
+    Or
+        kwargs = {'name':'Red Centre', 'rate':20}
+        update_venue(2, **kwargs) # Set name to 'Red Centre' and rate to 20.
+    """
+
+    valid_fields = (
+        "ownerid", "addressid", "name", "bedCount", "bathCount",
+        "carCount", "description", "rate", "minStay", "maxStay", "details"
+    )
+
+    if 'venueid' in fields:
+        raise ArgumentException("Unable to change a venue's id.")
+
+    query = "UPDATE Venues SET "
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException("Invalid field name: " + f)
+
+    # Build the rest of the query
+    keys = [f for f in fields]
+    # Do this to ensure dict ordering is irrelevant
+    vals = [fields[k] for k in keys]
+    s = [f"{f} = ?" for f in keys]
+    s = ' AND '.join(s)
+    query += s
+    query += " WHERE venueid=?"
+
+    cursor.execute(query, (*vals, venueid))
+
+def update_user(userid, **fields):
+    """
+    Update a user record. Takes the id of the user to be updated (userid)
+    and keyword arguments corresponding to the table's schema.
+    pwdhash and pwdplain must not be supplied at the same time, as both
+    affect the pwdhash field.
+
+    ** To update the password: **
+    Changing the pwdhash is not recommended. Instead, provide a plain text 
+    password for the keyword pwdplain and the hash will be calculated and
+    stored.
+
+    valid fields are:
+        name, userName, email, phone, description, pwdhash, pwdplain
+
+    Usage:
+        update_user(1, email='e@mail.com')  # Change the user's email.
+    Or
+        kwargs = {'email': 'e@mail.com', 'phone': '12345'}
+        update_user(2, **kwargs)  # Change the user's phone number and email.
+    """
+
+    valid_fields = (
+        "name", "userName", "email", "phone", "description", "pwdhash", "pwdplain"
+    )
+
+    if 'userid' in fields:
+        raise ArgumentException("Unable to change a user's id.")
+
+    if 'pwdplain' in fields and 'pwdhash' in fields:
+        raise ArgumentException(
+            "Can not change plain text password and password hash fields simultaneously.")
+
+    query = "UPDATE Users SET "
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException("Invalid field name: " + f)
+
+    # Build the rest of the query
+    keys = [f for f in fields]
+    # Do this to ensure dict ordering is irrelevant
+    vals = [fields[k] for k in keys if k != 'pwdplain']
+    s = [f"{f} = ?" for f in keys if f != 'pwdplain']
+    if 'pwdplain' in keys:
+        s.append("pwdhash = HASHBYTES('SHA2_512', ?)")
+        vals.append(fields['pwdplain'])
+    s = ' , '.join(s)
+    query += s
+    query += " WHERE userid=?"
+
+    cursor.execute(query, (*vals, userid))
 
 def check_user_pass(username, password_text):
     """

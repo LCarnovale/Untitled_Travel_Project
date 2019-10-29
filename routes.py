@@ -54,14 +54,19 @@ def login():
                     "admin@temp.com",
                     "0456123456")
             else:
-                print("Try admin & admin")
+                print("No database connection, try admin & admin")
         if result:
-            session['name'] = user.name
-            session['username'] = user.username
-            session['email'] = user.email
-            session['mobile'] = user.mobile
             session['id'] = login_id
-            session['desc'] = user.desc
+            d = user.todict()
+            for k, v in zip(d.keys(), d.values()):
+                session[k] = v
+
+            # session['name'] = user.name
+            # session['username'] = user.username
+            # session['email'] = user.email
+            # session['mobile'] = user.mobile
+            # session['desc'] = user.desc
+            # session['user'] = user.tojson()
         return render_template('home.html')
     return render_template('login.html')
 
@@ -73,6 +78,8 @@ def logout():
     # Remove any existing sessions
     session.pop('username', None)
     session.pop('id', None)
+
+    db.commit() # Save user changes
 
     return redirect(url_for('home'))
 
@@ -106,19 +113,40 @@ Edit profile page
 '''
 @app.route('/edit', methods=['GET', 'POST'])
 def editprofile():
+    # Create user.
+    uid = session['id']
+    user = userSystem.get_user(uid)
     if request.method == 'POST':
-        # Create user.
         form = request.form
-        uid = userSystem.get_user(session['id'])
 
-        if uid is not None:
-            user._email = form['account_email']
-            user._phone = form['account_phone']
-            user._desc = form['account_description']
+        if user is not None:
+            if form['account_pwd_new']:
+                pwd_check = db.check_user_pass(user.username, form['account_pwd_current'])
+                if pwd_check is None:
+                    # Incorrect password given
+                    return render_template('edit.html', pass_fail=True)
+                else:
+                    # Correct password given
+                    user = userSystem.set_password(uid, form['account_pwd_new'])
+            user.name = form['account_name']
+            user.username = form['account_username']
+            user.email = form['account_email']
+            user.phone = form['account_phone']
+            user.desc = form['account_description']
+            
+            # Assume edits successful
+            d = user.todict()
+            for k, v in zip(d.keys(), d.values()):
+                session[k] = v
+            # session['email'] = user.email
+            # session['phone'] = user.phone
+            # session['desc'] = user.desc
+            userSystem.update_user(uid)
+            db.commit()
         else:
             print("Error user not found")
         return render_template('confirm_edit.html')
-    return render_template('edit.html')
+    return render_template('edit.html', _user=user)
 	
 '''
 Main Booking page
@@ -193,7 +221,7 @@ def ad_main():
         # Create associated date ranges
         # This could be moved to another module?
         for i in range(0, int(form['dateCount']), 2):
-            newav = db.insert_availability(
+            db.insert_availability(
                 venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
             )
 
