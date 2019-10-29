@@ -62,6 +62,9 @@
             {%endif%}
         </ul></div>
       </div>
+      {% if err_msg %}
+      <label style="text-align:center; width:100%; color:red">{{err_msg}}</label>
+      {% endif %}
     </nav>
     <div class="container">
       <br>

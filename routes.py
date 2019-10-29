@@ -160,11 +160,14 @@ def book_main(id):
 
     if request.method == 'POST':
         form = request.form
-        if session['id']:
+        if 'id' in session:
             bookingSystem.create_booking(
                 id, session['id'], form['book_start'], form['book_end']
             )
             return render_template('book_confirm.html', acc=acc, **default_kwargs)
+        else:
+            return render_template('login.html', 
+                err_msg = "Please login to make a booking.", **default_kwargs)
 
     # Get owner details, address details, availabilities.
     owner = db.get_owner(acc.ownerid)
@@ -208,7 +211,7 @@ def ad_main():
         # (We haven't asked for enough info, pick a test owner)
         owner = db.get_owner(1)
         # Create Address info:
-        aid = db.insert_address(form['acc_location'])
+        aid = db.insert_address(form['acc_addr'])
 
         # Send to accommodationSystem
         venueid = accSystem.create_accomodation(
@@ -226,7 +229,8 @@ def ad_main():
             )
 
         # Done
-        print(request.form['avail_date'])
+        # print(request.form['avail_date'])
+        db.commit()
         return render_template('ad_confirm.html', id=venueid, **default_kwargs)
 
     return render_template('new_ad.html', **default_kwargs)
