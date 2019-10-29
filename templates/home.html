@@ -94,7 +94,10 @@
 			geocoder.geocode({'address': document.getElementById("searchkeyword").value}, function(results, status) {
 						if (status === 'OK') {
 							if (results[0]) {
-								var bounds = results[0].geometry.bounds.getSouthWest().lat()+","+results[0].geometry.bounds.getSouthWest().lng()+"+"+results[0].geometry.bounds.getNorthEast().lat()+","+results[0].geometry.bounds.getNorthEast().lng()
+								var bounds = results[0].geometry.bounds.getSouthWest().lat()+
+										 ","+results[0].geometry.bounds.getSouthWest().lng()+
+										 "+"+results[0].geometry.bounds.getNorthEast().lat()+
+										 ","+results[0].geometry.bounds.getNorthEast().lng()
 								//format = southwest bound+northeast bound
 								document.getElementById("geocodedvalue").value = bounds;
 								alert(document.getElementById("geocodedvalue").value)

@@ -489,6 +489,60 @@ def update_user(userid, **fields):
 
     cursor.execute(query, (*vals, userid))
 
+def update_owner(ownerid, **fields):
+    """
+    Update a owner record. Takes the id of the owner to be updated (ownerid)
+    and keyword arguments corresponding to the table's schema.
+    pwdhash and pwdplain must not be supplied at the same time, as both
+    affect the pwdhash field.
+
+    ** To update the password: **
+    Changing the pwdhash is not recommended. Instead, provide a plain text 
+    password for the keyword pwdplain and the hash will be calculated and
+    stored.
+
+    valid fields are:
+        name, userName, email, phone, description, pwdhash, pwdplain
+
+    Usage:
+        update_owner(1, email='e@mail.com')  # Change the owner's email.
+    Or
+        kwargs = {'email': 'e@mail.com', 'phone': '12345'}
+        update_owner(2, **kwargs)  # Change the owner's phone number and email.
+    """
+
+    valid_fields = (
+        "name", "userName", "email", "phone", "description", "pwdhash", "pwdplain"
+    )
+
+    if 'ownerid' in fields:
+        raise ArgumentException("Unable to change a owner's id.")
+
+    if 'pwdplain' in fields and 'pwdhash' in fields:
+        raise ArgumentException(
+            "Can not change plain text password and password hash fields simultaneously.")
+
+    query = "UPDATE Owners SET "
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException("Invalid field name: " + f)
+
+    # Build the rest of the query
+    keys = [f for f in fields]
+    # Do this to ensure dict ordering is irrelevant
+    vals = [fields[k] for k in keys if k != 'pwdplain']
+    s = [f"{f} = ?" for f in keys if f != 'pwdplain']
+    if 'pwdplain' in keys:
+        s.append("pwdhash = HASHBYTES('SHA2_512', ?)")
+        vals.append(fields['pwdplain'])
+    s = ' , '.join(s)
+    query += s
+    query += " WHERE ownerid=?"
+
+    cursor.execute(query, (*vals, ownerid))
+
+
 def check_user_pass(username, password_text):
     """
     Search users for a user with the matching username and password.

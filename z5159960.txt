@@ -39,3 +39,11 @@ Week 6
     Classes for representing users, venues etc. have been completed and
     are working well. I managed to make a booking on a venue from the website,
     which stored the relevant information in the database.
+
+Week 7: 
+    Website has a functional edit profile page, but there is still no way to log in as an owner.
+    Will try add this functionality this week.
+
+    Wednesday:
+    Now it is possible to login as an owner. This will help with
+    determining owners of new postings.

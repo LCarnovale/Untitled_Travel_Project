@@ -41,10 +41,20 @@ def login():
         # Attempt a Login
         login_id = -1
         if db.is_connected:
-            result = db.check_user_pass(request.form['username'], request.form['password'])
+            login_type = request.form['login_select'] # Will be either 'owner' or 'user'
+            if login_type == 'user':
+                result = db.check_user_pass(
+                    request.form['username'], request.form['password'])
+            else:
+                result = db.check_owner_pass(
+                    request.form['username'], request.form['password'])
             if result is not None:
                 login_id = result[0]
-                user = User(*result[1:])
+                user = userSystem.get_user(
+                    login_id, u_type=request.form['login_select'])  # should be same as  User(*result[1:])
+            else:
+                return render_template('login.html', login_fail=True)
+
         else:
             result = (request.form['password'] == 'admin' and request.form['username'] == 'admin')
             if result:
@@ -67,8 +77,8 @@ def login():
             # session['mobile'] = user.mobile
             # session['desc'] = user.desc
             # session['user'] = user.tojson()
-        return render_template('home.html')
-    return render_template('login.html')
+        return redirect('/') #render_template('home.html', **default_kwargs)
+    return render_template('login.html', **default_kwargs)
 
 '''
 Logout
@@ -187,25 +197,7 @@ Main Post accommodation page
 def ad_main():
     if request.method == "POST":
         form = request.form
-        # form elements:
-        # acc_name
-        # acc_addr
-        # acc_nbed
-        # acc_nbath
-        # acc_ncar
-        # acc_details
-        # acc_location
-        # own_name
-        # own_email
-        # own_phone
-        # description
-        # price
-        # dateCount 
-        # dateRange_0
-        # dateRange_1 ... (up to dateCount - 1)
-        # min_stay
-        # max_stay
-        # details
+        
 
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)

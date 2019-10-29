@@ -10,25 +10,64 @@ class UserSystemError(Exception):
 
 
 class UserSystem:
+    """
+    Handle fetching of users *and* owners from the database,
+    and allow updating of existing users and creation of new users.
+    """
     def __init__(self):
         self._users = {}
+        self._owners = {}
 
     def add_user(self, uid, user):
         self._users[uid] = user
         user.__id = uid
+    
+    def add_owner(self, oid, owner):
+        self._owners[oid] = owner
+        owner.__id = oid
 
-    def get_user(self, userid):
-        '''Finds user given the userID'''
-        if userid in self._users:
-            return self._users[userid]
+    def get_user(self, userid, u_type='user'):
+        '''
+        Finds a user or owner given the userID
+        u_type should be either 'user' or 'owner'
+        Return a user object.
+        '''
+        if u_type == 'user':
+            sys = self._users
+            add = self.add_user
+            get = db.get_user
+        elif u_type == 'owner':
+            sys = self._owners
+            add = self.add_owner
+            get = db.get_owner
         else:
-            u = db.get_user(userid)
+            raise UserSystemError(f"Invalid user type given: '{u_type}'")
+
+        if userid in sys:
+            return sys[userid]
+        else:
+            u = get(userid)
             if u is not None:
                 user = User(*u[1:])
-                self.add_user(userid, user)
+                add(userid, user)
                 return user
             else:
                 return None
+    
+    def get_owner(self, ownerid):
+        '''Finds an owner given the userID'''
+        # Might not need this anymore
+        if ownerid in self._owners:
+            return self._owners[ownerid]
+        else:
+            u = db.get_owner(ownerid)
+            if u is not None:
+                owner = User(*u[1:])
+                self.add_owner(ownerid, owner)
+                return owner
+            else:
+                return None
+ 
             
 
     def create_user(self, name, username, pwd, email, phone, description):
@@ -41,15 +80,44 @@ class UserSystem:
         # TODO: Verify user input in here
         # Might not be needed since the setters in User() are already checking
 
-        uid = db.insert_user(name, username, pwd, email, phone, description)
+        args = (name, username, pwd, email, phone, description)
+
+        uid = db.insert_user(*args)
+        self.get_user(uid) # Adds to the system.
+        # TODO: If the user has bad data, the insert might pass but the get_user()
+        # could fail, so we would want to remove the user from the database
+        # straight away. 
+        
         return uid
 
-    def set_password(self, uid, new_password):
+    def create_owner(self, name, username, pwd, email, phone, description):
         """
-        Change the password for a user. The plain password is not
+        Attempt to create an owner.
+        Takes pwd in plain text.
+        Return the new owner's id on success.
+        Return None on failure.
+        """
+        # TODO: Verify user input in here
+        # Might not be needed since the setters in User() are already checking
+
+        args = (name, username, pwd, email, phone, description)
+
+        oid = db.insert_owner(*args)
+        self.get_owner(oid) # Adds to the system.
+        # TODO: If the user has bad data, the insert might pass but the get_user()
+        # could fail, so we would want to remove the user from the database
+        # straight away. 
+        
+        return oid
+
+    def set_password(self, uid, new_password, u_type='user'):
+        """
+        Change the password for a user or owner. The plain password is not
         kept in the user object so the database will be updated when
         this is called, and then the updated user will be reloaded from 
         the database.
+
+        u_type should be either 'user' or 'owner'
 
         Returns the new user object, which will also be available in
         userSystem under the original id.
@@ -58,24 +126,48 @@ class UserSystem:
             uid = int(uid)
         except ValueError:
             raise ValueError("uid must be an integer.")
-        
-        self._users.pop(uid, None)
-        db.update_user(uid, pwdplain=new_password)
-        return self.get_user(uid)
 
-    def update_user(self, uid):
+        if u_type == 'user':
+            pop = self._users.pop
+            update = db.update_user
+            get = self.get_user
+        elif u_type == 'owner':
+            pop = self._owners.pop
+            update = db.update_owner
+            get = self.get_owner
+        else:
+            raise UserSystemError("Invalid user type given: '" + u_type + "'")
+
+        pop(uid)
+        update(uid, pwdplain=new_password)
+        return get(uid)
+
+    def update_user(self, uid, u_type='user'):
         """
-        Updates a database record for a user with information
+        Updates a database record for a user or owner with information
         in the user object from this userSystem. If uid does
         not exist in userSystem an error is raised, because
         there should not be a reason to edit a user that was never loaded.
+
+        u_type should be either 'user' or 'owner'
         """
-        if uid not in self._users:
-            raise UserSystemError("Attempt to edit a user that has not been loaded.")
+        if u_type == 'user':
+            sys = self._users
+            get = db.get_user
+            update = db.update_user
+        elif u_type == 'owner':
+            sys = self._owners
+            get = db.get_owner
+            update = db.update_owner
+        else:
+            raise UserSystemError(f"Invalid user type given: '{u_type}'")
 
-        user = self.get_user(uid)
+        if uid not in sys:
+            raise UserSystemError(f"Attempt to edit a {u_type} that has not been loaded.")
 
-        db.update_user(uid,
+        user = get(uid)
+
+        update(uid,
             name=user.name,
             userName=user.username,
             email=user.email,

@@ -8,8 +8,20 @@
 	<h2> Please enter your login details: </h2>
 	<form name='post_ad' id = "regForm" method='POST'>
 		<div>Login
+			{% if login_fail %}
+			<p><label style="color:red">Invalid username or password</label></p>
+			{% endif %}
 			<p><input name = "username" placeholder = "Name" class = "required"></p>
 			<p><input name = "password" placeholder = "Password" type = "password"></p>	
+		
+			<p>Login Type:<br><label>
+				<input type = "radio" name='login_select' checked value='user'>
+				<span>Normal</span>
+			</label>
+			<label>
+				<input type="radio" name="login_select" value='owner'>
+				<span>Owner</span>
+			</label></p>
 			<p><input type = "submit" value= "Login" >
 		</div> 
 		<p> <a href="{{url_for('signup')}}">Not a member? Sign up</a></p>
