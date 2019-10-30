@@ -35,12 +35,12 @@
 			if (newpass.value == confirm.value) {
 				newpass.setAttribute('style', 'border:green 2px solid');
 				confirm.setAttribute('style', 'border:green 2px solid');
-				document.getElementById('btn_submit').disabled = false//setAttribute('enabled', 'true');
+				document.getElementById('btn_submit').disabled = false
 				document.getElementById('pass_match_label').style.display = "none";
 			} else {
 				newpass.setAttribute('style', 'border:red 1px solid');
 				confirm.setAttribute('style', 'border:red 1px solid');
-				document.getElementById('btn_submit').disabled = true//setAttribute('disabled', 'true');
+				document.getElementById('btn_submit').disabled = true
 				document.getElementById('pass_match_label').style.display = 'block';
 			}
 		}

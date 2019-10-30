@@ -6,7 +6,9 @@ from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
 from src.booking import Booking
-import src.userSystem
+import src.userSystem as US
+import src.accommodationSystem as AS
+import src.bookingSystem as BS
 from server import accSystem
 from server import userSystem
 from server import bookingSystem
@@ -98,17 +100,23 @@ Signup page
 '''
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    form = request.form
     if request.method == 'POST':
         # Create user.
-        form = request.form
-        uid = userSystem.create_user(
-            form['account_name'],
-            form['account_username'],
-            form['account_password'],
-            form['account_email'],
-            form['account_phone'],
-            form['account_description']
-        )
+        try:
+            uid = userSystem.create_user(
+                form['account_name'],
+                form['account_username'],
+                form['account_password'],
+                form['account_email'],
+                form['account_phone'],
+                form['account_description']
+            )
+        except US.UserCreateError as e:
+            if e.col == 'userName':
+                return render_template('signup.html', username_taken=True)
+            if e.col == 'email':
+                return render_template('signup.html', invalid_email=True)
 
         if uid is not None:
             print("User successfully added.")

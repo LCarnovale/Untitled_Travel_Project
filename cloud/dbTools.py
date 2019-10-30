@@ -62,6 +62,11 @@ class ArgumentException(Exception):
     def __init__(self, message):
         super().__init__(message)
 
+class InsertionError(Exception):
+    def __init__(self, message, col=None, _type=None):
+        self.col = col
+        self.type = _type
+        super().__init__(message)
 
 class _FailedConnectionHandler:
     """
@@ -105,13 +110,11 @@ def init():
     try: 
         import connect_config
         cnxn = connect_config.get_connection()
-    except Exception as e:
+    except pyodbc.ProgrammingError as e:
         if ("IP address" in str(e)): 
-            # Could check for this exception properly with pyodbc.ProgrammingError,
-            # but pyodbc may not be installed.
             msg = str(e).split("IP address '")[1]
             msg = msg.split("' is not")[0]
-            print("Your ip (" + msg + ") was not allowed.")
+            print("Your ip (" + msg + ") was denied.")
         else:
             print(e)
         print("Unable to connect to database. Function calls will do nothing.")
@@ -256,6 +259,13 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
     #  email        varchar(100)
     #  phone        varchar(20)
     #  description  text 
+
+    # Make sure username is unique:
+    if (cursor.execute("SELECT * FROM users WHERE username = ?", userName).fetchone()):
+        raise InsertionError(
+            "Username already exists in users table.", col='userName', _type='duplicate')
+
+
     try:
         cursor.execute(
             "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
@@ -263,8 +273,8 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
             (name, userName, email, phone, description, password)
         )
     except pyodbc.IntegrityError as e:
-        print("Duplicate username on insert.")
         raise e
+        # raise InsertionError("SQL Integrity Error, likely a duplicate username on insert.")
 
     res = cursor.fetchone()
     if res is not None:

@@ -1,12 +1,24 @@
 import re
 
 import cloud.dbTools as db
-from user import User
+import user
+User = user.User
 
 class UserSystemError(Exception):
     def __init__(self, msg):
         super().__init__(msg)
 
+class UserCreateError(UserSystemError):
+    def __init__(self, msg, col=None, err=None):
+        # col: column/field causing the error (eg. userName)
+        # err: err with the column
+        if col is not None:
+            msg += f"\nInvalid data in field: {col}"
+        if err is not None:
+            msg += f"\nError: {err}"
+        self.col = col
+        self.err = err
+        super().__init__(msg)
 
 
 class UserSystem:
@@ -82,8 +94,15 @@ class UserSystem:
 
         args = (name, username, pwd, email, phone, description)
 
-        uid = db.insert_user(*args)
-        self.get_user(uid) # Adds to the system.
+        try:
+            uid = db.insert_user(*args)
+        except db.InsertionError as e:
+            raise UserCreateError("Error creating user.", col=e.col, err=e._type)
+        
+        try:
+            self.get_user(uid) # Adds to the system.
+        except user.EmailError:
+            raise UserCreateError("Error creating user.", col='email', err='invalid email')
         # TODO: If the user has bad data, the insert might pass but the get_user()
         # could fail, so we would want to remove the user from the database
         # straight away. 
