@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Profile Updated</title>
+{% endblock %}
+
+{% block content %}
+    <h2> Your profile is changed! </h2>
+    <p><a href = {{url_for('home')}}> Go home </a><p>
+{% endblock %}

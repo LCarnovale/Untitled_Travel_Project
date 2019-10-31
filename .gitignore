@@ -3,4 +3,4 @@ venv*
 __pycache__
 *.pyc
 .vscode
-connect_config.py
+connect_config*.py

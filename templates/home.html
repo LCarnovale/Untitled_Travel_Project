@@ -34,10 +34,11 @@
 	
     <p> <img src = "/static/nsw1.png"  > </p>
 	<form name = 'search' method = 'POST' >
-		<input type = "text" name = "search">
-		<button type = "submit">Submit</button>
+		<input type = "text" placeholder = "Search.." id = "searchkeyword" name = "search">
+		<input type = "hidden" id = "geocodedvalue" readonly>
+		<button type = "button" onclick = "getgeocode()">Submit</button>
 		<br><br>
-		<p><button type = "button" onclick="myFunction()">Advance Search</button></p>
+		<p><button type = "button" onclick="myFunction()">Advanced Search</button></p>
 		<div id = advancesearch style = "display:none;">
 			Start date: <input type="text" id="startdate" name = "startdate">
 			End date: <input type="text" id="enddate" name = "enddate">
@@ -48,7 +49,7 @@
 			Location:
 			<input type = "hidden" name = "location" id = "hiddenlocation">
 			<br>
-			Distance Radius:<output name="radiusrange" id="radiusrange">100</output> m
+			Distance Radius: <output name="radiusrange" id="radiusrange">100</output> m
 			<br>
 			<input type = "range" name= "distance" id = "radiuschange" min = "100" max = "2000" value = "100" oninput = "changeCircle(this.value)">
 			<div id="map"></div>
@@ -88,7 +89,31 @@
 				circlelist[i].setRadius(parseInt(newval));
 			}
 		}
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"
-    async defer></script>
+		function getgeocode(){
+			var geocoder = new google.maps.Geocoder;
+			geocoder.geocode({'address': document.getElementById("searchkeyword").value}, function(results, status) {
+						if (status === 'OK') {
+							if (results[0]) {
+								var bounds = results[0].geometry.bounds.getSouthWest().lat()+
+										 ","+results[0].geometry.bounds.getSouthWest().lng()+
+										 "+"+results[0].geometry.bounds.getNorthEast().lat()+
+										 ","+results[0].geometry.bounds.getNorthEast().lng()
+								//format = southwest bound+northeast bound
+								document.getElementById("geocodedvalue").value = bounds;
+								alert(document.getElementById("geocodedvalue").value)
+							} 
+							else {
+								alert('No results found');
+							}
+						} 
+						else {
+							alert('Geocoder failed due to: ' + status);
+						}
+					});
+		}
+	</script>
+	<!-- Actual link: -->	
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>
+	<!-- Use a wrong link when map isn't needed: -->		
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=NotARealKey&callback=initMap"></script> -->
 {% endblock %}

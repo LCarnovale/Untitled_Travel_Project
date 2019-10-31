@@ -1,3 +1,5 @@
+import pyodbc
+
 """
 This module handles all interaction with the database.
 
@@ -8,7 +10,7 @@ Table structures:
     a tuple of values in the order shown below.
 
     Venue:
-    0   id            int           Identity   PRIMARY KEY
+    0   venueid       int           Identity   PRIMARY KEY
     1   ownerid       int           not null   FK -> Owners(id)
     2   addressid     int           not null   FK -> Addresses(id)
     3   name          varchar(200)  not null
@@ -17,27 +19,31 @@ Table structures:
     6   carCount      tinyint
     7   description   text
     8   rate          smallmoney
-    9   availStart    date
-    10  availEnd      date
-    11  minStay       int           DEFAULT 1
-    12  maxStay       int
-    13  details       text
+    9   minStay       int
+    10  maxStay       int
+    11  details       text
+
+    Availabilities:
+    0   avId          int        Identity  PRIMARY KEY
+    1   venueid       int                  FK -> Venues(id)
+    2   startDate     date
+    3   endDate       date
 
     Owners and Users:
-    0   id           int          Identity   PRIMARY KEY
-    1   name         varchar(50)  not null
-    2   userName     varchar(50)             UNIQUE
-    3   email        varchar(100)
-    4   phone        varchar(20)
-    5   description  text
-    6   pwdhash      bytes
+    0   ownerid/userid  int          Identity   PRIMARY KEY
+    1   name            varchar(50)  not null
+    2   userName        varchar(50)             UNIQUE
+    3   email           varchar(100)
+    4   phone           varchar(20)
+    5   description     text
+    6   pwdhash         bytes
 
     Addresses:
-    0   id          int        Identity  PRIMARY KEY
+    0   aid         int        Identity  PRIMARY KEY
     1   location    text
 
     Bookings:
-    0   id          int        Identity  PRIMARY KEY
+    0   bookid      int        Identity  PRIMARY KEY
     1   venueid     int        not null  FK -> Venues(id)
     2   userid      int        not null  FK -> Users(id)
     3   startDate   date       not null
@@ -51,6 +57,16 @@ Table structures:
 # cursor.attr will return a lambda func, or cursor will be a FailedConnectionHandler
 # object. You will probably want to instead return None in these cases.  
 ########
+
+class ArgumentException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+class InsertionError(Exception):
+    def __init__(self, message, col=None, _type=None):
+        self.col = col
+        self.type = _type
+        super().__init__(message)
 
 class _FailedConnectionHandler:
     """
@@ -73,17 +89,14 @@ class _FailedConnectionHandler:
     fetchone = _default
     fetchall = _default
 
-class _UninitialisedConnectionHandler:
-    def __getattr__(self, attr):
+class _UninitialisedConnectionHandler(_FailedConnectionHandler):
+    def __getattribute__(self, attr, *args, **kwargs):
         print("Connection has not been established yet. Call dbTools.init() to connect.")
-        return _FailedConnectionHandler.__getattribute__(self, attr)
-    
-
-
+        return super().__getattribute__(attr)
 
 cursor = _UninitialisedConnectionHandler()
 is_connected = False
-pyodbc = _FailedConnectionHandler()
+
 def init():
     """
     Establish a connection to the database. This must be called
@@ -101,19 +114,18 @@ def init():
             raise Exception("Not using database")
         import connect_config
         cnxn = connect_config.get_connection()
-    except Exception as e:
+    except pyodbc.ProgrammingError as e:
         if ("IP address" in str(e)): 
-            # Could check for this exception properly with pyodbc.ProgrammingError,
-            # but pyodbc may not be installed.
             msg = str(e).split("IP address '")[1]
             msg = msg.split("' is not")[0]
-            print("Your ip (" + msg + ") was not allowed.")
+            print("Your ip (" + msg + ") was denied.")
+        else:
+            print(e)
         print("Unable to connect to database. Function calls will do nothing.")
         cursor = _FailedConnectionHandler()
     else:
         print("Successfully connected to database.")
         cursor = cnxn.cursor()
-        pyodbc = connect_config.pyodbc
         is_connected = True
 
 def close():
@@ -146,7 +158,7 @@ def get_user(id):
 
     Returns None if the user does not exist.
     """
-    cursor.execute("SELECT * FROM Users WHERE id=?", id)
+    cursor.execute("SELECT * FROM Users WHERE userid=?", id)
     result = cursor.fetchone()
     return result
 
@@ -165,29 +177,73 @@ def get_owner(id):
 
     Return None if the owner does not exist.
     """
-    cursor.execute("SELECT * FROM Owners WHERE id=?", id)
+    cursor.execute("SELECT * FROM Owners WHERE ownerid=?", id)
+    return cursor.fetchone()
+
+def get_owner_from_uname(userName):
+    """
+    Return an owner matching the given userName.
+    """
+    cursor.execute("SELECT * FROM Owners WHERE userName=?", userName)
     return cursor.fetchone()
 
 def get_venue(id):
     """
     Return a venue with the matching id.
     """
-    cursor.execute("SELECT * FROM Venues WHERE id=?", id)
+    cursor.execute("SELECT * FROM Venues WHERE venueid=?", id)
     return cursor.fetchone()
 
 def get_booking(id):
     """
     Return a booking with the matching id.
     """
-    cursor.execute("SELECT * FROM Bookings WHERE id=?", id)
+    cursor.execute("SELECT * FROM Bookings WHERE bookid=?", id)
     return cursor.fetchone()
 
 def get_address(id):
     """
     Return an address with the matching id.
     """
-    cursor.execute("SELECT * FROM Addresses WHERE id=?", id)
+    cursor.execute("SELECT * FROM Addresses WHERE aid=?", id)
     return cursor.fetchone()
+
+def get_availability(id):
+    """
+    Get an availability matching the given id.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE avId=?", id)
+    return cursor.fetchone()
+
+def get_venue_availabilities(venueid):
+    """
+    Return all availabilities for a venue with the
+    given venueid.
+    """
+    cursor.execute("SELECT * FROM Availabilities  \
+        WHERE venueid=?", venueid)
+    
+    return cursor.fetchall()
+
+def get_overlapping_availability(startDate, endDate):
+    """
+    Get all availabilities that contain the given period in their
+    start and end dates.
+    Returns a list of availability rows.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE \
+        startDate<? AND endDate>?", (startDate, endDate))
+    return cursor.fetchall()
+
+def get_overlapping_availability_venue(venueid, startDate, endDate):
+    """
+    Get availabilities that contain the given period in their
+    start and end dates for a given venue id.
+    Returns a list of availability rows.
+    """
+    cursor.execute("SELECT * FROM Availabilities WHERE \
+        venueid=? AND startDate<? AND endDate>?", (venueid, startDate, endDate))
+    return cursor.fetchall()
 
 def insert_user(name, userName, password, email=None, phone=None, description=None):
     """
@@ -207,16 +263,21 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
     #  email        varchar(100)
     #  phone        varchar(20)
     #  description  text 
-    import pyodbc as pyodbc_module
+
+    # Make sure username is unique:
+    if (cursor.execute("SELECT * FROM users WHERE username = ?", userName).fetchone()):
+        raise InsertionError(
+            "Username already exists in users table.", col='userName', _type='duplicate')
+
     try:
         cursor.execute(
             "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            OUTPUT INSERTED.userid VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
-    except pyodbc_module.IntegrityError as e:
-        print("Duplicate username on insert.")
+    except pyodbc.IntegrityError as e:
         raise e
+        # raise InsertionError("SQL Integrity Error, likely a duplicate username on insert.")
 
     res = cursor.fetchone()
     if res is not None:
@@ -238,7 +299,7 @@ def insert_owner(name, userName, password, email=None, phone=None, description=N
     try:
         cursor.execute(
             "INSERT INTO Owners (name, userName, email, phone, description, pwdhash)   \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
+            OUTPUT INSERTED.ownerid VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
     except pyodbc_module.IntegrityError as e:
@@ -269,8 +330,8 @@ def insert_booking(venueid, userid, startDate, endDate):
     import pyodbc as pyodbc_module
     try:
         cursor.execute("INSERT INTO Bookings (venueid, userid, startDate, endDate) \
-            OUTPUT INSERTED.id VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
-    except pyodbc_module.IntegrityError as e:
+            OUTPUT INSERTED.bookid VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
+    except pyodbc.IntegrityError as e:
         print("Invalid venueid or userid on insert.")
         raise e
     
@@ -280,9 +341,9 @@ def insert_booking(venueid, userid, startDate, endDate):
     else:
         return None
     
-def insert_venue(ownerid, addressid, name, bedCount, bathCount, 
-        carCount, description, rate, availStart, availEnd,
-        minStay, maxStay, details):
+def insert_venue(ownerid, addressid, name, bedCount, bathCount,
+                 carCount, description, rate,
+                 minStay, maxStay, details):
     """
     Insert a venue.
     ** Dates should be type datetime.date
@@ -299,18 +360,16 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
     # carCount      tinyint
     # description   text
     # rate          smallmoney
-    # availStart    date
-    # availEnd      date
     # minStay       int           DEFAULT 1
     # maxStay       int
     # details       text
     try:
-        cursor.execute("INSERT INTO Venues (ownerid, addressid, name, bedCount, \
-            bathCount, carCount, description, rate, availStart, availEnd,       \
-            minStay, maxStay, details) OUTPUT INSERTED.id                       \
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-            (ownerid, addressid, name, bedCount, bathCount, 
-            carCount, description, rate, availStart, availEnd,
+        cursor.execute("INSERT INTO Venues (ownerid, addressid, name,     \
+            bedCount, bathCount, carCount, description, rate, minStay,    \
+            maxStay, details) OUTPUT INSERTED.venueid                     \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (ownerid, addressid, name, bedCount, bathCount,
+            carCount, description, rate,
             minStay, maxStay, details)
         )
     except pyodbc.IntegrityError as e:
@@ -328,7 +387,7 @@ def insert_address(location):
 
     Return the id of the inserted address.
     """
-    cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.id VALUES (?)", location)
+    cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.aid VALUES (?)", location)
 
 
     res = cursor.fetchone()
@@ -337,6 +396,206 @@ def insert_address(location):
     else:
         return None
 
+def insert_availability(venueid, startDate, endDate):
+    """
+    Insert an availability and return the id of the new availability.
+    """
+    cursor.execute(
+        "INSERT INTO Availabilities (venueid, startDate, endDate) OUTPUT INSERTED.avId VALUES (?, ?, ?)", (
+            venueid, startDate, endDate)
+    )
+    res = cursor.fetchone()
+    if res is not None:
+        return int(res[0])
+    else:
+        return None
+
+def update_venue(venueid, **fields):
+    """
+    Update a venue record. Takes the id of the venue to be updated (venueid)
+    and keyword arguments corresponding to the table's schema.
+
+    valid fields are:
+        ownerid, addressid, name, bedCount, bathCount, 
+        carCount, description, rate, minStay, maxStay, details     
+
+    Usage:
+        update_venue(1, bedCount=3) # Set the bedCount value to 3
+    Or
+        kwargs = {'name':'Red Centre', 'rate':20}
+        update_venue(2, **kwargs) # Set name to 'Red Centre' and rate to 20.
+    """
+
+    valid_fields = (
+        "ownerid", "addressid", "name", "bedCount", "bathCount",
+        "carCount", "description", "rate", "minStay", "maxStay", "details"
+    )
+
+    if 'venueid' in fields:
+        raise ArgumentException("Unable to change a venue's id.")
+
+    query = "UPDATE Venues SET "
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException("Invalid field name: " + f)
+
+    # Build the rest of the query
+    keys = [f for f in fields]
+    # Do this to ensure dict ordering is irrelevant
+    vals = [fields[k] for k in keys]
+    s = [f"{f} = ?" for f in keys]
+    s = ' AND '.join(s)
+    query += s
+    query += " WHERE venueid=?"
+
+    cursor.execute(query, (*vals, venueid))
+
+def update_user(userid, **fields):
+    """
+    Update a user record. Takes the id of the user to be updated (userid)
+    and keyword arguments corresponding to the table's schema.
+    pwdhash and pwdplain must not be supplied at the same time, as both
+    affect the pwdhash field.
+
+    ** To update the password: **
+    Changing the pwdhash is not recommended. Instead, provide a plain text 
+    password for the keyword pwdplain and the hash will be calculated and
+    stored.
+
+    valid fields are:
+        name, userName, email, phone, description, pwdhash, pwdplain
+
+    Usage:
+        update_user(1, email='e@mail.com')  # Change the user's email.
+    Or
+        kwargs = {'email': 'e@mail.com', 'phone': '12345'}
+        update_user(2, **kwargs)  # Change the user's phone number and email.
+    """
+
+    valid_fields = (
+        "name", "userName", "email", "phone", "description", "pwdhash", "pwdplain"
+    )
+
+    if 'userid' in fields:
+        raise ArgumentException("Unable to change a user's id.")
+
+    if 'pwdplain' in fields and 'pwdhash' in fields:
+        raise ArgumentException(
+            "Can not change plain text password and password hash fields simultaneously.")
+
+    query = "UPDATE Users SET "
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException("Invalid field name: " + f)
+
+    # Build the rest of the query
+    keys = [f for f in fields]
+    # Do this to ensure dict ordering is irrelevant
+    vals = [fields[k] for k in keys if k != 'pwdplain']
+    s = [f"{f} = ?" for f in keys if f != 'pwdplain']
+    if 'pwdplain' in keys:
+        s.append("pwdhash = HASHBYTES('SHA2_512', ?)")
+        vals.append(fields['pwdplain'])
+    s = ' , '.join(s)
+    query += s
+    query += " WHERE userid=?"
+
+    cursor.execute(query, (*vals, userid))
+
+def update_owner(ownerid, **fields):
+    """
+    Update a owner record. Takes the id of the owner to be updated (ownerid)
+    and keyword arguments corresponding to the table's schema.
+    pwdhash and pwdplain must not be supplied at the same time, as both
+    affect the pwdhash field.
+
+    ** To update the password: **
+    Changing the pwdhash is not recommended. Instead, provide a plain text 
+    password for the keyword pwdplain and the hash will be calculated and
+    stored.
+
+    valid fields are:
+        name, userName, email, phone, description, pwdhash, pwdplain
+
+    Usage:
+        update_owner(1, email='e@mail.com')  # Change the owner's email.
+    Or
+        kwargs = {'email': 'e@mail.com', 'phone': '12345'}
+        update_owner(2, **kwargs)  # Change the owner's phone number and email.
+    """
+
+    valid_fields = (
+        "name", "userName", "email", "phone", "description", "pwdhash", "pwdplain"
+    )
+
+    if 'ownerid' in fields:
+        raise ArgumentException("Unable to change a owner's id.")
+
+    if 'pwdplain' in fields and 'pwdhash' in fields:
+        raise ArgumentException(
+            "Can not change plain text password and password hash fields simultaneously.")
+
+    query = "UPDATE Owners SET "
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException("Invalid field name: " + f)
+
+    # Build the rest of the query
+    keys = [f for f in fields]
+    # Do this to ensure dict ordering is irrelevant
+    vals = [fields[k] for k in keys if k != 'pwdplain']
+    s = [f"{f} = ?" for f in keys if f != 'pwdplain']
+    if 'pwdplain' in keys:
+        s.append("pwdhash = HASHBYTES('SHA2_512', ?)")
+        vals.append(fields['pwdplain'])
+    s = ' , '.join(s)
+    query += s
+    query += " WHERE ownerid=?"
+
+    cursor.execute(query, (*vals, ownerid))
+
+def update_booking(bookid, **fields):
+    """
+    Update a booking record. Takes the id of the booking to be updated (bookid)
+    and values for available fields:
+    
+    fields:
+        venueid, userid, startDate, endDate
+
+    Similar usage to update_owner()
+    """
+    valid_fields = (
+        "venueid", "userid", "startDate", "endDate"
+    )
+
+    if 'bookid' in fields:
+        raise ArgumentException("Unable to change a booking's id.")
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException(f"Invalid field name: {f}")
+
+    query = "UPDATE Bookings SET "
+
+    keys = [f for f in fields]
+    vals = [fields[f] for f in keys]
+    s = [f"{f} = ?" for f in keys]
+    s = ' , '.join(s)
+    query += s
+    query += " WHERE bookid=?"
+
+    cursor.execute(query, (*vals, bookid))
+
+def update_address(aid, location=None):
+    """
+    Update the location of an address row.
+    """
+    if location is not None:
+        cursor.execute('UPDATE Addresses SET location=? WHERE aid=?', (location, aid))
+    
 def check_user_pass(username, password_text):
     """
     Search users for a user with the matching username and password.
@@ -372,6 +631,8 @@ def select_venues(**patterns):
         SELECT * FROM Venues WHERE 
         column1 LIKE pattern1 AND
         column2 LIKE pattern2 ...
+
+    Returns a list of matching rows.    
         
     For example: 
         select_venues(name="test%", details="%d%") 
@@ -382,7 +643,7 @@ def select_venues(**patterns):
     information on patterns.
 
     Available fields:
-        id            int          
+        venueid       int          
         ownerid       int          
         addressid     int          
         name          varchar(200) 
@@ -419,11 +680,13 @@ def select_bookings(**patterns):
         column1 LIKE pattern1 AND
         column2 LIKE pattern2 ...
 
+    Returns a list of matching rows.
+
     See https://www.w3schools.com/sql/sql_like.asp for 
     information on patterns.
 
     Available fields:
-        id          int    
+        bookid      int    
         venueid     int    
         userid      int    
         startDate   date   
