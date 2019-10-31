@@ -265,7 +265,6 @@ def insert_user(name, userName, password, email=None, phone=None, description=No
         raise InsertionError(
             "Username already exists in users table.", col='userName', _type='duplicate')
 
-
     try:
         cursor.execute(
             "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
@@ -552,7 +551,45 @@ def update_owner(ownerid, **fields):
 
     cursor.execute(query, (*vals, ownerid))
 
+def update_booking(bookid, **fields):
+    """
+    Update a booking record. Takes the id of the booking to be updated (bookid)
+    and values for available fields:
+    
+    fields:
+        venueid, userid, startDate, endDate
 
+    Similar usage to update_owner()
+    """
+    valid_fields = (
+        "venueid", "userid", "startDate", "endDate"
+    )
+
+    if 'bookid' in fields:
+        raise ArgumentException("Unable to change a booking's id.")
+
+    for f in fields:
+        if f not in valid_fields:
+            raise ArgumentException(f"Invalid field name: {f}")
+
+    query = "UPDATE Bookings SET "
+
+    keys = [f for f in fields]
+    vals = [fields[f] for f in keys]
+    s = [f"{f} = ?" for f in keys]
+    s = ' , '.join(s)
+    query += s
+    query += " WHERE bookid=?"
+
+    cursor.execute(query, (*vals, bookid))
+
+def update_address(aid, location=None):
+    """
+    Update the location of an address row.
+    """
+    if location is not None:
+        cursor.execute('UPDATE Addresses SET location=? WHERE aid=?', (location, aid))
+    
 def check_user_pass(username, password_text):
     """
     Search users for a user with the matching username and password.
