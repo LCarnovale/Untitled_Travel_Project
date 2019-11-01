@@ -47,3 +47,8 @@ Week 7:
     Wednesday:
     Now it is possible to login as an owner. This will help with
     determining owners of new postings.
+
+    Friday:
+    Merged the current backend into Ian's search branch, will get that working smoothly then
+    hopefully merge back into backend and/or master. Might have to fix some outdated
+    references to class methods etc. 
