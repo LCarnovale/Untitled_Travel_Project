@@ -6,7 +6,7 @@ from src.accommodation import Accommodation
 
 class Search():
     def __init__(self, items):
-        self._items = [items[x] for x in items]
+        self._items = items
         self._scores = []
         self._most_recent = []
 
@@ -24,11 +24,11 @@ class Search():
             self._limitRegion(text_bounds)
 
         if startdate:
-            startdate = datetime.strptime(startdate, '%d-%m-%Y')
+            startdate = datetime.strptime(startdate, '%d/%m/%Y')
         else:
             startdate = datetime.today()
         if enddate:
-            enddate = datetime.strptime(enddate, '%d-%m-%Y')
+            enddate = datetime.strptime(enddate, '%d/%m/%Y')
             self._filterDates(startdate, enddate)
 
         if beds:
@@ -44,7 +44,7 @@ class Search():
             distance = int(distance)
             self._filterLocation(location, distance)
 
-        return [x[0] for x in self._scores]
+        return [self._items[x[0]] for x in self._scores]
 
     def _keywordSearch(self, search):
         search = self._cleanString(search)
@@ -52,7 +52,8 @@ class Search():
 
         scores = []
 
-        for ad in self._items:
+        for ad_id in self._items:
+            ad = self._items[ad_id]
             title_score = 0.0
             body_score = 0.0
 
@@ -82,7 +83,8 @@ class Search():
 
         limited = []
 
-        for ad, score in self._scores:
+        for ad_id, score in self._scores:
+            ad = self._items[ad_id]
             if (southwest[0] < ad.getLocation()[0] and # TODO: fix location
                 southwest[1] < ad.getLocation()[1] and
                 northeast[0] > ad.getLocation()[0] and
@@ -105,7 +107,8 @@ class Search():
 
     def _filterBeds(self, beds):
         result = []
-        for ad, score in self._scores:
+        for ad_id, score in self._scores:
+            ad = self._items[ad_id]
             if (ad.bed_count >= beds):
                 result.append((ad, score))
 
@@ -113,7 +116,8 @@ class Search():
 
     def _filterBaths(self, baths):
         result = []
-        for ad, score in self._scores:
+        for ad_id, score in self._scores:
+            ad = self._items[ad_id]
             if (ad.bath_count >= baths):
                 result.append((ad, score))
 
@@ -121,7 +125,8 @@ class Search():
 
     def _filterParking(self, spots):
         result = []
-        for ad, score in self._scores:
+        for ad_id, score in self._scores:
+            ad = self._items[ad_id]
             if (ad.car_count >= spots):
                 result.append((ad, score))
 
@@ -133,7 +138,8 @@ class Search():
         lat = float(location.split(' ')[0])
         lon = float(location.split(' ')[1])
 
-        for ad, score in self._scores:
+        for ad_id, score in self._scores:
+            ad = self._items[ad_id]
             if (geodesic((lat, lon), ad.getLocation()).km <= dist/1000): # TODO fix location
                 result.append((ad, score))
 

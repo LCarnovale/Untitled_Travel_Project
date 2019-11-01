@@ -214,4 +214,8 @@ class Accommodation:
     def details(self, details):
         self._details = details
 
+    @property
+    def id(self):
+        return self.__id
+
 

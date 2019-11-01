@@ -51,7 +51,7 @@ def home():
                 return render_template('search_results.html', results = results)
             else:
                 accSystem.get_all_ads()
-                results = accSystem.advancedSearch(search, startdate, enddate, beds,
+                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                    bathrooms, parking, location, distance)
                 return render_template('search_results.html', results = results)
         except Exception as e:
