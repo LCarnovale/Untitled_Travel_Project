@@ -9,7 +9,7 @@ from src.user import User
 from src.stayDetails import StayDetails
 from src.accommodation import Accommodation
 
-USE_DATABASE = False
+USE_DATABASE = True
 
 app = Flask(__name__)
 app.secret_key = 'very-secret-123'  # Used to add entropy TODO: Learn what this is actually for

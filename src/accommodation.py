@@ -1,4 +1,5 @@
 import cloud.dbTools as db
+import datetime
 
 class NegativeNumberError(Exception):
     pass
@@ -53,8 +54,27 @@ class Accommodation:
         return ['2019-10-10', '2019-11-11']
 
     def isAvailable(self, startDate, endDate=None):
-        # TODO
-        return True
+        """
+        Check if the venue is available during the given range.
+        Give single date to check if the venue is available for the
+        given day and the next day.
+        
+        startDate and endDate must be datetime.date types.
+
+        Return True if available.
+        """
+        
+        if (endDate == None):
+            endDate = startDate + datetime.timedelta(days=1)
+        
+        avails = db.get_overlapping_availability_venue(self.__id, startDate, endDate)
+
+        if len(avails) >= 1:
+            return True
+        else:
+            return False
+
+
 
     '''
     Properties

@@ -19,10 +19,11 @@ class Search():
 
         if startdate:
             startdate = datetime.strptime(startdate, '%d-%m-%Y')
-            self._filterStart(startdate)
+        else:
+            startdate = datetime.today()
         if enddate:
             enddate = datetime.strptime(enddate, '%d-%m-%Y')
-            self._filterStart(enddate)
+            self._filterDates(startdate, enddate)
 
         if beds:
             self._filterBeds(int(beds))
@@ -49,11 +50,11 @@ class Search():
             title_score = 0.0
             body_score = 0.0
 
-            name = ad.getName()
+            name = ad.name
             name = self._cleanString(name)
             name = name.split(' ')
 
-            desc = ad.getDesc()
+            desc = ad.description
             desc = self._cleanString(desc)
             desc = desc.split(' ')
 
@@ -68,18 +69,11 @@ class Search():
 
         self._scores = scores
 
-    def _filterStart(self, startdate):
+    def _filterDates(self, startdate, enddate):
         result = []
-        for ad, score in self._scores:
-            if (ad.getAvailEnd() >= startdate):
-                result.append((ad, score))
-
-        self._scores = result
-
-    def _filterEnd(self, enddate):
-        result = []
-        for ad, score in self._scores:
-            if (ad.getAvailStart() <= enddate):
+        for ad_id, score in self._scores:
+            ad = self._items[ad_id]
+            if (ad.isAvailable(startdate, enddate)):
                 result.append((ad, score))
 
         self._scores = result
@@ -140,15 +134,17 @@ class Search():
 
         scores = []
 
-        for ad in self._items:
+        for ad_id in self._items:
+            ad = self._items[ad_id]
+
             title_score = 0.0
             body_score = 0.0
 
-            name = ad.getName()
+            name = ad.name
             name = self._cleanString(name)
             name = name.split(' ')
 
-            desc = ad.getDesc()
+            desc = ad.description
             desc = self._cleanString(desc)
             desc = desc.split(' ')
 

@@ -242,7 +242,7 @@ def get_overlapping_availability_venue(venueid, startDate, endDate):
     Returns a list of availability rows.
     """
     cursor.execute("SELECT * FROM Availabilities WHERE \
-        venueid=? AND startDate<? AND endDate>?", (venueid, startDate, endDate))
+        venueid=? AND startDate<=? AND endDate>=?", (venueid, startDate, endDate))
     return cursor.fetchall()
 
 def insert_user(name, userName, password, email=None, phone=None, description=None):
