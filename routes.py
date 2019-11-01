@@ -32,6 +32,7 @@ def home():
     if request.method == 'POST':
         try:
             search = request.form.get('search')
+            text_bounds = request.form.get('geocodedvalue')
             startdate = request.form.get('startdate')
             enddate = request.form.get('enddate')
             beds = request.form.get('beds')
@@ -41,8 +42,15 @@ def home():
             distance = request.form.get('distance')
 
             if (search or startdate or enddate or beds or
-                bathrooms or parking or location or distance):
-
+                bathrooms or parking or location):
+                print(search, startdate, enddate, beds,
+                      bathrooms, parking, location)
+                accSystem.get_all_ads()
+                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
+                                                   bathrooms, parking, location, distance)
+                return render_template('search_results.html', results = results)
+            else:
+                accSystem.get_all_ads()
                 results = accSystem.advancedSearch(search, startdate, enddate, beds,
                                                    bathrooms, parking, location, distance)
                 return render_template('search_results.html', results = results)
@@ -52,6 +60,7 @@ def home():
             print('Error as follows:')
             print(e)
             print('----------------------------------')
+            raise e
             return render_template('search_results.html', results = [])
 
     return render_template('home.html', **default_kwargs)

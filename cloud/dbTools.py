@@ -194,6 +194,13 @@ def get_venue(id):
     cursor.execute("SELECT * FROM Venues WHERE venueid=?", id)
     return cursor.fetchone()
 
+def get_all_venues():
+    """
+    Return a venue with the matching id.
+    """
+    cursor.execute("SELECT * FROM Venues")
+    return cursor.fetchall()
+
 def get_booking(id):
     """
     Return a booking with the matching id.

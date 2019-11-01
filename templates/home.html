@@ -33,9 +33,9 @@
 	</script>
 	
     <p> <img src = "/static/nsw1.png"  > </p>
-	<form name = 'search' method = 'POST' >
+	<form id = 'searchForm' name = 'search' method = 'POST' >
 		<input type = "text" placeholder = "Search.." id = "searchkeyword" name = "search">
-		<input type = "hidden" id = "geocodedvalue" readonly>
+		<input type = "hidden" name = "geocodedvalue" id = "geocodedvalue" readonly>
 		<button type = "button" onclick = "getgeocode()">Submit</button>
 		<br><br>
 		<p><button type = "button" onclick="myFunction()">Advanced Search</button></p>
@@ -93,14 +93,15 @@
 			var geocoder = new google.maps.Geocoder;
 			geocoder.geocode({'address': document.getElementById("searchkeyword").value}, function(results, status) {
 						if (status === 'OK') {
-							if (results[0]) {
+							if (results[0] && results[0].geometry &&
+								results[0].geometry.bounds) {
 								var bounds = results[0].geometry.bounds.getSouthWest().lat()+
 										 ","+results[0].geometry.bounds.getSouthWest().lng()+
 										 "+"+results[0].geometry.bounds.getNorthEast().lat()+
 										 ","+results[0].geometry.bounds.getNorthEast().lng()
 								//format = southwest bound+northeast bound
 								document.getElementById("geocodedvalue").value = bounds;
-								alert(document.getElementById("geocodedvalue").value)
+								alert(document.getElementById("geocodedvalue").value);
 							} 
 							else {
 								alert('No results found');
@@ -109,6 +110,7 @@
 						else {
 							alert('Geocoder failed due to: ' + status);
 						}
+						document.getElementById('searchForm').submit();
 					});
 		}
 	</script>

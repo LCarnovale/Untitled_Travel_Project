@@ -2,13 +2,15 @@ import re
 from datetime import datetime
 from geopy.distance import geodesic
 
+from src.accommodation import Accommodation
+
 class Search():
     def __init__(self, items):
-        self._items = items
+        self._items = [items[x] for x in items]
         self._scores = []
         self._most_recent = []
 
-    def advancedSearch(self, search, startdate, enddate, beds,
+    def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
         self._scores = []
 
@@ -16,6 +18,10 @@ class Search():
             self._keywordSearch(search)
         else:
             self._scores = [(x,0.0) for x in self._items]
+            print(self._scores)
+
+        if text_bounds:
+            self._limitRegion(text_bounds)
 
         if startdate:
             startdate = datetime.strptime(startdate, '%d-%m-%Y')
@@ -69,6 +75,24 @@ class Search():
 
         self._scores = scores
 
+    def _limitRegion(self, text_bounds):
+        southwest, northeast = text_bounds.split('+')
+        southwest = tuple(map(float, southwest.split(',')))
+        northeast = tuple(map(float, northeast.split(',')))
+
+        limited = []
+
+        for ad, score in self._scores:
+            if (southwest[0] < ad.getLocation()[0] and # TODO: fix location
+                southwest[1] < ad.getLocation()[1] and
+                northeast[0] > ad.getLocation()[0] and
+                northeast[1] > ad.getLocation()[1]):
+                limited.append((ad, score))
+
+        if limited != []:
+            self._scores = limited
+
+
     def _filterDates(self, startdate, enddate):
         result = []
         for ad_id, score in self._scores:
@@ -82,7 +106,7 @@ class Search():
     def _filterBeds(self, beds):
         result = []
         for ad, score in self._scores:
-            if (ad.getBeds() >= beds):
+            if (ad.bed_count >= beds):
                 result.append((ad, score))
 
         self._scores = result
@@ -90,21 +114,18 @@ class Search():
     def _filterBaths(self, baths):
         result = []
         for ad, score in self._scores:
-            if (ad.getBathrooms() >= baths):
+            if (ad.bath_count >= baths):
                 result.append((ad, score))
 
         self._scores = result
 
     def _filterParking(self, spots):
-        print('#TODO: Parking unimplemented')
-        '''
         result = []
         for ad, score in self._scores:
-            if (ad.getParking() >= spots):
+            if (ad.car_count >= spots):
                 result.append((ad, score))
 
         self._scores = result
-        '''
 
 
     def _filterLocation(self, location, dist):
@@ -113,7 +134,7 @@ class Search():
         lon = float(location.split(' ')[1])
 
         for ad, score in self._scores:
-            if (geodesic((lat, lon), ad.getLocation()).km <= dist/1000):
+            if (geodesic((lat, lon), ad.getLocation()).km <= dist/1000): # TODO fix location
                 result.append((ad, score))
 
         self._scores = result
