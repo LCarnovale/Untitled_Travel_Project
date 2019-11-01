@@ -184,7 +184,7 @@ class UserSystem:
         if uid not in sys:
             raise UserSystemError(f"Attempt to edit a {u_type} that has not been loaded.")
 
-        user = get(uid)
+        user = sys.pop(uid)
 
         update(uid,
             name=user.name,
@@ -193,6 +193,8 @@ class UserSystem:
             phone=user.mobile,
             description=user.desc
         )
+        db.commit()
+        get(uid)
 
         
 

@@ -302,14 +302,13 @@ def insert_owner(name, userName, password, email=None, phone=None, description=N
 
     Returns the id of the inserted owner.
     """
-    import pyodbc as pyodbc_module
     try:
         cursor.execute(
             "INSERT INTO Owners (name, userName, email, phone, description, pwdhash)   \
             OUTPUT INSERTED.ownerid VALUES (?, ?, ?, ?, ?, HASHBYTES('SHA2_512', ?))", 
             (name, userName, email, phone, description, password)
         )
-    except pyodbc_module.IntegrityError as e:
+    except pyodbc.IntegrityError as e:
         print("Duplicate username on insert.")
         raise e
 
@@ -334,7 +333,6 @@ def insert_booking(venueid, userid, startDate, endDate):
     #  userid      int        not null  FK -> Users(id)
     #  startDate   date       not null
     #  endDate     date       not null
-    import pyodbc as pyodbc_module
     try:
         cursor.execute("INSERT INTO Bookings (venueid, userid, startDate, endDate) \
             OUTPUT INSERTED.bookid VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))

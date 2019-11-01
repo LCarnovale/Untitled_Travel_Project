@@ -180,7 +180,7 @@ def editprofile():
             user.name = form['account_name']
             user.username = form['account_username']
             user.email = form['account_email']
-            user.phone = form['account_phone']
+            user.mobile = form['account_phone']
             user.desc = form['account_description']
             
             # Assume edits successful
