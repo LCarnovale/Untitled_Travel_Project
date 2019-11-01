@@ -107,7 +107,11 @@ def init():
     """
     global cursor
     global is_connected
+    from server import USE_DATABASE
     try: 
+        if not USE_DATABASE:
+            print('Please set USE_DATABASE in server.py to True for database.')
+            raise Exception("Not using database")
         import connect_config
         cnxn = connect_config.get_connection()
     except pyodbc.ProgrammingError as e:
@@ -190,6 +194,13 @@ def get_venue(id):
     cursor.execute("SELECT * FROM Venues WHERE venueid=?", id)
     return cursor.fetchone()
 
+def get_all_venues():
+    """
+    Return a venue with the matching id.
+    """
+    cursor.execute("SELECT * FROM Venues")
+    return cursor.fetchall()
+
 def get_booking(id):
     """
     Return a booking with the matching id.
@@ -238,7 +249,7 @@ def get_overlapping_availability_venue(venueid, startDate, endDate):
     Returns a list of availability rows.
     """
     cursor.execute("SELECT * FROM Availabilities WHERE \
-        venueid=? AND startDate<? AND endDate>?", (venueid, startDate, endDate))
+        venueid=? AND startDate<=? AND endDate>=?", (venueid, startDate, endDate))
     return cursor.fetchall()
 
 def insert_user(name, userName, password, email=None, phone=None, description=None):

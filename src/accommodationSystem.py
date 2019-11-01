@@ -1,3 +1,5 @@
+from src.accommodation import Accommodation
+from src.search import Search
 import cloud.dbTools as db
 
 from src.accommodation import Accommodation
@@ -43,6 +45,31 @@ class AccommodationSystem:
         self.add_acc(new_venueid, new_venue)
         return new_venueid
 
+
+    def keywordSearch(self, search):
+        s = Search(self._accommodations)
+        return s.keywordSearch(search)
+
+    def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
+                       bathrooms, parking, location, distance):
+        print('SEARCHING')
+        print(self._accommodations)
+        s = Search(self._accommodations)
+        return s.advancedSearch(search, text_bounds, startdate, enddate, beds,
+                                bathrooms, parking, location, distance)
     def clean_system(self):
         """Remove all stored venues (Not from database)"""
         self._accommodations = {}
+
+    def get_all_ads(self):
+        # TODO: UPDATE CHANGES
+        self.clean_system()
+
+        accs = db.get_all_venues()
+
+        for acc in accs:
+            new_acc = Accommodation(*acc[1:])
+            self.add_acc(acc[0], new_acc)
+            print(new_acc.__id)
+
+        print(self._accommodations)
