@@ -193,7 +193,6 @@ class UserSystem:
             phone=user.mobile,
             description=user.desc
         )
-        db.commit()
         get(uid)
 
         

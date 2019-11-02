@@ -122,8 +122,6 @@ def logout():
     session.pop('username', None)
     session.pop('id', None)
 
-    db.commit() # Save user changes
-
     return redirect(url_for('home'))
 
 '''
@@ -191,7 +189,6 @@ def editprofile():
             # session['phone'] = user.phone
             # session['desc'] = user.desc
             userSystem.update_user(uid)
-            db.commit()
         else:
             print("Error user not found")
         return render_template('confirm_edit.html')
@@ -261,7 +258,6 @@ def ad_main():
 
         # Done
         # print(request.form['avail_date'])
-        db.commit()
         return render_template('ad_confirm.html', id=venueid, **default_kwargs)
 
     return render_template('new_ad.html', **default_kwargs)
