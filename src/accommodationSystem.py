@@ -2,16 +2,14 @@ from src.accommodation import Accommodation
 from src.search import Search
 import cloud.dbTools as db
 
-from src.accommodation import Accommodation
-
 class AccommodationSystem:
     def __init__(self):
         self._accommodations = {}
 
     def add_acc(self, id, acc):
         '''Adds accommodations into the system'''
-        self._accommodations[id] = acc
         acc.__id = id
+        self._accommodations[id] = acc
 
 
     def get_acc(self, id):

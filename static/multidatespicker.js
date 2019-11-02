@@ -274,6 +274,7 @@
 				}
 			},
 			addDates : function( dates, type ) {
+				// console.log(dates);
 				if(dates.length > 0) {
 					if(!type) type = 'picked';
 					switch(typeof dates) {
@@ -282,6 +283,7 @@
 							if(dates.length) {
 								for(var i = 0; i < dates.length; i++)
 									addDate.call(this, dates[i], type, true);
+								console.log(this);
 								sortDates.call(this, type);
 								break;
 							} // else does the same as 'string'

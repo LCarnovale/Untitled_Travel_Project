@@ -41,6 +41,8 @@ Table structures:
     Addresses:
     0   aid         int        Identity  PRIMARY KEY
     1   location    text
+    2   lat         varchar(10)
+    3   lng         varchar(10)
 
     Bookings:
     0   bookid      int        Identity  PRIMARY KEY
@@ -94,56 +96,6 @@ class _UninitialisedConnectionHandler(_FailedConnectionHandler):
         print("Connection has not been established yet. Call dbTools.init() to connect.")
         return super().__getattribute__(attr)
 
-# class _CursorWrapper:
-#     """
-#     A wrapper for a pyodbc cursor object.
-
-#     Takes in a connection object, that 
-#     """
-#     def __init__(self, cnxn):
-#         self._cnxn = cnxn
-#         self._cursor = cnxn.cursor()
-
-
-#     def __getattr__(self, attr):
-#         # Extablish a connection exists:
-#         try:
-#             self._cursor.()
-
-
-        
-
-# class _ConnectionWrapper:
-#     """
-#     A wrapper for a pyodbc connection object.
-#     If a call to the connection fails due to a connection error, 
-#     attempts to re-establish the connection.
-#     """
-#     def __init__(self, connect_func):
-#         self.cnxn = connect_func()
-#         self.connect_func = connect_func
-
-#     def _reconnect(self):
-#         try:
-#             self.cnxn.commit()
-#             self.cnxn.close()
-#         except:
-#             pass
-
-#         self.cnxn = self.connect_func()
-    
-#     def __getattr__(self, attr):
-#         try:
-#             self.cnxn.__getattribute__(attr)
-#         except pyodbc.OperationalError:
-#             print("Operational error occured, attempting reconnection.")
-#             self._reconnect()
-
-#     def cursor(self):
-#         return _CursorWrapper(self)._cursor
-
-
-        
 class dbCursor:
     get_con = lambda : None
     def __enter__(self):
@@ -201,22 +153,6 @@ def init():
         cnxn.close()
         is_connected = True
 
-# def close():
-#     """
-#     Close the connection to the database.
-#     Other programs might have trouble connecting to the database
-#     with two connections open.
-#     """
-#     global cursor
-#     cursor.close()
-#     cursor = _UninitialisedConnectionHandler()
-
-# def commit():
-#     """
-#     Commit recent changes to the database.
-#     """
-#     cursor.commit()
-
 def execute(sql, *params):
     """
     Execute a SQL query and return a cursor object. 
@@ -227,7 +163,7 @@ def execute(sql, *params):
         out = cursor.execute(sql, params)
     
     return out
-    
+
 def get_user(id):
     """
     Return a single user with the matching id from the database
@@ -238,7 +174,6 @@ def get_user(id):
         cursor.execute("SELECT * FROM Users WHERE userid=?", id)
         return cursor.fetchone()
 
-
 def get_user_from_uname(userName):
     """
     Return a single user with the matching username, or None if it doesn't exist.
@@ -246,7 +181,6 @@ def get_user_from_uname(userName):
     with dbc as cursor:
         cursor.execute("SELECT * FROM Users WHERE userName=?", userName)
         return cursor.fetchone()
-
 
 def get_owner(id):
     """
@@ -258,7 +192,6 @@ def get_owner(id):
         cursor.execute("SELECT * FROM Owners WHERE ownerid=?", id)
         return cursor.fetchone()
 
-
 def get_owner_from_uname(userName):
     """
     Return an owner matching the given userName.
@@ -266,7 +199,6 @@ def get_owner_from_uname(userName):
     with dbc as cursor:
         cursor.execute("SELECT * FROM Owners WHERE userName=?", userName)
         return cursor.fetchone()
-
 
 def get_venue(id):
     """
@@ -276,7 +208,6 @@ def get_venue(id):
         cursor.execute("SELECT * FROM Venues WHERE venueid=?", id)
         return cursor.fetchone()
 
-
 def get_all_venues():
     """
     Return a venue with the matching id.
@@ -285,7 +216,6 @@ def get_all_venues():
         cursor.execute("SELECT * FROM Venues")
         return cursor.fetchall()
     
-
 def get_booking(id):
     """
     Return a booking with the matching id.
@@ -294,7 +224,6 @@ def get_booking(id):
         cursor.execute("SELECT * FROM Bookings WHERE bookid=?", id)
         return cursor.fetchone()
 
-
 def get_address(id):
     """
     Return an address with the matching id.
@@ -302,7 +231,6 @@ def get_address(id):
     with dbc as cursor:
         cursor.execute("SELECT * FROM Addresses WHERE aid=?", id)
         return cursor.fetchone()
-    
 
 def get_availability(id):
     """
@@ -440,7 +368,7 @@ def insert_booking(venueid, userid, startDate, endDate):
             return int(res[0])
         else:
             return None
-    
+
 def insert_venue(ownerid, addressid, name, bedCount, bathCount,
                  carCount, description, rate,
                  minStay, maxStay, details):
@@ -482,14 +410,18 @@ def insert_venue(ownerid, addressid, name, bedCount, bathCount,
         else:
             return None
 
-def insert_address(location):
+def insert_address(location, lat, lng):
     """
     Insert the given location into the database.
+
+    location should be an address as text,
+    lat and lng should be latitude and longitude, as float or string.
 
     Return the id of the inserted address.
     """
     with dbc as cursor:
-        cursor.execute("INSERT INTO Addresses (location) OUTPUT INSERTED.aid VALUES (?)", location)
+        cursor.execute("INSERT INTO Addresses (location, lat, lng) OUTPUT INSERTED.aid VALUES (?, ?, ?)", 
+            location, lat, lng)
         res = cursor.fetchone()
         if res is not None:
             return int(res[0])
@@ -739,6 +671,7 @@ def select_venues(**patterns):
         
     For example: 
         select_venues(name="test%", details="%d%") 
+
     will return all venues with names starting with test,
     and 'd' in the details.
 

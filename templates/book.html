@@ -24,7 +24,7 @@
             <th>Car Spaces</th>
         </tr>
         <tr>
-            <td>{{address.postcode}}</td>
+            <td>{{address.street_address}}</td>
             <td>{{acc.bed_count}}</td>
             <td>{{acc.bath_count}}</td>
             <td>{{acc.car_count}}</td>
@@ -45,8 +45,8 @@
                 Fix me
             </div></td>
             <script>
-            var dates = {{ acc.get_dates()|tojson }}
-            getDates(dates)
+            var dates = {{ acc.get_dates()|tojson }};
+            getDates(dates, false);
             </script>
         </tr>
     </table>
@@ -78,9 +78,5 @@
 
     <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
 
-    <script>
-        var avails={{acc.get_dates()|tojson}};
-        console.log(avails);
-    </script>
 
 {% endblock %}

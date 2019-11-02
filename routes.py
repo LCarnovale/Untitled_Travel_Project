@@ -61,7 +61,8 @@ def home():
             print(e)
             print('----------------------------------')
             raise e
-            return render_template('search_results.html', results = [])
+
+        return render_template('search_results.html', results = [])
 
     return render_template('home.html', **default_kwargs)
 
@@ -217,8 +218,7 @@ def book_main(id):
 
     # Get owner details, address details, availabilities.
     owner = db.get_owner(acc.ownerid)
-    # address = db.get_address(acc.aid)
-    address = Address(*db.get_address(acc.aid))
+    address = Address(*db.get_address(acc.aid)[1:])
     # avails = [[str(x[2]), str(x[3])] for x in db.get_venue_availabilities(id)]
     
     return render_template('book.html', acc=acc, owner=owner, 
@@ -239,13 +239,16 @@ def ad_main():
         # (We haven't asked for enough info, pick a test owner)
         owner = db.get_owner(1)
         # Create Address info:
-        aid = db.insert_address(form['acc_addr'])
+        lat, lng = form['acc_location'].split(",")
+        lat = lat.strip()[:10]
+        lng = lng.strip()[:10]
+        aid = db.insert_address(form['acc_addr'], lat, lng)
 
         # Send to accommodationSystem
         venueid = accSystem.create_accomodation(
             int(owner[0]),         int(aid),               form['acc_name'], 
             int(form['acc_nbed']), int(form['acc_nbath']), int(form['acc_ncar']), 
-            form['description'],   float(form['price']),   int(form['min_stay']), 
+            form['acc_details'],   float(form['price']),   int(form['min_stay']), 
             int(form['max_stay']), form['details']
         )
 

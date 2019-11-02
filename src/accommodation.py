@@ -48,10 +48,11 @@ class Accommodation:
         availability.
         """
         avails = db.get_venue_availabilities(self.__id)
+        print(self.__id, avails)
         # avails = 
 
         # return avails
-        return ['2019-10-10', '2019-11-11']
+        return ['10-10-2019', '11-11-2019']
 
     def isAvailable(self, startDate, endDate=None):
         """

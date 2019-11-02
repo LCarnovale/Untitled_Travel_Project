@@ -2,7 +2,7 @@
 $( function() {
     $( "#avail_date" ).multiDatesPicker({
         minDate: 0,
-        dateFormat: 'd-m-yy'
+        dateFormat: 'dd-mm-yyyy'
     });
  });
 
@@ -12,10 +12,16 @@ $(document).ready(function() {
     	$( "#avail_date" ).multiDatesPicker('resetDates', 'picked');
 	});
 });
-// calendar in book.html to show the available days
-function getDates(dates) {
+/**
+ * Create a calendar to show the available days
+ * 
+ * @param {Array.<String>} dates Start and end dates, ie:
+ *      `[start_1, end_1, start_2, end_2, ... ]`
+ * @param {Boolean} disable If the calendar should be disabled
+ */
+function getDates(dates, disable) {
     $( "#avail_dates" ).multiDatesPicker({
-        disabled: true,
+        disabled: disable,
         dateFormat: 'd-m-yy',
         addDates: dates
     });
