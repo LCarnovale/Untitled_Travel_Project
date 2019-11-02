@@ -8,7 +8,7 @@ class EmailError(Exception):
 
 class User:
     def __init__(self, name, userName, email, mobile, desc=None, pwdhash=None):
-        self.__id = -1 # Will be set by userSystem
+        self._id = -1 # Will be set by userSystem
 
         # Use setters to validate data
         self.name = name
@@ -18,6 +18,8 @@ class User:
         self.desc = desc
         self._pwdhash = pwdhash
         self._authenticated = False
+
+        self._type = None
         # self._bookings = [] Use this or use the database?
 
     # ''' Adds a booking into the user'''
@@ -104,6 +106,10 @@ class User:
     @property
     def authenticated(self):
         return self._authenticated
+
+    @property
+    def type(self):
+        return self._type
         
 
 

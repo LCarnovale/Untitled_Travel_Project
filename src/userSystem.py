@@ -32,11 +32,13 @@ class UserSystem:
 
     def add_user(self, uid, user):
         self._users[uid] = user
-        user.__id = uid
+        user._id = uid
+        user._type = 'user'
     
     def add_owner(self, oid, owner):
         self._owners[oid] = owner
-        owner.__id = oid
+        owner._id = oid
+        owner._type = 'owner'
 
     def get_user(self, userid, u_type='user'):
         '''
@@ -195,8 +197,26 @@ class UserSystem:
         )
         get(uid)
 
-        
+    def check_user_pass(self, userName, password, u_type='user'):
+        """
+        Check the user or owner database for a matching username
+        and password.
 
+        Return the user's id if found.
+        """
+        if u_type == 'user':
+            check = db.check_user_pass
+            get = self.get_user
+        elif u_type == 'owner':
+            check = db.check_owner_pass
+            get = self.get_owner
+        else:
+            raise UserSystemError(f"Invalid user type given: '{u_type}'")
 
-
+        r = check(userName, password)
+        self.get_user(r[0], u_type)
+        if r:
+            return r[0]
+        else:
+            return None
 

@@ -73,24 +73,23 @@ Login page
 def login():
     if request.method == 'POST':
         # Attempt a Login
+        form = request.form
         login_id = -1
         if db.is_connected:
-            login_type = request.form['login_select'] # Will be either 'owner' or 'user'
-            if login_type == 'user':
-                result = db.check_user_pass(
-                    request.form['username'], request.form['password'])
-            else:
-                result = db.check_owner_pass(
-                    request.form['username'], request.form['password'])
+            login_type = form['login_select'] # Will be either 'owner' or 'user'
+            result = userSystem.check_user_pass(
+                form['username'], form['password'], login_type
+            )
             if result is not None:
-                login_id = result[0]
+                login_id = result
                 user = userSystem.get_user(
-                    login_id, u_type=request.form['login_select'])  # should be same as  User(*result[1:])
+                    login_id, u_type=form['login_select'])  # should be same as  User(*result[1:])
             else:
                 return render_template('login.html', login_fail=True)
+            session['login_type'] = login_type
 
         else:
-            result = (request.form['password'] == 'admin' and request.form['username'] == 'admin')
+            result = (form['password'] == 'admin' and form['username'] == 'admin')
             if result:
                 user = User(
                     "Developer",
@@ -105,13 +104,7 @@ def login():
             for k, v in zip(d.keys(), d.values()):
                 session[k] = v
 
-            # session['name'] = user.name
-            # session['username'] = user.username
-            # session['email'] = user.email
-            # session['mobile'] = user.mobile
-            # session['desc'] = user.desc
-            # session['user'] = user.tojson()
-        return redirect('/') #render_template('home.html', **default_kwargs)
+        return redirect('/')
     return render_template('login.html', **default_kwargs)
 
 '''
@@ -163,19 +156,21 @@ Edit profile page
 def editprofile():
     # Create user.
     uid = session['id']
-    user = userSystem.get_user(uid)
+    user = userSystem.get_user(uid, u_type=session['login_type'])
     if request.method == 'POST':
         form = request.form
 
         if user is not None:
             if form['account_pwd_new']:
-                pwd_check = db.check_user_pass(user.username, form['account_pwd_current'])
+                pwd_check = userSystem.check_user_pass(
+                    user.username, form['account_pwd_current'], u_type=user.type)
                 if pwd_check is None:
                     # Incorrect password given
-                    return render_template('edit.html', pass_fail=True)
+                    return render_template('edit.html', _user=user, pass_fail=True)
                 else:
                     # Correct password given
-                    user = userSystem.set_password(uid, form['account_pwd_new'])
+                    user = userSystem.set_password(
+                        uid, form['account_pwd_new'], u_type=user.type)
             user.name = form['account_name']
             user.username = form['account_username']
             user.email = form['account_email']
@@ -189,7 +184,7 @@ def editprofile():
             # session['email'] = user.email
             # session['phone'] = user.phone
             # session['desc'] = user.desc
-            userSystem.update_user(uid)
+            userSystem.update_user(uid, u_type=user.type)
         else:
             print("Error user not found")
         return render_template('confirm_edit.html')

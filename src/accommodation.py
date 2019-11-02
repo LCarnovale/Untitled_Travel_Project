@@ -20,7 +20,7 @@ class Accommodation:
         so it is easiest to pass around a collection of the return values after
         the id instead of track each of dozen or so fields individually.
         """ 
-        self.__id = -1 # Will be set by the accomodationSystem,
+        self._id = -1 # Will be set by the accomodationSystem,
 
         self._ownerid,         \
         self._aid,             \
@@ -45,14 +45,18 @@ class Accommodation:
     def get_dates(self):
         """
         Return a list of date ranges representing this venues
-        availability.
+        availability, structured as:
+            [
+                [start1, end1],
+                [start2, end2], ...
+            ]
+        With all dates as d-m-yy
         """
-        avails = db.get_venue_availabilities(self.__id)
-        print(self.__id, avails)
-        # avails = 
+        avails = db.get_venue_availabilities(self._id)
+        avails = [[x[2].strftime('%d-%m-%Y'), x[3].strftime('%d-%m-%Y')] for x in avails]
 
-        # return avails
-        return ['10-10-2019', '11-11-2019']
+        # return ['10-10-2019', '11-11-2019']
+        return avails
 
     def isAvailable(self, startDate, endDate=None):
         """
@@ -68,7 +72,7 @@ class Accommodation:
         if (endDate == None):
             endDate = startDate + datetime.timedelta(days=1)
         
-        avails = db.get_overlapping_availability_venue(self.__id, startDate, endDate)
+        avails = db.get_overlapping_availability_venue(self._id, startDate, endDate)
 
         if len(avails) >= 1:
             return True
@@ -217,6 +221,6 @@ class Accommodation:
 
     @property
     def id(self):
-        return self.__id
+        return self._id
 
 

@@ -8,9 +8,8 @@ class AccommodationSystem:
 
     def add_acc(self, id, acc):
         '''Adds accommodations into the system'''
-        acc.__id = id
+        acc._id = id
         self._accommodations[id] = acc
-
 
     def get_acc(self, id):
         '''
@@ -68,6 +67,6 @@ class AccommodationSystem:
         for acc in accs:
             new_acc = Accommodation(*acc[1:])
             self.add_acc(acc[0], new_acc)
-            print(new_acc.__id)
+            print(new_acc._id)
 
         print(self._accommodations)
