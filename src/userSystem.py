@@ -99,8 +99,7 @@ class UserSystem:
         try:
             uid = db.insert_user(*args)
         except db.InsertionError as e:
-            raise UserCreateError("Error creating user.", col=e.col, err=e._type)
-        
+            raise UserCreateError("Error creating user.", col=e.col, err=e.type)        
         try:
             self.get_user(uid) # Adds to the system.
         except user.EmailError:

@@ -21,17 +21,6 @@ class Booking:
             return True 
         return False
 
-    # def checkBooking(self):
-    #     '''Check if the accommodation is available given the period 
-    #         booking is an object passed in'''
-    #     available = False
-    #     #TODO check how the date is being parsed in
-    #     # users cannot book 2 places within the same period
-    #     pass
-    #     # if available during period
-    #     makeBooking(booking)
-    #     # else deny (Give reason why)
-
     '''
     Properties
     '''

@@ -241,6 +241,14 @@ def get_address(id):
         cursor.execute("SELECT * FROM Addresses WHERE aid=?", id)
         return cursor.fetchone()
 
+def get_venue_address(venueid):
+    """
+    Get the address of a given venue.
+    """
+    with dbc as cursor:
+        cursor.execute("SELECT * FROM Addresses WHERE venueid=?", venueid)
+        return cursor.fetchone()
+
 def get_availability(id):
     """
     Get an availability matching the given id.

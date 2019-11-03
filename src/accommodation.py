@@ -1,5 +1,6 @@
 import cloud.dbTools as db
 import datetime
+import src
 
 class NegativeNumberError(Exception):
     pass
@@ -222,5 +223,12 @@ class Accommodation:
     @property
     def id(self):
         return self._id
+
+    @property
+    def address(self):
+        # Get address for the venue
+        address = db.get_address(self.aid)
+        return src.address.Address(*address[1:])
+
 
 
