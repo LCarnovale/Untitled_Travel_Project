@@ -206,16 +206,14 @@ class UserSystem:
         """
         if u_type == 'user':
             check = db.check_user_pass
-            get = self.get_user
         elif u_type == 'owner':
             check = db.check_owner_pass
-            get = self.get_owner
         else:
             raise UserSystemError(f"Invalid user type given: '{u_type}'")
 
         r = check(userName, password)
-        self.get_user(r[0], u_type)
         if r:
+            self.get_user(r[0], u_type)
             return r[0]
         else:
             return None

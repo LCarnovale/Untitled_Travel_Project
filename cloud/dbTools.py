@@ -105,6 +105,15 @@ class dbCursor:
             print("Connection has not been established yet. Call init().")
             self._cnxn = _FailedConnectionHandler()
             self._cursor = _FailedConnectionHandler()
+        except pyodbc.ProgrammingError as e:
+            if ("IP address" in str(e)):
+                msg = str(e).split("IP address '")[1]
+                msg = msg.split("' is not")[0]
+                print("Your ip (" + msg + ") was denied.")
+            else:
+                raise e
+            self._cnxn = _FailedConnectionHandler()
+            self._cursor = _FailedConnectionHandler()
         else:
             self._cursor = self._cnxn.cursor()
 
