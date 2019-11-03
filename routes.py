@@ -6,7 +6,9 @@ from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
 from src.booking import Booking
-import src.userSystem
+import src.userSystem as US
+import src.accommodationSystem as AS
+import src.bookingSystem as BS
 from server import accSystem
 from server import userSystem
 from server import bookingSystem
@@ -28,7 +30,39 @@ Landing page
 def home():
     
     if request.method == 'POST':
-        pass
+        try:
+            search = request.form.get('search')
+            text_bounds = request.form.get('geocodedvalue')
+            startdate = request.form.get('startdate')
+            enddate = request.form.get('enddate')
+            beds = request.form.get('beds')
+            bathrooms = request.form.get('bathrooms')
+            parking = request.form.get('parking')
+            location = request.form.get('location')
+            distance = request.form.get('distance')
+
+            if (search or startdate or enddate or beds or
+                bathrooms or parking or location):
+                print(search, startdate, enddate, beds,
+                      bathrooms, parking, location)
+                accSystem.get_all_ads()
+                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
+                                                   bathrooms, parking, location, distance)
+                return render_template('search_results.html', results = results)
+            else:
+                accSystem.get_all_ads()
+                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
+                                                   bathrooms, parking, location, distance)
+                return render_template('search_results.html', results = results)
+        except Exception as e:
+            print('----------------------------------')
+            print('INVALID DATA WAS ENTERED TO SEARCH')
+            print('Error as follows:')
+            print(e)
+            print('----------------------------------')
+            raise e
+
+        return render_template('search_results.html', results = [])
 
     return render_template('home.html', **default_kwargs)
 
@@ -39,36 +73,39 @@ Login page
 def login():
     if request.method == 'POST':
         # Attempt a Login
+        form = request.form
         login_id = -1
         if db.is_connected:
-            result = db.check_user_pass(request.form['username'], request.form['password'])
-            if result is None:
-                print("Login failed")
+            login_type = form['login_select'] # Will be either 'owner' or 'user'
+            result = userSystem.check_user_pass(
+                form['username'], form['password'], login_type
+            )
+            if result is not None:
+                login_id = result
+                user = userSystem.get_user(
+                    login_id, u_type=form['login_select'])  # should be same as  User(*result[1:])
             else:
-                print(f"Log in for {result[1]} ({result[2]}) successful.")
-                login_id = result[0]
-                user = User(*result[1:])
+                return render_template('login.html', login_fail=True)
+            session['login_type'] = login_type
+
         else:
-            result = (request.form['password'] == 'admin' and request.form['username'] == 'admin')
+            result = (form['password'] == 'admin' and form['username'] == 'admin')
             if result:
-                print("Logged in as admin")
                 user = User(
                     "Developer",
                     "admin",
                     "admin@temp.com",
                     "0456123456")
             else:
-                print("Try admin & admin")
+                print("No database connection, try admin & admin")
         if result:
-            session['name'] = user.name
-            session['username'] = user._username
-            session['email'] = user._email
-            session['mobile'] = user._mobile
             session['id'] = login_id
-            session['desc'] = user._desc
-        print(session['mobile'])
-        return render_template('home.html')
-    return render_template('login.html')
+            d = user.todict()
+            for k, v in zip(d.keys(), d.values()):
+                session[k] = v
+
+        return redirect('/')
+    return render_template('login.html', **default_kwargs)
 
 '''
 Logout
@@ -76,7 +113,6 @@ Logout
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     # Remove any existing sessions
-    print(session)
     session.pop('username', None)
     session.pop('id', None)
 
@@ -87,17 +123,23 @@ Signup page
 '''
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    form = request.form
     if request.method == 'POST':
         # Create user.
-        form = request.form
-        uid = userSystem.create_user(
-            form['account_name'],
-            form['account_username'],
-            form['account_password'],
-            form['account_email'],
-            form['account_phone'],
-            form['account_description']
-        )
+        try:
+            uid = userSystem.create_user(
+                form['account_name'],
+                form['account_username'],
+                form['account_password'],
+                form['account_email'],
+                form['account_phone'],
+                form['account_description']
+            )
+        except US.UserCreateError as e:
+            if e.col == 'userName':
+                return render_template('signup.html', username_taken=True)
+            if e.col == 'email':
+                return render_template('signup.html', invalid_email=True)
 
         if uid is not None:
             print("User successfully added.")
@@ -112,18 +154,41 @@ Edit profile page
 '''
 @app.route('/edit', methods=['GET', 'POST'])
 def editprofile():
+    # Create user.
+    uid = session['id']
+    user = userSystem.get_user(uid, u_type=session['login_type'])
     if request.method == 'POST':
-        # Create user.
         form = request.form
-        uid = userSystem.get_user(session['id'])
 
-        if uid is not None:
-            user._email = form['account_email']
-            user._phone = form['account_phone']
-            user._desc = form['account_description']
+        if user is not None:
+            if form['account_pwd_new']:
+                pwd_check = userSystem.check_user_pass(
+                    user.username, form['account_pwd_current'], u_type=user.type)
+                if pwd_check is None:
+                    # Incorrect password given
+                    return render_template('edit.html', _user=user, pass_fail=True)
+                else:
+                    # Correct password given
+                    user = userSystem.set_password(
+                        uid, form['account_pwd_new'], u_type=user.type)
+            user.name = form['account_name']
+            user.username = form['account_username']
+            user.email = form['account_email']
+            user.mobile = form['account_phone']
+            user.desc = form['account_description']
+            
+            # Assume edits successful
+            d = user.todict()
+            for k, v in zip(d.keys(), d.values()):
+                session[k] = v
+            # session['email'] = user.email
+            # session['phone'] = user.phone
+            # session['desc'] = user.desc
+            userSystem.update_user(uid, u_type=user.type)
         else:
             print("Error user not found")
-    return render_template('edit.html')
+        return render_template('confirm_edit.html')
+    return render_template('edit.html', _user=user)
 	
 '''
 Main Booking page
@@ -137,12 +202,22 @@ def book_main(id):
 
     if request.method == 'POST':
         form = request.form
-        if session['id']:
+        if 'id' in session:
             bookingSystem.create_booking(
                 id, session['id'], form['book_start'], form['book_end']
             )
+            return render_template('book_confirm.html', acc=acc, **default_kwargs)
+        else:
+            return render_template('login.html', 
+                err_msg = "Please login to make a booking.", **default_kwargs)
 
-    return render_template('book.html', acc=acc, **default_kwargs)
+    # Get owner details, address details, availabilities.
+    owner = db.get_owner(acc.ownerid)
+    address = Address(*db.get_address(acc.aid)[1:])
+    # avails = [[str(x[2]), str(x[3])] for x in db.get_venue_availabilities(id)]
+    
+    return render_template('book.html', acc=acc, owner=owner, 
+        address=address, **default_kwargs)
 
 
 
@@ -153,50 +228,34 @@ Main Post accommodation page
 def ad_main():
     if request.method == "POST":
         form = request.form
-        # form elements:
-        # acc_name
-        # acc_addr
-        # acc_nbed
-        # acc_nbath
-        # acc_ncar
-        # acc_details
-        # acc_location
-        # own_name
-        # own_email
-        # own_phone
-        # description
-        # price
-        # dateCount 
-        # dateRange_0
-        # dateRange_1 ... (up to dateCount - 1)
-        # min_stay
-        # max_stay
-        # details
+        
 
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
         owner = db.get_owner(1)
         # Create Address info:
-        aid = db.insert_address(form['acc_location'])
+        lat, lng = form['acc_location'].split(",")
+        lat = lat.strip()[:10]
+        lng = lng.strip()[:10]
+        aid = db.insert_address(form['acc_addr'], lat, lng)
 
         # Send to accommodationSystem
         venueid = accSystem.create_accomodation(
             int(owner[0]),         int(aid),               form['acc_name'], 
             int(form['acc_nbed']), int(form['acc_nbath']), int(form['acc_ncar']), 
-            form['description'],   float(form['price']),   int(form['min_stay']), 
+            form['acc_details'],   float(form['price']),   int(form['min_stay']), 
             int(form['max_stay']), form['details']
         )
 
         # Create associated date ranges
         # This could be moved to another module?
-        for i in range(0, int(form['dateCount']), 1):
-            print(form[f'dateRange+{i}'])
-            # newav = db.insert_availability(
-            #     venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
-            # )
 
+        for i in range(0, int(form['dateCount']), 2):
+            db.insert_availability(
+                venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
+            )
         # Done
-        print(request.form['avail_date'])
+        # print(request.form['avail_date'])
         return render_template('ad_confirm.html', id=venueid, **default_kwargs)
 
     return render_template('new_ad.html', **default_kwargs)

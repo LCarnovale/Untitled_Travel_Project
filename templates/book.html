@@ -18,13 +18,13 @@
     <h1>{{acc.name}}</h1>
     <table class = "addr_details">
         <tr>
-            <!-- <th style = "width:50%">Address</th> -->
+            <th style = "width:50%">Address</th>
             <th>Beds</th>
             <th>Bathrooms</th>
             <th>Car Spaces</th>
         </tr>
         <tr>
-            <!-- <td>{{acc.location}}</td> -->
+            <td>{{address.street_address}}</td>
             <td>{{acc.bed_count}}</td>
             <td>{{acc.bath_count}}</td>
             <td>{{acc.car_count}}</td>
@@ -44,9 +44,9 @@
             <td><div id="avail_dates" align="center">
                 Fix me
             </div></td>
-             <script>
-<!--            var dates = {{ acc.getDates()|tojson }}-->
-<!--            getDates(dates)-->
+            <script>
+            var dates = {{ acc.get_dates()|tojson }};
+            getDates(dates, false);
             </script>
         </tr>
     </table>
@@ -70,13 +70,13 @@
     </form>
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
-
-
-    {% if acc.ownerid %}
+    {% if owner %}
         <h2> About the owner </h2>
-        <p> (Put owner details here) </p>
+        <p> Name: {{owner[1]}} </p>
+        <p> {{owner[5]}} </p>
     {% endif %}
 
-    <p> Have any questions? Contact the owner at (put owner contact here) </p>
+    <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
+
 
 {% endblock %}
