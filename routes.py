@@ -189,10 +189,11 @@ def ad_main():
 
         # Create associated date ranges
         # This could be moved to another module?
-        for i in range(0, int(form['dateCount']), 2):
-            newav = db.insert_availability(
-                venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
-            )
+        for i in range(0, int(form['dateCount']), 1):
+            print(form[f'dateRange+{i}'])
+            # newav = db.insert_availability(
+            #     venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
+            # )
 
         # Done
         print(request.form['avail_date'])
