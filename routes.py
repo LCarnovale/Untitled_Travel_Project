@@ -228,8 +228,13 @@ Main Post accommodation page
 def ad_main():
     if request.method == "POST":
         form = request.form
-        
-
+        print(request.files)
+        for i in (request.files):
+            f = request.files[i]
+            f.save((f.filename))
+            print(type(f))
+            url = f.filename
+            print(url)
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
         owner = db.get_owner(1)
@@ -238,7 +243,7 @@ def ad_main():
         lat = lat.strip()[:10]
         lng = lng.strip()[:10]
         aid = db.insert_address(form['acc_addr'], lat, lng)
-
+		
         # Send to accommodationSystem
         venueid = accSystem.create_accomodation(
             int(owner[0]),         int(aid),               form['acc_name'], 
