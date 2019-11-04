@@ -54,6 +54,39 @@ function validateForm() {
       valid = false;
     }
   }
+  // Error check on the date ranges
+  var dateCount = document.getElementById("dateCountOut").value;
+  // Check if it has been filled
+  if (dateCount == 1) {
+    if (dateRange_0.value == "") {
+        // empty, invalid
+    }
+  } else {
+    // Check if the dates are not overlapping
+  var start_date = new Array(dateCount);
+var end_date = new Array(dateCount);
+    // Get all the dates into a start date array and end date array
+    for (var i = 0; i < dateCount; i++) {
+        var date = eval('dateRange_' + i);
+        start_date[i] = date.match("([0-9]{2}/[0-9]{2}/[0-9]{4}) - [0-9]{2}/[0-9]{2}/[0-9]{4}")[1];
+        end_date[i] = date.match("[0-9]{2}/[0-9]{2}/[0-9]{4} - ([0-9]{2}/[0-9]{2}/[0-9]{4})")[1];
+        document.getElementById("demo"+i).innerHTML = start_date[i];
+    }
+    // compare all start dates with end dates
+    for (var j = 0; j < dateCount; j++) {
+        var first_date = moment(start_date[j], "DD/MM/YYYY");
+        var sec_date = moment(end_date[j], "DD/MM/YYYY");
+        for (var k = dateCount-1; k > 0; k--) {
+        	if (k ==j) break;
+            var third_date = moment(start_date[j], "DD/MM/YYYY");
+            var fourth_date = moment(end_date[j], "DD/MM/YYYY");
+            if (third_date <= first_date <= fourth_date || third_date <= sec_date <= fourth_date) {
+                alert("FALSE");
+            }
+        }
+    }
+  }
+
   // If the valid status is true, mark the step as finished and valid:
   if (valid) {
     document.getElementsByClassName("step")[currentTab].className += " finish";

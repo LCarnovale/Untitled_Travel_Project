@@ -256,11 +256,11 @@ def ad_main():
 
         # Create associated date ranges
         # This could be moved to another module?
+
         for i in range(0, int(form['dateCount']), 2):
             db.insert_availability(
                 venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
             )
-
         # Done
         # print(request.form['avail_date'])
         return render_template('ad_confirm.html', id=venueid, **default_kwargs)

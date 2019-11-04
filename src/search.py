@@ -44,7 +44,7 @@ class Search():
             distance = int(distance)
             self._filterLocation(location, distance)
 
-        return [self._items[x[0]] for x in self._scores]
+        return [x[0] for x in self._scores]
 
     def _keywordSearch(self, search):
         search = self._cleanString(search)
@@ -134,13 +134,14 @@ class Search():
 
 
     def _filterLocation(self, location, dist):
+        print(location)
         result = []
-        lat = float(location.split(' ')[0])
-        lon = float(location.split(' ')[1])
+        lat = float(location.split(',')[0])
+        lon = float(location.split(',')[1])
 
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
-            if (geodesic((lat, lon), ad.getLocation()).km <= dist/1000): # TODO fix location
+            if (geodesic((lat, lon), (ad.address.lat, ad.address.lng)).km <= dist/1000):
                 result.append((ad, score))
 
         self._scores = result

@@ -1,3 +1,21 @@
+// date range picker in new_ad
+$(document).ready(function() {
+var today = new Date();
+$('.calRange').daterangepicker({
+    minDate: today,
+    locale: {
+        cancelLabel: 'Clear'
+    }
+});
+$('.calRange').on('apply.daterangepicker', function(ev,picker) {
+    $(this).val(picker.startDate.format('DD/MM/YYYY') + " - " + picker.endDate.format('DD/MM/YYYY'));
+});
+
+$('.calRange').on('cancel.daterangepicker', function(ev, picker) {
+    $(this).val('');
+});
+});
+
 // Calendar in new_ad
 $( function() {
     $( "#avail_date" ).multiDatesPicker({
@@ -12,6 +30,7 @@ $(document).ready(function() {
     	$( "#avail_date" ).multiDatesPicker('resetDates', 'picked');
 	});
 });
+
 /**
  * Create a calendar to show the available days
  * 
@@ -88,3 +107,4 @@ function disableDates(dates) {
         addDisabledDates: disable
     });
 }
+
