@@ -11,7 +11,6 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script  src = "{{ url_for('static',filename = 'multidatespicker.js')}}"></script>
     <script  src = "{{ url_for('static',filename = 'calendar.js')}}"></script>
-    <script src = "{{ url_for('static',filename = 'star_rating.js')}}"></script>
 
 {% endblock %}
 
@@ -41,7 +40,7 @@
             <th>Availability</th>
         </tr>
         <tr>
-            <td>${{acc.rate}} / night</td>
+            <td>${{acc.rate | round(2)}} / night</td>
             <td><div id="avail_dates" align="center">
                 Fix me
             </div></td>
@@ -80,23 +79,30 @@
     <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
 
     <div class="reviews_container">
-    <h3> Reviews </h3>
-    <form name="post_review" method="POST" style="width:100%;text-align:center">
-        <div style="width:80%; display:inline-block;">
-            <textarea rows = "3" style="width:70%;" name = "review" placeholder = "Post your own review"></textarea>
-            <div class = "starbox" style="width:150px; display:inline-block">
-                <input id = "rating_input" name="rating_input" value="0" hidden>
-                <img src="/static/star_empty.png" id="star1" onclick="star_click(1);" onmouseover="star_hover(1);" onmouseleave="star_unhover();">
-                <img src="/static/star_empty.png" id="star2" onclick="star_click(2);" onmouseover="star_hover(2);" onmouseleave="star_unhover();">
-                <img src="/static/star_empty.png" id="star3" onclick="star_click(3);" onmouseover="star_hover(3);" onmouseleave="star_unhover();">
-                <img src="/static/star_empty.png" id="star4" onclick="star_click(4);" onmouseover="star_hover(4);" onmouseleave="star_unhover();">
-                <img src="/static/star_empty.png" id="star5" onclick="star_click(5);" onmouseover="star_hover(5);" onmouseleave="star_unhover();">
-                <br>
-                <br>
-                <input type="submit" id="review_submit" name="review_submit" value = "Post" disabled>
-            </div>
-        </div>
-    </form>
+        <h3> Reviews </h3>
+        <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
+        {% for review in reviews %}
+        <table>
+            <tr>
+                <td>
+                {% if not review.reccommends() %}
+                    <img src="/static/thumbs_down_selected.png">
+                {% else %}
+                    <img src="/static/thumbs_up_selected.png">
+                {% endif %}
+                </td>
+                <td>{{review.get_name()}} {% if not review.reccommends() %} does not {% else %} would {% endif %} reccommend staying here.</td>
+            </tr>
+            <tr>
+                <td><h4>The good:</h4><br>{{review.get_good()}}</td>
+            </tr>
+            <tr>
+                <td><h4>The bad:</h4><br>{{review.get_issues()}}</td>
+            </tr>
+        </table>
+        {% endfor %}
+
+
 
 
 {% endblock %}

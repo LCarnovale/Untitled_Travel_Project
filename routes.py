@@ -201,12 +201,13 @@ def book_main(id):
         abort(404)
 
     if request.method == 'POST':
+        '''
         if request.form.get('review_submit') != None:
             if request.form.get('rating_input') not in ['1','2','3','4','5']:
                 raise ValueError('Rating not submitted, or form mangled')
-            #TODO: post review
             print(request.form.get('review'))
             return redirect(url_for('book_main', id=id))
+        '''
 
         form = request.form
         if 'id' in session:
@@ -223,10 +224,34 @@ def book_main(id):
     address = Address(*db.get_address(acc.aid)[1:])
     # avails = [[str(x[2]), str(x[3])] for x in db.get_venue_availabilities(id)]
     
-    return render_template('book.html', acc=acc, owner=owner, 
-        address=address, **default_kwargs)
+    reviews = [] #TODO: acc.get_reviews(id)
+
+    return render_template('book.html', acc=acc, owner=owner, id=id,
+        address=address, reviews = reviews, **default_kwargs)
 
 
+'''
+Booking page, accessed via the booking page
+'''
+@app.route('/review/<id>', methods = ['GET', 'POST'])
+def review(id):
+
+    acc = accSystem.get_acc(id)
+    if acc == None:
+        abort(404)
+
+    if request.method == 'POST':
+        print(request.form)
+        reccommend = True if request.form.get('recc') == 'Yes' else False
+        issues = request.form.get('issues')
+        good = request.form.get('good')
+
+        #TODO: add to DB
+
+        return redirect(url_for('book_main', id=id))
+
+
+    return render_template('review.html')
 
 '''
 Main Post accommodation page
