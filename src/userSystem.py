@@ -99,8 +99,7 @@ class UserSystem:
         try:
             uid = db.insert_user(*args)
         except db.InsertionError as e:
-            raise UserCreateError("Error creating user.", col=e.col, err=e._type)
-        
+            raise UserCreateError("Error creating user.", col=e.col, err=e.type)        
         try:
             self.get_user(uid) # Adds to the system.
         except user.EmailError:
@@ -206,16 +205,14 @@ class UserSystem:
         """
         if u_type == 'user':
             check = db.check_user_pass
-            get = self.get_user
         elif u_type == 'owner':
             check = db.check_owner_pass
-            get = self.get_owner
         else:
             raise UserSystemError(f"Invalid user type given: '{u_type}'")
 
         r = check(userName, password)
-        self.get_user(r[0], u_type)
         if r:
+            self.get_user(r[0], u_type)
             return r[0]
         else:
             return None

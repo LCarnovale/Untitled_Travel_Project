@@ -201,6 +201,13 @@ def book_main(id):
         abort(404)
 
     if request.method == 'POST':
+        if request.form.get('review_submit') != None:
+            if request.form.get('rating_input') not in ['1','2','3','4','5']:
+                raise ValueError('Rating not submitted, or form mangled')
+            #TODO: post review
+            print(request.form.get('review'))
+            return redirect(url_for('book_main', id=id))
+
         form = request.form
         if 'id' in session:
             bookingSystem.create_booking(
@@ -254,11 +261,11 @@ def ad_main():
 
         # Create associated date ranges
         # This could be moved to another module?
+
         for i in range(0, int(form['dateCount']), 2):
             db.insert_availability(
                 venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
             )
-
         # Done
         # print(request.form['avail_date'])
         return render_template('ad_confirm.html', id=venueid, **default_kwargs)
