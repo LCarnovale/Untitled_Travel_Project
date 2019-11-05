@@ -1,4 +1,4 @@
-import cloud.dbTools as db
+import db
 import datetime
 import src
 
@@ -227,7 +227,7 @@ class Accommodation:
     @property
     def address(self):
         # Get address for the venue
-        address = db.get_address(self.aid)
+        address = db.addresses.get(self.aid)
         return src.address.Address(*address[1:])
 
 

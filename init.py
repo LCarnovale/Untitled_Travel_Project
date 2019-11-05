@@ -3,5 +3,5 @@ import server
 
 
 def bootstrap_system():
-    import cloud.dbTools as db
+    import db
     db.init()

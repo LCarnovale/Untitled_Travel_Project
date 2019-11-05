@@ -1,6 +1,6 @@
 import re
 
-import cloud.dbTools as db
+import db
 import user
 User = user.User
 
@@ -49,11 +49,11 @@ class UserSystem:
         if u_type == 'user':
             sys = self._users
             add = self.add_user
-            get = db.get_user
+            get = db.users.get
         elif u_type == 'owner':
             sys = self._owners
             add = self.add_owner
-            get = db.get_owner
+            get = db.owners.get
         else:
             raise UserSystemError(f"Invalid user type given: '{u_type}'")
 
@@ -74,7 +74,7 @@ class UserSystem:
         if ownerid in self._owners:
             return self._owners[ownerid]
         else:
-            u = db.get_owner(ownerid)
+            u = db.owners.get(ownerid)
             if u is not None:
                 owner = User(*u[1:])
                 self.add_owner(ownerid, owner)
@@ -97,7 +97,7 @@ class UserSystem:
         args = (name, username, pwd, email, phone, description)
 
         try:
-            uid = db.insert_user(*args)
+            uid = db.users.insert(*args)
         except db.InsertionError as e:
             raise UserCreateError("Error creating user.", col=e.col, err=e.type)        
         try:
@@ -122,7 +122,7 @@ class UserSystem:
 
         args = (name, username, pwd, email, phone, description)
 
-        oid = db.insert_owner(*args)
+        oid = db.owners.insert(*args)
         self.get_owner(oid) # Adds to the system.
         # TODO: If the user has bad data, the insert might pass but the get_user()
         # could fail, so we would want to remove the user from the database
@@ -149,11 +149,11 @@ class UserSystem:
 
         if u_type == 'user':
             pop = self._users.pop
-            update = db.update_user
+            update = db.users.update
             get = self.get_user
         elif u_type == 'owner':
             pop = self._owners.pop
-            update = db.update_owner
+            update = db.owners.update
             get = self.get_owner
         else:
             raise UserSystemError("Invalid user type given: '" + u_type + "'")
@@ -173,12 +173,12 @@ class UserSystem:
         """
         if u_type == 'user':
             sys = self._users
-            get = db.get_user
-            update = db.update_user
+            get = db.users.get
+            update = db.users.update
         elif u_type == 'owner':
             sys = self._owners
-            get = db.get_owner
-            update = db.update_owner
+            get = db.owners.get
+            update = db.owners.update
         else:
             raise UserSystemError(f"Invalid user type given: '{u_type}'")
 
@@ -206,7 +206,7 @@ class UserSystem:
         if u_type == 'user':
             check = db.check_user_pass
         elif u_type == 'owner':
-            check = db.check_owner_pass
+            check = db.owners.check_user_pass
         else:
             raise UserSystemError(f"Invalid user type given: '{u_type}'")
 

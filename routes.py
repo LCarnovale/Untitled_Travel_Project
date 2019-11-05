@@ -13,7 +13,7 @@ from server import accSystem
 from server import userSystem
 from server import bookingSystem
 from server import app
-import cloud.dbTools as db
+import db
 
 default_kwargs = {
     "is_connected": db.is_connected,
@@ -219,9 +219,9 @@ def book_main(id):
                 err_msg = "Please login to make a booking.", **default_kwargs)
 
     # Get owner details, address details, availabilities.
-    owner = db.get_owner(acc.ownerid)
-    address = Address(*db.get_address(acc.aid)[1:])
-    # avails = [[str(x[2]), str(x[3])] for x in db.get_venue_availabilities(id)]
+    owner = db.owners.get(acc.ownerid)
+    address = Address(*db.addresses.get(acc.aid)[1:])
+    # avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
     return render_template('book.html', acc=acc, owner=owner, 
         address=address, **default_kwargs)
@@ -239,12 +239,12 @@ def ad_main():
 
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
-        owner = db.get_owner(1)
+        owner = db.owners.get(1)
         # Create Address info:
         lat, lng = form['acc_location'].split(",")
         lat = lat.strip()[:10]
         lng = lng.strip()[:10]
-        aid = db.insert_address(form['acc_addr'], lat, lng)
+        aid = db.addresses.insert(form['acc_addr'], lat, lng)
 
         # Send to accommodationSystem
         venueid = accSystem.create_accomodation(
@@ -258,7 +258,7 @@ def ad_main():
         # This could be moved to another module?
 
         for i in range(0, int(form['dateCount']), 2):
-            db.insert_availability(
+            db.availabilities.insert(
                 venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
             )
         # Done

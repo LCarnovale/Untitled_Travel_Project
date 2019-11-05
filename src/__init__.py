@@ -1,7 +1,7 @@
 import sys
 sys.path.append('src/')
 
-import cloud.dbTools as db
+import db
 if not db.is_connected:
     db.init()
 

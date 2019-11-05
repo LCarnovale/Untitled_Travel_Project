@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from routes import app
-import cloud.dbTools as db
+import db
 
 if __name__ == '__main__':
     # SIGINT to stop (Ctrl + C)
