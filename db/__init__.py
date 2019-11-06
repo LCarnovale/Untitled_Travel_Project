@@ -2,14 +2,15 @@ import sys
 sys.path.append('db/')
 
 __all__ = ['users', 'owners', 'venues','addresses',
-        'reviews', 'bookings', 'availabilities']
+        'reviews', 'bookings', 'availabilities', 'images']
 
-import _users as users
-import _owners as owners
-import _venues as venues
-import _addresses as addresses
-import _reviews as reviews
-import _bookings as bookings
-import _availabilities as availabilities
+import users
+import owners
+import venues
+import addresses
+import reviews
+import bookings
+import availabilities
+import images
 
 
