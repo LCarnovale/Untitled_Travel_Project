@@ -229,6 +229,12 @@ def ad_main():
             print(url)
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
+        if session['login_type'] == 'owner':
+            owner = db.owners.get(session['id'])
+        else:
+            #TODO we should either fix owner signup or have this.
+            return redirect('/login', message="Please login as an owner.") 
+        
         owner = db.owners.get(1)
         # Create Address info:
         lat, lng = form['acc_location'].split(",")
@@ -252,7 +258,6 @@ def ad_main():
                 venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
             )
         # Done
-        # print(request.form['avail_date'])
         return render_template('ad_confirm.html', id=venueid)
 
     return render_template('new_ad.html')
