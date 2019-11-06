@@ -1,12 +1,13 @@
 """
     Reviews:
-    0    revid      int        Identity  PRIMARY KEY
-    1    venueid    int        not null  FK -> Venues(id)
-    2    userid     int        not null  FK -> Users(id)
-    3    postTime   time
-    4    postDate   date
-    5    rating     tinyint
-    6    review     text
+    0    revid         int        Identity  PRIMARY KEY
+    1    venueid       int        not null  FK -> Venues(id)
+    2    userid        int        not null  FK -> Users(id)
+    3    postDateTime  datetime
+    4    reccommends   bit
+    5    reviewBad     text
+    6    reviewGood    text
+
 """
 from helpers import dbc, execute
 
@@ -15,14 +16,18 @@ def get(id):
         cursor.execute("SELECT * FROM Reviews WHERE revid =?", id)
         return cursor.fetchone()
 
-def insert(venueid, userid, postTime, postDate, rating, review):
+def insert(venueid, userid, postDateTime, recommends, reviewBad, reviewGood):
     with dbc as cursor:
-        cursor.execute("INSERT INTO Reviews (venueid, userid, postTime, postDate, rating, review) \
-            OUTPUT INSERTED.revid                                                                 \
-            VALUES (?, ?, ?, ?, ?, ?)", (venueid, userid, postTime, postDate, rating, review))
+        cursor.execute(
+            """INSERT INTO Reviews
+            (venueid, userid, postDateTime, reccommends, reviewBad, reviewGood)    
+            OUTPUT INSERTED.revid                                                        
+            VALUES (?, ?, ?, ?, ?, ?)""", 
+            (venueid, userid, postDateTime, reccommends, reviewBad, reviewGood)
+        )
         return cursor.fetchone()
 
-def get_from_venue(venueid):
+def get_for_venue(venueid):
     """
     Fetch all reviews for a given venue.
     Return a list of 

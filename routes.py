@@ -210,10 +210,10 @@ def book_main(id):
     address = Address(*db.addresses.get(acc.aid)[1:])
     # avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
-    reviews = [] #TODO: acc.get_reviews(id)
+    reviews = db.reviews.get_for_venue(id)
 
     return render_template('book.html', acc=acc, owner=owner, id=id,
-        address=address, reviews = reviews, **default_kwargs)
+        address=address, reviews = reviews)
 
 
 '''
