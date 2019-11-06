@@ -1,4 +1,4 @@
-import cloud.dbTools as db
+import db
 import datetime
 import src
 
@@ -53,7 +53,7 @@ class Accommodation:
             ]
         With all dates as d-m-yy
         """
-        avails = db.get_venue_availabilities(self._id)
+        avails = db.venues.get_availabilities(self._id)
         avails = [[x[2].strftime('%d-%m-%Y'), x[3].strftime('%d-%m-%Y')] for x in avails]
 
         # return ['10-10-2019', '11-11-2019']
@@ -73,7 +73,7 @@ class Accommodation:
         if (endDate == None):
             endDate = startDate + datetime.timedelta(days=1)
         
-        avails = db.get_overlapping_availability_venue(self._id, startDate, endDate)
+        avails = db.venues.get_overlapping_availability(self._id, startDate, endDate)
 
         if len(avails) >= 1:
             return True
@@ -227,7 +227,7 @@ class Accommodation:
     @property
     def address(self):
         # Get address for the venue
-        address = db.get_address(self.aid)
+        address = db.addresses.get(self.aid)
         return src.address.Address(*address[1:])
 
 
