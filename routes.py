@@ -14,7 +14,7 @@ from server import userSystem
 from server import bookingSystem
 from server import app
 import cloud.dbTools as db
-
+import os
 default_kwargs = {
     "is_connected": db.is_connected,
 }
@@ -238,10 +238,9 @@ def ad_main():
         print(request.files)
         for i in (request.files):
             f = request.files[i]
-            f.save((f.filename))
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'],f.filename))
             print(type(f))
-            url = f.filename
-            print(url)
+            url = os.path.join(app.config['UPLOAD_FOLDER'],f.filename)
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
         owner = db.get_owner(1)
