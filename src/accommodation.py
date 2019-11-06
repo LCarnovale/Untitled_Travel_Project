@@ -80,6 +80,12 @@ class Accommodation:
         else:
             return False
 
+    def get_images(self):
+        """
+        Return a list of paths of images for this venue.
+        """
+        images = db.images.get_for_venue(self.id)
+        return [img[2] for img in images]
 
 
     '''
