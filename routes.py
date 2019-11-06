@@ -15,6 +15,7 @@ from server import bookingSystem
 from server import app
 import db
 import os
+from datetime import datetime
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -245,19 +246,13 @@ Main Post accommodation page
 def ad_main():
     if request.method == "POST":
         form = request.form
-        print(request.files)
-        for i in (request.files):
-            f = request.files[i]
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'],f.filename))
-            print(type(f))
-            url = os.path.join(app.config['UPLOAD_FOLDER'],f.filename)
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
         if session['login_type'] == 'owner':
             owner = db.owners.get(session['id'])
         else:
             #TODO we should either fix owner signup or have this.
-            return redirect('/login', message="Please login as an owner.") 
+            return render_template('/login', err_msg="Please login as an owner.") 
         
         owner = db.owners.get(1)
         # Create Address info:
@@ -274,12 +269,23 @@ def ad_main():
             int(form['max_stay']), form['details']
         )
 
+        print(request.files)
+        for i in (request.files):
+            f = request.files[i]
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+            print(type(f))
+            url = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
+            db.images.insert(venueid, url)
+
         # Create associated date ranges
         # This could be moved to another module?
 
-        for i in range(0, int(form['dateCount']), 2):
+        for i in range(0, int(form['dateCount'])):
+            start, end = form[f'dateRange_{i}'].split(' - ')
+            start = datetime.strptime(start, r'%d/%m/%Y')
+            end   = datetime.strptime(end,   r'%d/%m/%Y')
             db.availabilities.insert(
-                venueid, form[f'dateRange_{i}'], form[f'dateRange_{i+1}']
+                venueid, start, end
             )
         # Done
         return render_template('ad_confirm.html', id=venueid)
