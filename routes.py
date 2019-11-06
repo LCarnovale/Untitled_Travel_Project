@@ -220,8 +220,13 @@ Main Post accommodation page
 def ad_main():
     if request.method == "POST":
         form = request.form
-        
-
+        print(request.files)
+        for i in (request.files):
+            f = request.files[i]
+            f.save((f.filename))
+            print(type(f))
+            url = f.filename
+            print(url)
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
         owner = db.owners.get(1)

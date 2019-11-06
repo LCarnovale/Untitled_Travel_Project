@@ -49,7 +49,7 @@
 	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
 
 	<h2> Please enter the details of your accommodation: </h2>
-	<form name='post_ad' id = "regForm" method='POST' formaction='submit()'>
+	<form name='post_ad' id = "regForm" method='POST' formaction='submit()' enctype="multipart/form-data">
 		<div class = "tab">Place Details
 			<p><input name = "acc_name" placeholder = "Name" class = "required"></p>
 			<p><input name = "acc_nbed" placeholder = "Beds" class = "required" type = number></p>
@@ -58,13 +58,17 @@
 			<p><input name = "acc_details" placeholder = "Accommodation description" type = text></p>		
 		</div>
 		<div class = "tab">Place Details
-			<input name = "acc_images" id="file-input" type="file" accept="image/*" multiple>
+			<ul id = "imagelist">
+			<li><input name = "acc_image-0" id="file-input" type="file" accept="image/*">
+			</li>
+			</ul>
+			<input type="button" id="addImageButton" value="Add Image" onclick = "addImage()"/>
 			<div id="preview"></div>
 		</div>
 		<div class = "tab">Location Details
 			<p><input name = "acc_addr" placeholder = "Address" class = "required" id = "hiddenaddress" readonly></p>
 			<p><input name = "acc_location" id = "hiddenlocation" class = "required" type = "hidden"></p>
-			<ul id="map"></ul>
+			<div id="map"></div>
 		</div>
 		{%if 'username' not in session%}
 		<div class = "tab">Owner Details
@@ -163,8 +167,44 @@
 		 	//window.prompt("prompt");
 		 	//console.log("Submitting");
 			//}
-
-	var imagelist = []
+	var imagelen = 0;
+	function addImage() {
+		var imagetemp = document.getElementsByName('acc_image-'+imagelen)
+		
+		for(i=0;i<imagetemp.length;i++){
+			if(imagetemp[i].tagName == 'INPUT'){
+				console.log(imagetemp[i].value)
+				if(imagetemp[i].value == ""){
+					return false
+				}
+			}
+		}
+		imagelen+=1;
+		var node = document.createElement("LI");
+		node.setAttribute('name', 'acc_image-'+imagelen);
+		var input = document.createElement("input");
+		input.setAttribute('type', 'file');
+		input.setAttribute('name', 'acc_image-'+imagelen);
+		input.setAttribute('accept','image/*');
+		input.addEventListener("change", previewImage);
+		var removeButton = document.createElement('input');
+		removeButton.setAttribute('type', 'button');
+		removeButton.setAttribute('value', 'Remove');
+		removeButton.setAttribute('onclick', 'removeImage(this)');
+		removeButton.setAttribute('name', 'acc_image-'+imagelen);
+		node.appendChild(input)
+		node.appendChild(removeButton)
+		var list = document.getElementById('imagelist')
+		list.appendChild(node)
+	}
+	function removeImage(buttonObj){
+		var imagenode = document.getElementsByName(buttonObj.name)
+		console.log(buttonObj.name)
+		while(imagenode.length > 0){
+			imagenode[0].remove()
+		}
+		imagelen--
+	}
 	function previewImage() { 
 		var preview = document.querySelector('#preview');
 		if (this.files) {
@@ -177,48 +217,19 @@
 
 			reader.addEventListener("load", function() {
 			  var node = document.createElement("LI")
+			  node.setAttribute('name', 'acc_image-'+imagelen)
 			  var image = new Image();
 			  image.height = 100;
 			  image.title  = file.name;
 			  image.src    = this.result;
-			  console.log(imagelist)
 			  node.appendChild(image);
-			  node.append(document.createElement("br"))
-			  var a = document.createElement("A");
-			  a.innerHTML = "Remove";
-			  a.href = "#";
-			  a.onclick = deletefile;
-			  function deletefile(){
-			    console.log(file.name);
-				for(i=0;i<imagelist.length;i++){
-					if (imagelist[i].name == file.name)
-						imagelist.splice(i,1);
-				}
-				var previewlist = document.getElementById("preview").getElementsByTagName("li");
-				for(i=0;i<previewlist.length; i++){
-					console.log(previewlist[i]);
-					if(previewlist[i].children[0].title == file.name){
-						previewlist[i].remove()
-					}
-					
-				}
-				console.log(imagelist)
-				return false;
-			  }
-			  node.appendChild(a);
-			  node.append(document.createElement("br"))
+			  node.append(document.createElement("br"));
+			  node.append(document.createElement("br"));
 			  preview.appendChild(node);
-			  imagelist.push(file)
 			});
-
 			reader.readAsDataURL(file);
 		}
 	}
-	function submitImage(){
-		this.files = imagelist;
-		console.log(this.files)
-	}
-	document.querySelector('#file-input').addEventListener("submit", submitImage);
 	document.querySelector('#file-input').addEventListener("change", previewImage);
 	</script>
 	<!-- Actual link: -->
