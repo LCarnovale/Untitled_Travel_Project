@@ -73,7 +73,7 @@ class Accommodation:
         if (endDate == None):
             endDate = startDate + datetime.timedelta(days=1)
         
-        avails = db.get_overlapping_availability_venue(self._id, startDate, endDate)
+        avails = db.venues.get_overlapping_availability(self._id, startDate, endDate)
 
         if len(avails) >= 1:
             return True

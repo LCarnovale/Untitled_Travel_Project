@@ -14,7 +14,7 @@ from server import userSystem
 from server import bookingSystem
 from server import app
 import db
-
+import os
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -223,10 +223,9 @@ def ad_main():
         print(request.files)
         for i in (request.files):
             f = request.files[i]
-            f.save((f.filename))
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'],f.filename))
             print(type(f))
-            url = f.filename
-            print(url)
+            url = os.path.join(app.config['UPLOAD_FOLDER'],f.filename)
         # Find owner:
         # (We haven't asked for enough info, pick a test owner)
         if session['login_type'] == 'owner':

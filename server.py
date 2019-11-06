@@ -12,6 +12,7 @@ from src.accommodation import Accommodation
 USE_DATABASE = True
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
 app.secret_key = 'very-secret-123'  # Used to add entropy TODO: Learn what this is actually for
 accSystem = AccommodationSystem()
 userSystem = UserSystem()
