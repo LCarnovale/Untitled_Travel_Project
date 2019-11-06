@@ -3,5 +3,4 @@ import server
 
 
 def bootstrap_system():
-    import db
-    db.init()
+    pass

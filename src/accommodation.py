@@ -53,7 +53,7 @@ class Accommodation:
             ]
         With all dates as d-m-yy
         """
-        avails = db.get_venue_availabilities(self._id)
+        avails = db.venues.get_availabilities(self._id)
         avails = [[x[2].strftime('%d-%m-%Y'), x[3].strftime('%d-%m-%Y')] for x in avails]
 
         # return ['10-10-2019', '11-11-2019']

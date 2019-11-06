@@ -33,10 +33,11 @@ class FailedConnectionHandler:
     fetchone = _default
     fetchall = _default
 
+from connect_config import get_connection
 class dbCursor:
     def __enter__(self):
         try:
-            self._cnxn = dbCursor.get_con()
+            self._cnxn = get_connection()
         except TypeError:
             print("Connection has not been established yet. Call init().")
             self._cnxn = FailedConnectionHandler()

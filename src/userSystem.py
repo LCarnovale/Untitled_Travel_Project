@@ -204,7 +204,7 @@ class UserSystem:
         Return the user's id if found.
         """
         if u_type == 'user':
-            check = db.check_user_pass
+            check = db.users.check_user_pass
         elif u_type == 'owner':
             check = db.owners.check_user_pass
         else:

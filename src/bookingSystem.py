@@ -30,7 +30,7 @@ class BookingSystem:
         if bookid in self._bookings:
             return self._bookings[bookid]
         else:
-            b = .bookings.get(bookid)
+            b = db.bookings.get(bookid)
             if b is not None:
                 book = Booking(*b[1:])
                 self.add_booking(bookid, book)

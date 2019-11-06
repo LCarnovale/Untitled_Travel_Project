@@ -15,13 +15,10 @@ from server import bookingSystem
 from server import app
 import db
 
-default_kwargs = {
-    "is_connected": db.is_connected,
-}
-    
+
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html', **default_kwargs)
+    return render_template('404.html')
 
 '''
 Landing page
@@ -64,7 +61,7 @@ def home():
 
         return render_template('search_results.html', results = [])
 
-    return render_template('home.html', **default_kwargs)
+    return render_template('home.html')
 
 '''
 Login page
@@ -75,29 +72,17 @@ def login():
         # Attempt a Login
         form = request.form
         login_id = -1
-        if db.is_connected:
-            login_type = form['login_select'] # Will be either 'owner' or 'user'
-            result = userSystem.check_user_pass(
-                form['username'], form['password'], login_type
-            )
-            if result is not None:
-                login_id = result
-                user = userSystem.get_user(
-                    login_id, u_type=form['login_select'])  # should be same as  User(*result[1:])
-            else:
-                return render_template('login.html', login_fail=True)
-            session['login_type'] = login_type
-
+        login_type = form['login_select'] # Will be either 'owner' or 'user'
+        result = userSystem.check_user_pass(
+            form['username'], form['password'], login_type
+        )
+        if result is not None:
+            login_id = result
+            user = userSystem.get_user(
+                login_id, u_type=form['login_select'])  # should be same as  User(*result[1:])
         else:
-            result = (form['password'] == 'admin' and form['username'] == 'admin')
-            if result:
-                user = User(
-                    "Developer",
-                    "admin",
-                    "admin@temp.com",
-                    "0456123456")
-            else:
-                print("No database connection, try admin & admin")
+            return render_template('login.html', login_fail=True)
+        session['login_type'] = login_type
         if result:
             session['id'] = login_id
             d = user.todict()
@@ -105,7 +90,7 @@ def login():
                 session[k] = v
 
         return redirect('/')
-    return render_template('login.html', **default_kwargs)
+    return render_template('login.html')
 
 '''
 Logout
@@ -213,10 +198,10 @@ def book_main(id):
             bookingSystem.create_booking(
                 id, session['id'], form['book_start'], form['book_end']
             )
-            return render_template('book_confirm.html', acc=acc, **default_kwargs)
+            return render_template('book_confirm.html', acc=acc)
         else:
             return render_template('login.html', 
-                err_msg = "Please login to make a booking.", **default_kwargs)
+                err_msg = "Please login to make a booking.")
 
     # Get owner details, address details, availabilities.
     owner = db.owners.get(acc.ownerid)
@@ -224,7 +209,7 @@ def book_main(id):
     # avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
     return render_template('book.html', acc=acc, owner=owner, 
-        address=address, **default_kwargs)
+        address=address)
 
 
 
@@ -263,7 +248,7 @@ def ad_main():
             )
         # Done
         # print(request.form['avail_date'])
-        return render_template('ad_confirm.html', id=venueid, **default_kwargs)
+        return render_template('ad_confirm.html', id=venueid)
 
-    return render_template('new_ad.html', **default_kwargs)
+    return render_template('new_ad.html')
 
