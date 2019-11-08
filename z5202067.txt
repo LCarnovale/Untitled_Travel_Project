@@ -16,3 +16,8 @@ Worked on the HTML files. Created a multiple form page, logo and home page.
 Week 6 
 Start working on advanced search which consists of the following: 2 calendar(start date and end date), number of people staying and a Gmap for location selector.
 
+Week 7 
+Worked on users logging in and google maps API. Mainly worked on displaying google maps and geocoding to get address in human-readable format
+
+Week 8
+Worked on Photo Uploading to a folder and storing the url in database

@@ -49,14 +49,14 @@
         <div>
           <a href="/"> <img src = "/static/nsw1.png" style = "width: 200px;height: 200px"></a>
         </div>
-
 <!--        Dev info <br>-->
 <!--        Database Connected: {{is_connected}} <br>-->
-
         <div><ul>
             <li><a href="{{url_for('home')}}">Home</a></li>
             <li><a href="{{url_for('book_main', id=id)}}">Booking</a></li>
+            {% if session['login_type'] == 'owner' %}
             <li><a href="{{url_for('ad_main')}}">Post Ad</a></li>
+            {% endif %}
             {% if 'username' in session %}
             <li style= "float:right"><a href="{{url_for('logout')}}">Logout</a></li>
             <li style= "float:right"><a href="{{url_for('editprofile')}}">Edit Profile</a></li>

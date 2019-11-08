@@ -1,4 +1,4 @@
-import cloud.dbTools as db
+import db
 from booking import Booking
 
 class BookingSystem:
@@ -16,7 +16,7 @@ class BookingSystem:
 
         # TODO: Verify the booking is allowed
 
-        new_bookingid = db.insert_booking(venueid, userid, startDate, endDate)
+        new_bookingid = db.bookings.insert(venueid, userid, startDate, endDate)
         new_booking = Booking(venueid, userid, startDate, endDate)
         self.add_booking(new_bookingid, new_booking)
         return new_bookingid
@@ -30,7 +30,7 @@ class BookingSystem:
         if bookid in self._bookings:
             return self._bookings[bookid]
         else:
-            b = db.get_booking(bookid)
+            b = db.bookings.get(bookid)
             if b is not None:
                 book = Booking(*b[1:])
                 self.add_booking(bookid, book)

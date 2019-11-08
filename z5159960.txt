@@ -52,3 +52,7 @@ Week 7:
     Merged the current backend into Ian's search branch, will get that working smoothly then
     hopefully merge back into backend and/or master. Might have to fix some outdated
     references to class methods etc. 
+
+Week 8: 
+    Updating the db tools module into separate modules for each table, and adding a new 
+    table for reviews.
