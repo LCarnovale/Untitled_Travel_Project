@@ -33,8 +33,10 @@ def home():
         try:
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
-            startdate = request.form.get('startdate')
-            enddate = request.form.get('enddate')
+            dates = request.form.get('dates')
+            print(dates)
+            startdate = ''
+            enddate = ''
             beds = request.form.get('beds')
             bathrooms = request.form.get('bathrooms')
             parking = request.form.get('parking')

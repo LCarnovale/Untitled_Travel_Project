@@ -4,18 +4,29 @@
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script>
-      $(function() {
-        $("#startdate").datepicker();
-		$("#enddate").datepicker();
-      });
-    </script>
-	<style>#map {
+
+	<!-- Script for dateRangePicker -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+	<style>
+	#map {
         height: 400px;
 		width: 400px;
 		margin-left: auto;
 		margin-right: auto;
-      }</style>
+      }
+    #searchkeyword {
+    	height: 30px;
+    	width: 200px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -32,16 +43,15 @@
 	}
 	</script>
 	
-    <p> <img src = "/static/nsw1.png"  > </p>
+    <p> <img src = "/static/nsw1.png"  style = "width: 250px;height: 250px"> </p>
 	<form id = 'searchForm' name = 'search' method = 'POST' >
 		<input type = "text" placeholder = "Search.." id = "searchkeyword" name = "search">
 		<input type = "hidden" name = "geocodedvalue" id = "geocodedvalue" readonly>
-		<button type = "button" onclick = "getgeocode()">Submit</button>
+		<button type = "button" onclick = "getgeocode()" style="height: 30px;width: 75px">Submit</button>
 		<br><br>
-		<p><button type = "button" onclick="myFunction()">Advanced Search</button></p>
+		<p><button type = "button" onclick="myFunction()" style="height: 30px;width: 150px">Advanced Search</button></p>
 		<div id = advancesearch style = "display:none;">
-			Start date: <input type="text" id="startdate" name = "startdate">
-			End date: <input type="text" id="enddate" name = "enddate">
+			Date Range: <input type="text" id="dates" name = "dates">
 			Beds: <input type= "number" name = "beds" max = "5" min = "1">
 			Bathrooms: <input type= "number" name = "bathrooms" max  = "5" min = "1" >
 			Parking Spaces: <input type= "number" name = "parking" max  = "3" min = "0" >
@@ -114,8 +124,23 @@
 					});
 		}
 	</script>
+<script>
+	$(function() {
+		$('#dates').daterangepicker({
+			minDate: new Date(),
+        	locale: {
+            	cancelLabel: 'Clear',
+            	format: 'DD/MM/YYYY'
+        	}
+		});
+	});
+	$('#dates').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+</script>
 	<!-- Actual link: -->	
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>
+<!--	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>-->
 	<!-- Use a wrong link when map isn't needed: -->		
-    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=NotARealKey&callback=initMap"></script> -->
+     <script src="https://maps.googleapis.com/maps/api/js?key=NotARealKey&callback=initMap"></script>
+
 {% endblock %}

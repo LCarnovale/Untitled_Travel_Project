@@ -44,3 +44,12 @@ When viewing an ad, users will see a calendar with the available dates highlight
 
 27/10/19
 When pulling from the git repository, my work on calendars was deleted. Put it back into new ad but plays no vital role in the form. I will discuss with the group on how we want to approach storing available dates since we are using a cloud database.
+
+4/11/19
+Worked on a new calendar date picker for posting an ad. Using multiple date ranges and also included error checking in javacsript. Had a problem with using multiple date ranges but found a solution using document focus. Might have a problem with javascript regex using str.match function. Might not work on all browsers.
+
+5/11/19
+Worked on tidying up calendar and will work on the frontend of the website.
+
+8/11/19
+Worked on the frontend and changed start and end date in advanced search to a daterangepicker. Tried to make the website look appealing without adding too much.

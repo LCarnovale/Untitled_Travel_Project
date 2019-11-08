@@ -67,21 +67,29 @@ function validateForm() {
 var end_date = new Array(dateCount);
     // Get all the dates into a start date array and end date array
     for (var i = 0; i < dateCount; i++) {
-        var date = eval('dateRange_' + i);
-        start_date[i] = date.match("([0-9]{2}/[0-9]{2}/[0-9]{4}) - [0-9]{2}/[0-9]{2}/[0-9]{4}")[1];
+        var date = eval('dateRange_' + i).value.toString();
+        start_date[i] = date.match("([0-9]{2}/[0-9]{2}/[0-9]{4}) - ([0-9]{2}/[0-9]{2}/[0-9]{4})")[1];
         end_date[i] = date.match("[0-9]{2}/[0-9]{2}/[0-9]{4} - ([0-9]{2}/[0-9]{2}/[0-9]{4})")[1];
-        document.getElementById("demo"+i).innerHTML = start_date[i];
     }
     // compare all start dates with end dates
     for (var j = 0; j < dateCount; j++) {
         var first_date = moment(start_date[j], "DD/MM/YYYY");
         var sec_date = moment(end_date[j], "DD/MM/YYYY");
         for (var k = dateCount-1; k > 0; k--) {
-        	if (k ==j) break;
-            var third_date = moment(start_date[j], "DD/MM/YYYY");
-            var fourth_date = moment(end_date[j], "DD/MM/YYYY");
-            if (third_date <= first_date <= fourth_date || third_date <= sec_date <= fourth_date) {
-                alert("FALSE");
+        	if (k == j) {
+        	    break;
+        	}
+            var third_date = moment(start_date[k], "DD/MM/YYYY");
+            var fourth_date = moment(end_date[k], "DD/MM/YYYY");
+
+            if (third_date <= first_date && first_date <= fourth_date) {
+                alert("Overlapping date ranges");
+                valid = false;
+            } else if (third_date <= sec_date && sec_date <= fourth_date) {
+                alert("Overlapping date ranges");
+                valid = false;
+            } else {
+                valid = true;
             }
         }
     }

@@ -26,9 +26,12 @@
             text-align: center;
             padding: 5px 60px;
             text-decoration: none;
+            text-transform: uppercase;
+            font-size: 20px;
         }
         .topnav li a:hover {
-            background-color: #4CAF50;	
+<!--            background-color: #4CAF50;	-->
+            background-color: #f6f6f6;
         }
         form {
             display: inline-block;
@@ -44,11 +47,11 @@
     <nav class = "topnav">
       <div>
         <div>
-          <a href="/"> <img src = "/static/nsw1.png" style = "width: 100px;height: 100px"></a>
+          <a href="/"> <img src = "/static/nsw1.png" style = "width: 200px;height: 200px"></a>
         </div>
 
-        Dev info <br>
-        Database Connected: {{is_connected}} <br>
+<!--        Dev info <br>-->
+<!--        Database Connected: {{is_connected}} <br>-->
 
         <div><ul>
             <li><a href="{{url_for('home')}}">Home</a></li>
