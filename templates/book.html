@@ -33,7 +33,9 @@
 
     <h2>About the place</h2>
     <p>{{acc.description}}</p>
-
+	{%for image in images%}
+		 <img src="{{ image }} " style = "width: 100px;height: 100px"></img>
+	{%endfor%}
     <table class = "booking_details">
         <tr>
             <th>Price</th>

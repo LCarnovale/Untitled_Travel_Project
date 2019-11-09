@@ -173,7 +173,6 @@
 		
 		for(i=0;i<imagetemp.length;i++){
 			if(imagetemp[i].tagName == 'INPUT'){
-				console.log(imagetemp[i].value)
 				if(imagetemp[i].value == ""){
 					return false
 				}
@@ -199,7 +198,6 @@
 	}
 	function removeImage(buttonObj){
 		var imagenode = document.getElementsByName(buttonObj.name)
-		console.log(buttonObj.name)
 		while(imagenode.length > 0){
 			imagenode[0].remove()
 		}
@@ -207,6 +205,15 @@
 	}
 	function previewImage() { 
 		var preview = document.querySelector('#preview');
+		images = document.getElementsByName('acc_image-'+imagelen)
+		for(i=0;i<images.length;i++){
+			if(images[i].firstChild != null){
+				if(images[i].firstChild.tagName == 'IMG'){
+					images[i].remove()
+				}
+			}
+				
+		}
 		if (this.files) {
 			[].forEach.call(this.files, readAndPreview);
 		}

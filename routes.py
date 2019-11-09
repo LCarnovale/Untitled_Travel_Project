@@ -209,12 +209,16 @@ def book_main(id):
     # Get owner details, address details, availabilities.
     owner = db.owners.get(acc.ownerid)
     address = Address(*db.addresses.get(acc.aid)[1:])
-    # avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
+    images = acc.get_images()
+    print('images: ' )
+    images = (['/static/'+image.replace("\\","/") for image in images])
+    print(images)
+	# avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
     reviews = src.review.get_for_venue(id)
 
     return render_template('book.html', acc=acc, owner=owner, id=id,
-        address=address, reviews = reviews)
+        address=address, reviews = reviews, images = images)
 
 
 '''
@@ -273,7 +277,7 @@ def ad_main():
         print(request.files)
         for i in (request.files):
             f = request.files[i]
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+            f.save(os.path.join('static/'+app.config['UPLOAD_FOLDER'], f.filename))
             print(type(f))
             url = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
             db.images.insert(venueid, url)
