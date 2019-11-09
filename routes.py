@@ -256,7 +256,6 @@ def ad_main():
             #TODO we should either fix owner signup or have this.
             return render_template('/login', err_msg="Please login as an owner.") 
         
-        owner = db.owners.get(1)
         # Create Address info:
         lat, lng = form['acc_location'].split(",")
         lat = lat.strip()[:10]
