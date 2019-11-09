@@ -54,5 +54,14 @@ Week 7:
     references to class methods etc. 
 
 Week 8: 
-    Updating the db tools module into separate modules for each table, and adding a new 
-    table for reviews.
+    Finished updating the db tools module into separate modules for each table, and added new 
+    tables for reviews and images. We have now been able to upload images through the website and
+    have them stored by the server.
+
+    Saturday:
+    Reviews have been implemented, the front end usage of them still needs to be improved but
+    the backend part and database usage is all working well. 
+
+    Will start working on a program to fill the database with realistic sample data that we can
+    use for testing.
+    
