@@ -4,7 +4,7 @@
     1    venueid       int        not null  FK -> Venues(id)
     2    userid        int        not null  FK -> Users(id)
     3    postDateTime  datetime
-    4    reccommends   bit
+    4    recommends   bit
     5    reviewBad     text
     6    reviewGood    text
 
@@ -20,10 +20,10 @@ def insert(venueid, userid, postDateTime, recommends, reviewBad, reviewGood):
     with dbc as cursor:
         cursor.execute(
             """INSERT INTO Reviews
-            (venueid, userid, postDateTime, reccommends, reviewBad, reviewGood)    
+            (venueid, userid, postDateTime, recommends, reviewBad, reviewGood)    
             OUTPUT INSERTED.revid                                                        
             VALUES (?, ?, ?, ?, ?, ?)""", 
-            (venueid, userid, postDateTime, reccommends, reviewBad, reviewGood)
+            (venueid, userid, postDateTime, recommends, reviewBad, reviewGood)
         )
         return cursor.fetchone()
 

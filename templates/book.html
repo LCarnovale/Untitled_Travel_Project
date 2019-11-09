@@ -82,23 +82,22 @@
         <h3> Reviews </h3>
         <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
         {% for review in reviews %}
-        <!-- TODO: Implement this stuff in backend (Leo will do this) -->
         <table>
             <tr>
                 <td>
-                {% if not review.reccommends() %}
+                {% if not review.recommends %}
                     <img src="/static/thumbs_down_selected.png">
                 {% else %}
                     <img src="/static/thumbs_up_selected.png">
                 {% endif %}
                 </td>
-                <td>{{review.get_name()}} {% if not review.reccommends() %} does not {% else %} would {% endif %} reccommend staying here.</td>
+                <td>{{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.</td>
             </tr>
             <tr>
-                <td><h4>The good:</h4><br>{{review.get_good()}}</td>
+                <td><h4>The good:</h4><br>{{review.reviewGood}}</td>
             </tr>
             <tr>
-                <td><h4>The bad:</h4><br>{{review.get_issues()}}</td>
+                <td><h4>The bad:</h4><br>{{review.reviewBad}}</td>
             </tr>
         </table>
         {% endfor %}

@@ -6,6 +6,7 @@ from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
 from src.booking import Booking
+import src
 import src.userSystem as US
 import src.accommodationSystem as AS
 import src.bookingSystem as BS
@@ -210,7 +211,7 @@ def book_main(id):
     address = Address(*db.addresses.get(acc.aid)[1:])
     # avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
-    reviews = db.reviews.get_for_venue(id)
+    reviews = src.review.get_for_venue(id)
 
     return render_template('book.html', acc=acc, owner=owner, id=id,
         address=address, reviews = reviews)
@@ -228,11 +229,12 @@ def review(id):
 
     if request.method == 'POST':
         print(request.form)
-        reccommend = True if request.form.get('recc') == 'Yes' else False
+        reccommend = True if request.form.get('recc') == 'yes' else False
         issues = request.form.get('issues')
         good = request.form.get('good')
 
-        #TODO: add to DB
+        db.reviews.insert(id, session['id'], datetime.today(),
+                          reccommend, issues, good)
 
         return redirect(url_for('book_main', id=id))
 
