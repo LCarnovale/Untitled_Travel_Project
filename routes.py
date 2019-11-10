@@ -31,10 +31,10 @@ def home():
         try:
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
-            dates = request.form.get('dates')
-            print(dates)
-            startdate = ''
-            enddate = ''
+            dates = request.form.get('dates').split(' - ')
+            startdate = dates[0]
+            enddate = dates[1]
+
             beds = request.form.get('beds')
             bathrooms = request.form.get('bathrooms')
             parking = request.form.get('parking')
@@ -43,8 +43,8 @@ def home():
 
             if (search or startdate or enddate or beds or
                 bathrooms or parking or location):
-                print(search, startdate, enddate, beds,
-                      bathrooms, parking, location)
+                # print(search, startdate, enddate, beds,
+                #       bathrooms, parking, location)
                 accSystem.get_all_ads()
                 results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                    bathrooms, parking, location, distance)

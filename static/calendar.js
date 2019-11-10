@@ -16,20 +16,18 @@ $('.calRange').on('cancel.daterangepicker', function(ev, picker) {
 });
 });
 
-// Calendar in new_ad
-$( function() {
-    $( "#avail_date" ).multiDatesPicker({
+
+
+
+// Button in new_ad to reset dates selected
+    $( "#calendar" ).multiDatesPicker({
         minDate: 0,
         dateFormat: 'dd-mm-yyyy'
     });
- });
 
-// Button in new_ad to reset dates selected
-$(document).ready(function() {
 	$( "#reset" ).click(function() {
-    	$( "#avail_date" ).multiDatesPicker('resetDates', 'picked');
+    	$( "#calendar" ).multiDatesPicker('resetDates', 'picked');
 	});
-});
 
 /**
  * Create a calendar to show the available days
@@ -39,7 +37,7 @@ $(document).ready(function() {
  * @param {Boolean} disable If the calendar should be disabled
  */
 function getDates(dates, disable) {
-    $( "#avail_dates" ).multiDatesPicker({
+    $( "#calendar" ).multiDatesPicker({
         disabled: disable,
         dateFormat: 'd-m-yy',
         addDates: dates
@@ -102,7 +100,7 @@ function disableDates(dates) {
     // convert to list
 	const disable = [...toDisable];
 	// Put into calendar
-    $("#mdp-demo").multiDatesPicker({
+    $("#calendar").multiDatesPicker({
         dateFormat: 'd-m-yy',
         addDisabledDates: disable
     });

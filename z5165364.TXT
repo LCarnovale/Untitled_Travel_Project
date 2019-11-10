@@ -53,3 +53,7 @@ Worked on tidying up calendar and will work on the frontend of the website.
 
 8/11/19
 Worked on the frontend and changed start and end date in advanced search to a daterangepicker. Tried to make the website look appealing without adding too much.
+
+
+10/11/19
+Worked on the frontend for booking accommodations and edited the calendar showing. Updated calendar so it now disables all dates that are not in the available date ranges. It also must have the minimum/maximum days for staying. Booking works with the new calendar. Booking page is shown in grids, where header is the name of accommodation, left grid is details, right grid is images and booking details and footer is owner details and review.

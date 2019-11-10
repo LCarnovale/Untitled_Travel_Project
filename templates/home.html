@@ -47,7 +47,7 @@
 	<form id = 'searchForm' name = 'search' method = 'POST' >
 		<input type = "text" placeholder = "Search.." id = "searchkeyword" name = "search">
 		<input type = "hidden" name = "geocodedvalue" id = "geocodedvalue" readonly>
-		<button type = "button" onclick = "getgeocode()" style="height: 30px;width: 75px">Submit</button>
+		<button type = "submit" onclick = "getgeocode()" style="height: 30px;width: 75px">Submit</button>
 		<br><br>
 		<p><button type = "button" onclick="myFunction()" style="height: 30px;width: 150px">Advanced Search</button></p>
 		<div id = advancesearch style = "display:none;">
@@ -63,7 +63,7 @@
 			<br>
 			<input type = "range" name= "distance" id = "radiuschange" min = "100" max = "2000" value = "100" oninput = "changeCircle(this.value)">
 			<div id="map"></div>
-		<div >	
+		</div>
 	</form>
 	
     <script>
