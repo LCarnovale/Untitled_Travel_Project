@@ -6,6 +6,7 @@ from src.address import Address
 from src.user import User
 from src.stayDetails import StayDetails
 from src.booking import Booking
+import src
 import src.userSystem as US
 import src.accommodationSystem as AS
 import src.bookingSystem as BS
@@ -189,12 +190,13 @@ def book_main(id):
         abort(404)
 
     if request.method == 'POST':
+        '''
         if request.form.get('review_submit') != None:
             if request.form.get('rating_input') not in ['1','2','3','4','5']:
                 raise ValueError('Rating not submitted, or form mangled')
-            #TODO: post review
             print(request.form.get('review'))
             return redirect(url_for('book_main', id=id))
+        '''
 
         form = request.form
         if 'id' in session:
@@ -209,12 +211,41 @@ def book_main(id):
     # Get owner details, address details, availabilities.
     owner = db.owners.get(acc.ownerid)
     address = Address(*db.addresses.get(acc.aid)[1:])
-    # avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
+    images = acc.get_images()
+    print('images: ' )
+    images = (['/static/'+image.replace("\\","/") for image in images])
+    print(images)
+	# avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
-    return render_template('book.html', acc=acc, owner=owner, 
-        address=address)
+    reviews = src.review.get_for_venue(id)
+
+    return render_template('book.html', acc=acc, owner=owner, id=id,
+        address=address, reviews = reviews, images = images)
 
 
+'''
+Booking page, accessed via the booking page
+'''
+@app.route('/review/<id>', methods = ['GET', 'POST'])
+def review(id):
+
+    acc = accSystem.get_acc(id)
+    if acc == None:
+        abort(404)
+
+    if request.method == 'POST':
+        print(request.form)
+        reccommend = True if request.form.get('recc') == 'yes' else False
+        issues = request.form.get('issues')
+        good = request.form.get('good')
+
+        db.reviews.insert(id, session['id'], datetime.today(),
+                          reccommend, issues, good)
+
+        return redirect(url_for('book_main', id=id))
+
+
+    return render_template('review.html')
 
 '''
 Main Post accommodation page
@@ -231,7 +262,6 @@ def ad_main():
             #TODO we should either fix owner signup or have this.
             return render_template('/login', err_msg="Please login as an owner.") 
         
-        owner = db.owners.get(1)
         # Create Address info:
         lat, lng = form['acc_location'].split(",")
         lat = lat.strip()[:10]
@@ -249,7 +279,7 @@ def ad_main():
         print(request.files)
         for i in (request.files):
             f = request.files[i]
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+            f.save(os.path.join('static/'+app.config['UPLOAD_FOLDER'], f.filename))
             print(type(f))
             url = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
             db.images.insert(venueid, url)

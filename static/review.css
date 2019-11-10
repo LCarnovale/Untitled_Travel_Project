@@ -1,0 +1,23 @@
+.reviews_container {
+    width: 100%;
+    padding-top: 30px;
+    padding-bottom: 100px;
+    text-align: center;
+}
+
+.reviews_container td {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.reviews_container img {
+    width:30px;
+    height:auto;
+}
+
+.reviews_container table {
+    width:80%;
+    display:inline;
+}

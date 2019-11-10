@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block head %}
+    <title>Make a review</title>
+    <script src = "{{ url_for('static',filename = 'thumb_rating.js')}}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='review.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1> Make a review </h1>
+
+
+    <div class="reviews_container">
+        <form name="post_review" method="POST" style="width:100%;text-align:center">
+            <input id = "return" name="return" value="" hidden>
+            <input id = "recc" name="recc" value="" hidden>
+            <table>
+                <tr>
+                    <td><h4>Would you reccomend it to a friend?</h4></td>
+                    <td>
+                        <img src="/static/thumbs_up_deselected.png" id="recc_thumb_up" onclick="thumb_up('recc');">
+                        <img src="/static/thumbs_down_deselected.png" id="recc_thumb_down" onclick="thumb_down('recc');">
+                    </td>
+                </tr>
+            </table>
+            <br>
+            <br>
+            <h4>Were there any issues with the accommodation?</h4>
+            <textarea rows = "3" style="width:50%;" name = "issues"></textarea>
+            <br>
+            <br>
+            <h4>What was good about the accommodation?</h4>
+            <textarea rows = "3" style="width:50%;" name = "good"></textarea>
+            <br>
+            <br>
+
+            <input type="submit" id="review_submit" name="review_submit" value = "Post">
+        </form>
+    </div>
+
+
+{% endblock %}
