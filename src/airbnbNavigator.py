@@ -1,0 +1,99 @@
+import requests
+import re
+
+class Airbnb_Navigator:
+    def seed_roots(self):
+        return ['https://www.airbnb.com.au/s/New-South-Wales/homes']
+
+    def next_roots(self, prev_root):
+        if 'items_offset' in prev_root:
+            prev_offset = int(prev_root.split('=')[-1])
+            new_offset = str(int(prev_offset) + 18)
+            return [prev_root.replace('items_offset='+prev_offset, 'items_offset='+new_offset)]
+
+        return ['https://www.airbnb.com.au/s/New-South-Wales/homes?section_offset=5&items_offset=18']
+
+    # Unpack a search result page, getting the urls of all the results
+    def read_pages_from_route(self, root_path):
+        landing = requests.get(root_path)
+        html = str(landing.content)
+
+        pages = []
+        for section in html.split('href="/rooms/')[1:]:
+            new_url = 'https://www.airbnb.com.au/rooms/'
+            new_url += section.split('"')[0]
+            if '/plus/' not in new_url:
+                pages.append(new_url)
+
+        print('Child read', len(pages), 'pages from', root_path)
+
+        return pages
+
+    # Go to a specific search result page, and get the info
+    def visit_page(self, page_path):
+        print('Visiting page', page_path)
+
+        landing = requests.get(page_path)
+        html = str(landing.content)
+
+        name = html.split('id="summary"')[1].split('</h1>')[0][:-7].split('>')[-1]
+
+        location = html.split('data-location="')[1].split('"')[0]
+
+        poster_url = 'https://www.airbnb.com.au'
+        poster_url += html.split('id="summary"')[1].split('</a>')[0].split('href="')[1].split('"')[0]
+
+        bedCount = re.search(r'>([0-9]+) beds?</div>', html)
+        bedCount = bedCount.group(1) if bedCount else 0
+
+
+        bathCount = re.search(r'>([0-9]+) baths?</div>', html)
+        bathCount = bathCount.group(1) if bathCount else 0
+
+        # This could be better
+        carCount = 1 if 'Free parking on premises' else 0
+
+        description = ('(This ad was found at <a href="' + page_path + '">' + 
+                       page_path.split('?')[0] +'</a>)\n\n')
+        try:
+            description += html.split('id="details"')[1].split('</span>')[0].split('<span>')[-1]
+            description = description.replace('\\n', '\n')
+        except IndexError:
+            pass
+
+        rate = re.search(r'for \$([0-9\.]+)\.', html)
+        rate = rate.group(1) if rate else 0
+
+        # Airbnb places dont advertise a global max/min stay
+        minStay = '1' 
+        maxStay = '1000'
+
+        try:
+            details = html.split('"additional_house_rules":"')[1].split('","')[0]
+            details = details.replace('\\\\n', '\n')
+        except IndexError:
+            details = ''
+
+        lat = html.split('"lat":')[1].split(',')[0]
+        lng = html.split('"lng":')[1].split(',')[0]
+
+        return {
+            'name':         name,
+
+            'location':     location,
+            'lat':          lat,
+            'lng':          lng,
+
+            'bedCount':     bedCount,
+            'bathCount':    bathCount,
+            'carCount':     carCount,
+            'description':  description,
+
+            'rate':         rate,
+            'minStay':      minStay,
+            'maxStay':      maxStay,
+            'details':      details,
+
+            'ad_url':       page_path,
+            'poster_url':   poster_url
+        }
