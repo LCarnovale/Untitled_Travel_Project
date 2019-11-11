@@ -13,15 +13,20 @@ class Search():
     def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
         self._scores = []
+        print('ADV search')
 
         if search:
             self._keywordSearch(search)
         else:
             self._scores = [(x,0.0) for x in self._items]
-            # print(self._scores)
+            #print(self._scores)
+
+        print('Done keys')
 
         if text_bounds:
             self._limitRegion(text_bounds)
+
+        print('Done region')
 
         if startdate:
             startdate = datetime.strptime(startdate, '%d/%m/%Y')
@@ -31,6 +36,8 @@ class Search():
             enddate = datetime.strptime(enddate, '%d/%m/%Y')
             self._filterDates(startdate, enddate)
 
+        print('Done dates')
+
         if beds:
             self._filterBeds(int(beds))
         if bathrooms:
@@ -38,12 +45,15 @@ class Search():
         if parking:
             self._filterParking(int(parking))
 
+        print('Done half')
+
         if location:
             if not distance:
                 distance = '2000'
             distance = int(distance)
             self._filterLocation(location, distance)
 
+        print('Done search.')
         return [x[0] for x in self._scores]
 
     def _keywordSearch(self, search):
@@ -99,6 +109,7 @@ class Search():
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
+            print('Check avail')
             if (ad.isAvailable(startdate, enddate)):
                 result.append((ad, score))
 

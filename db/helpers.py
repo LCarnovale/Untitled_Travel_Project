@@ -1,4 +1,6 @@
 import pyodbc
+import time
+
 class ArgumentException(Exception):
     def __init__(self, message):
         super().__init__(message)
@@ -36,6 +38,8 @@ class FailedConnectionHandler:
 from connect_config import get_connection
 class dbCursor:
     def __enter__(self):
+        print('Opening connection')
+
         try:
             self._cnxn = get_connection()
         except TypeError:
@@ -57,10 +61,12 @@ class dbCursor:
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
+        print('Closing connection')
         self._cnxn.commit()
         self._cnxn.close()
 
     def __getattr__(self, attr):
+        print(attr)
         return self._cursor.__getattribute__(attr)
 
 
@@ -70,7 +76,7 @@ def execute(sql, *params):
     For use of params see: 
     https://github.com/mkleehammer/pyodbc/wiki/Cursor#executesql-parameters.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         out = cursor.execute(sql, params)
 
     return out

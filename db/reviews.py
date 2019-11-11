@@ -9,15 +9,15 @@
     6    reviewGood    text
 
 """
-from helpers import dbc, execute
+from helpers import dbc, execute, dbCursor
 
 def get(id):
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Reviews WHERE revid =?", id)
         return cursor.fetchone()
 
 def insert(venueid, userid, postDateTime, recommends, reviewBad, reviewGood):
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute(
             """INSERT INTO Reviews
             (venueid, userid, postDateTime, recommends, reviewBad, reviewGood)    
@@ -33,6 +33,6 @@ def get_for_venue(venueid):
     Return a list of 
         [ (revid, venueid, userid, postTime, postDate, rating, review), ... ]
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Reviews WHERE venueid = ?", (venueid))
         return cursor.fetchall()
