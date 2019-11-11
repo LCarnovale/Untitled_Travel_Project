@@ -46,25 +46,14 @@ def home():
             location = request.form.get('location')
             distance = request.form.get('distance')
 
-            if (search or startdate or enddate or beds or
-                bathrooms or parking or location):
-                # print(search, startdate, enddate, beds,
-                #       bathrooms, parking, location)
-                accSystem.get_all_ads()
-                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
-                                                   bathrooms, parking, location, distance)
-                print(results)
-                results = list(map(accSystem.get_acc, results))
-                print(results)
-                return render_template('search_results.html', results = results)
-            else:
-                accSystem.get_all_ads()
-                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
-                                                   bathrooms, parking, location, distance)
-                print(results)
-                results = list(map(accSystem.get_acc, results))
-                print(results)
-                return render_template('search_results.html', results = results)
+            
+            accSystem.get_all_ads()
+            results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
+                                                bathrooms, parking, location, distance)
+            results = list(map(accSystem.get_acc, results))
+            # print(results)
+            return render_template('search_results.html', results = results)
+
         except Exception as e:
             print('----------------------------------')
             print('INVALID DATA WAS ENTERED TO SEARCH')
