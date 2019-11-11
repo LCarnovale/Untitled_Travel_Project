@@ -66,9 +66,9 @@
                 <div class="flip-card-inner">
                     <div class="flip-card-front">
                         <h1> {{result.name}} </h1>
+
+                        {% if result.get_images %}
                         <p> Image Inserted here</p>
-                        {% if result.getImage %}
-                        <img src="{{result.getImage}}">
                         {%endif%}
                     </div>
                     <div class="flip-card-back">

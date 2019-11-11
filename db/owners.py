@@ -12,7 +12,7 @@ Table schema:
     6   pwdhash         bytes
 
 """
-from helpers import dbc, execute
+from helpers import dbc, execute, dbCursor
 
 
 def get(id):
@@ -21,7 +21,7 @@ def get(id):
 
     Return None if the owner does not exist.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Owners WHERE ownerid=?", id)
         return cursor.fetchone()
 
@@ -29,7 +29,7 @@ def get_from_uname(userName):
     """
     Return an owner matching the given userName.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Owners WHERE userName=?", userName)
         return cursor.fetchone()
 
@@ -43,7 +43,7 @@ def insert(name, userName, password, email=None, phone=None, description=None):
 
     Returns the id of the inserted owner.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         try:
             cursor.execute(
                 "INSERT INTO Owners (name, userName, email, phone, description, pwdhash)   \
@@ -111,7 +111,7 @@ def update(ownerid, **fields):
     s = ' , '.join(s)
     query += s
     query += " WHERE ownerid=?"
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute(query, (*vals, ownerid))
 
 def check_user_pass(username, password_text):
@@ -121,7 +121,7 @@ def check_user_pass(username, password_text):
     If username and password match, return that row.
     Otherwise return None.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Owners \
             WHERE userName=? AND pwdhash=HASHBYTES('SHA2_512', ?)", (username, password_text))
 

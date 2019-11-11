@@ -50,7 +50,7 @@ class AccommodationSystem:
     def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
         print('SEARCHING')
-        print(self._accommodations)
+        #print(self._accommodations)
         s = Search(self._accommodations)
         return s.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                 bathrooms, parking, location, distance)
@@ -67,6 +67,6 @@ class AccommodationSystem:
         for acc in accs:
             new_acc = Accommodation(*acc[1:])
             self.add_acc(acc[0], new_acc)
-            print(new_acc._id)
+            #print(new_acc._id)
 
-        print(self._accommodations)
+        #print(self._accommodations)

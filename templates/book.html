@@ -27,8 +27,9 @@
     display: grid;
     grid-template-areas:
     'header header header header header header'
-    'left left middle middle right right'
-    'footer footer footer footer footer footer';
+    'left left left right right right'
+    'footer footer footer footer footer footer'
+    'reviewGood reviewGood reviewGood reviewBad reviewBad reviewBad';
 }
 
 .left-grid, .right-grid {
@@ -52,10 +53,25 @@
 .footer {
     grid-area: footer;
     background-color: #fcc2bb;
-    height: 1000px;
+    height: 300px;
     width: 1200px;
-
 }
+
+.reviewGood {
+    grid-area: reviewGood;
+    background-color: #ebb4ad;
+    height: 500px;
+    width: 600px;
+}
+
+.reviewBad {
+    grid-area: reviewBad;
+    background-color: #deb5b0;
+    height: 500px;
+    width: 600px;
+}
+
+
 
 </style>
 {% endblock %}
@@ -76,51 +92,52 @@
         <p>Bathrooms: {{acc.bath_count}}</p>
         <p>Car Spaces: {{acc.car_count}}</p>
         <p>Address: {{acc.address.street_address}}</p>
-         {% if owner %}
-        <h2> About the owner </h2>
-        <p> Name: {{owner[1]}} </p>
-        <p> {{owner[5]}} </p>
-        <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
-        {% endif %}
     </div>
 
     <div class="right-grid">
         <p>Images</p><br><br>
         <p>Booking Details</p>
         <p>Price: {{acc.rate}} / night</p>
-
-
         <p>Availability:</p>
         <p class = "good_msg">This place is currently available!</p>
         <form name='book_acc' method='POST'>
-            <input type="text"  id="dateRange, required" value="Booking Dates"class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
+            <input type="text"  id="dateRange required" value="Booking Dates" class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
             <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
             <p><input name = "book_start" type = "hidden" id="book_start"></p>
             <p><input name = "book_end" type = hidden id="book_end"></p>
             <input type="submit" value="Book this room"/>
-    </form>
-
+        </form>
     </div>
 
-        <div class="reviews_container, footer">
+    <div class="review_container footer">
+        {% if owner %}
+        <h2> About the owner </h2>
+        <p> Name: {{owner[1]}} </p>
+        <p> {{owner[2]}} </p>
+        <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
+        {% endif %}
         <h3 align="center"> Reviews </h3>
         <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
-        {% for review in reviews %}
-                {% if not review.recommends %}
-                    <img src="/static/thumbs_down_selected.png" align="right">
-                    <div align="right">
-                        <h4>The bad:</h4><br>{{review.reviewBad}}
-                    </div>
-                {% else %}
-                    <img src="/static/thumbs_up_selected.png" align="left">
-                    <div align="left">
-                        <h4>The good:</h4><br>{{review.reviewGood}}
-                    </div>
-                {% endif %}
-        {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
     </div>
 
+    {% for review in reviews %}
+    {% if not review.recommends %}
+            <div class="reviewBad">
+                <img src="/static/thumbs_down_selected.png">
+                <h4>The bad:</h4><br>{{review.reviewBad}}
+                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+            </div>
+           {% else %}
+           <div class="reviewGood">
+                <img src="/static/thumbs_up_selected.png">
+                <h4>The good:</h4><br>{{review.reviewGood}}
+               {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+           {% endif %}
+           </div>
+    {% endfor %}
 </div>
+
+
 <script>
 function getDates(dates) {
     var availDateSize = {{acc.get_dates()|length}};
@@ -213,8 +230,5 @@ function getDates(dates) {
 
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
-
-
-        {% endfor %}
 
 {% endblock %}
