@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Edit details</title>
+{% endblock %}
+
+{% block content %}
+	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+	<h2> Please enter your details: </h2>
+	<form name='post_ad' id = "regForm" method='POST'>
+		<div class = "tab"> Edit details
+				<p><input name = "account_name" placeholder = "Name" type="text" value="{{_user.name}}"></p>
+				<p><input name = "account_username" placeholder = "Username" type="text" value="{{_user.username}}"></p>
+				<p><input name = "account_email" placeholder = "Email" type = "email" value = "{{_user.email}}"></p>
+				<p><input name = "account_phone" placeholder = "Mobile" value = "{{_user.mobile}}"></p>
+				<p><input name = "account_description" placeholder = "Description" type = "paragraph" value = "{{_user.desc}}">
+				<br>
+				Update password:
+				<p><input name = "account_pwd_current" placeholder = "Current password" type ="password"></p>
+				{% if pass_fail %}<label style="color: red; float: left" >Incorrect password</label>{% endif %}
+				<p><input name = "account_pwd_new" placeholder = "New password" type ="password" oninput="checkPassMatch()"></p>
+				<p><input name = "account_pwd_confirm" placeholder = "Confirm new password" type ="password" oninput="checkPassMatch()"></p>
+				<label id="pass_match_label", style="color: red; float:left; display:none">Passwords must match.</label>
+		</div>
+		<div style="overflow:auto;">
+			<div style="float:right;">
+				<button id='btn_submit' type="submit">Submit</button>
+			</div>
+		</div>
+	</form>
+
+	<script>
+		function checkPassMatch() {
+			var newpass = document.getElementsByName("account_pwd_new")[0];
+			var confirm = document.getElementsByName("account_pwd_confirm")[0];
+			if (newpass.value == confirm.value) {
+				newpass.setAttribute('style', 'border:green 2px solid');
+				confirm.setAttribute('style', 'border:green 2px solid');
+				document.getElementById('btn_submit').disabled = false
+				document.getElementById('pass_match_label').style.display = "none";
+			} else {
+				newpass.setAttribute('style', 'border:red 1px solid');
+				confirm.setAttribute('style', 'border:red 1px solid');
+				document.getElementById('btn_submit').disabled = true
+				document.getElementById('pass_match_label').style.display = 'block';
+			}
+		}
+	</script>
+	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
+{% endblock %}

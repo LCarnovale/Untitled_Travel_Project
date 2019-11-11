@@ -1,10 +1,24 @@
 class Address:
-    def __init__(self, street, postcode=None, aptNum=None):
-        self._street = street
-        self._postcode = postcode
-        self._state = "NSW"
-        self._aptNum = aptNum
+    def __init__(self, street_address, lat, lng):
+        self._street_address = street_address
+        self._lat = lat
+        self._lng = lng
+
+    '''
+    Properties
+    '''
 
 
-    def getAddr(self):
-        return self._street
+    @property
+    def street_address(self):
+        return self._street_address
+        
+    @property
+    def lat(self):
+        return self._lat
+        
+    @property
+    def lng(self):
+        return self._lng
+        
+        

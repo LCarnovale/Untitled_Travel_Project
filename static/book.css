@@ -1,7 +1,3 @@
-body {
-    font-size: 2em;
-}
-
 .addr_details {
     width: 100%;
     text-align: center;
@@ -45,4 +41,26 @@ body {
 .bad_msg {
     color: #CC1111;
     text-align: center;
+}
+
+.reviews_container {
+    width: 100%;
+    padding-top: 30px;
+    padding-bottom: 100px;
+    text-align: center;
+}
+
+.reviews_container table {
+    padding-top:20px;
+    padding-bottom:20px;
+    background-color: #DDDDDD;
+}
+
+.reviews_container img {
+    width:30px;
+    height:auto;
+}
+
+.reviews_container div {
+    display: inline-block;
 }

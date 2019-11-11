@@ -3,6 +3,4 @@ import server
 
 
 def bootstrap_system():
-    import cloud.dbTools as db
-    db.init()
-    
+    pass
