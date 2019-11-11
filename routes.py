@@ -54,12 +54,14 @@ def home():
                 results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                    bathrooms, parking, location, distance)
                 print(results)
+                results = list(map(accSystem.get_acc, results))
                 return render_template('search_results.html', results = results)
             else:
                 accSystem.get_all_ads()
                 results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                    bathrooms, parking, location, distance)
                 print(results)
+                results = list(map(accSystem.get_acc, results))
                 return render_template('search_results.html', results = results)
         except Exception as e:
             print('----------------------------------')
