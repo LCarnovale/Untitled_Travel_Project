@@ -102,22 +102,29 @@
 
     </div>
 
-        <div class="reviews_container, footer">
-        <h3 align="center"> Reviews </h3>
+    <div class="reviews_container footer">
+        <h2 align="center"> Reviews </h2>
         <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
+        <br>
         {% for review in reviews %}
+            <h4>
                 {% if not review.recommends %}
-                    <img src="/static/thumbs_down_selected.png" align="right">
-                    <div align="right">
-                        <h4>The bad:</h4><br>{{review.reviewBad}}
-                    </div>
+                    <img src="/static/thumbs_down_selected.png">
                 {% else %}
-                    <img src="/static/thumbs_up_selected.png" align="left">
-                    <div align="left">
-                        <h4>The good:</h4><br>{{review.reviewGood}}
-                    </div>
+                    <img src="/static/thumbs_up_selected.png">
                 {% endif %}
-        {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+            </h4>
+            <br>
+            <div style="width:100%;">
+                <div style="width:40%; display: inline-block;">
+                    <h4>The bad:</h4><br>{{review.reviewBad}}
+                </div>
+                <div style="width:40%; display: inline-block;">
+                    <h4>The good:</h4><br>{{review.reviewGood}}
+                </div>
+            </div>
+        {% endfor %}
     </div>
 
 </div>
@@ -214,7 +221,5 @@ function getDates(dates) {
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
 
-
-        {% endfor %}
 
 {% endblock %}

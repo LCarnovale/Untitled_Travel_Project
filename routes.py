@@ -32,6 +32,7 @@ def home():
         try:
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
+            print(text_bounds)
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
@@ -46,7 +47,7 @@ def home():
             location = request.form.get('location')
             distance = request.form.get('distance')
 
-            
+
             accSystem.get_all_ads()
             results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                 bathrooms, parking, location, distance)
