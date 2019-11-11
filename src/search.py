@@ -6,9 +6,9 @@ from src.accommodation import Accommodation
 
 class Search():
     def __init__(self, items):
-        self._items = items
-        self._scores = []
-        self._most_recent = []
+        self._items = items   
+        self._scores = []    
+        self._most_recent = [] 
 
     def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
@@ -18,7 +18,7 @@ class Search():
             self._keywordSearch(search)
         else:
             self._scores = [(x,0.0) for x in self._items]
-            print(self._scores)
+            # print(self._scores)
 
         if text_bounds:
             self._limitRegion(text_bounds)
@@ -72,7 +72,7 @@ class Search():
                     body_score += (1/3) * desc.count(keyword)/len(desc)
 
             if title_score + body_score != 0:
-                scores.append((ad, title_score + body_score))
+                scores.append((ad_id, title_score + body_score))
 
         self._scores = scores
 
@@ -134,7 +134,7 @@ class Search():
 
 
     def _filterLocation(self, location, dist):
-        print(location)
+        # print(location)
         result = []
         lat = float(location.split(',')[0])
         lon = float(location.split(',')[1])

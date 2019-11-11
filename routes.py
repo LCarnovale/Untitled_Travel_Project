@@ -42,18 +42,14 @@ def home():
             location = request.form.get('location')
             distance = request.form.get('distance')
 
+            results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
+                                                bathrooms, parking, location, distance)
             if (search or startdate or enddate or beds or
-                bathrooms or parking or location):
-                # print(search, startdate, enddate, beds,
-                #       bathrooms, parking, location)
+                    bathrooms or parking or location):
                 accSystem.get_all_ads()
-                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
-                                                   bathrooms, parking, location, distance)
                 return render_template('search_results.html', results = results)
             else:
                 accSystem.get_all_ads()
-                results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
-                                                   bathrooms, parking, location, distance)
                 return render_template('search_results.html', results = results)
         except Exception as e:
             print('----------------------------------')
