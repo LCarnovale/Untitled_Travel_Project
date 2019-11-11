@@ -33,8 +33,12 @@ def home():
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
             dates = request.form.get('dates').split(' - ')
-            startdate = dates[0]
-            enddate = dates[1]
+            if len(dates) == 2:
+                startdate = dates[0]
+                enddate = dates[1]
+            else:
+                startdate = ''
+                enddate = ''
 
             beds = request.form.get('beds')
             bathrooms = request.form.get('bathrooms')
@@ -49,11 +53,13 @@ def home():
                 accSystem.get_all_ads()
                 results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                    bathrooms, parking, location, distance)
+                print(results)
                 return render_template('search_results.html', results = results)
             else:
                 accSystem.get_all_ads()
                 results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                    bathrooms, parking, location, distance)
+                print(results)
                 return render_template('search_results.html', results = results)
         except Exception as e:
             print('----------------------------------')

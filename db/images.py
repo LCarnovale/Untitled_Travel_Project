@@ -5,7 +5,7 @@ Images:
     path     varchar(250)
 """
 
-from helpers import dbc, execute
+from helpers import dbc, execute, dbCursor
 import helpers
 import pyodbc
 
@@ -13,7 +13,7 @@ def get(id):
     """
     Geth the path and venue information for a given image id.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM images WHERE id = ?", id)
         return cursor.fetchone()
 
@@ -21,7 +21,7 @@ def get_for_venue(venueid):
     """
     Fetch all image rows for a given venue.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM images WHERE venueid = ?", venueid)
         return cursor.fetchall()
 
@@ -29,7 +29,7 @@ def insert(venueid, path):
     """
     Insert a new image for a given venue.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         try:
             cursor.execute("INSERT INTO images (venueid, path) \
                 OUTPUT INSERTED.imId                           \

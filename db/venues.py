@@ -1,11 +1,11 @@
-from helpers import dbc, execute
+from helpers import dbc, execute, dbCursor
 
 
 def get_all():
     """
     Return a venue with the matching id.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Venues")
         return cursor.fetchall()
 
@@ -14,7 +14,7 @@ def get(id):
     """
     Return a venue with the matching id.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Venues WHERE venueid=?", id)
         return cursor.fetchone()
 
@@ -24,7 +24,7 @@ def get_availabilities(venueid):
     Return all availabilities for a venue with the
     given venueid.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Availabilities  \
             WHERE venueid=?", venueid)
         return cursor.fetchall()
@@ -35,7 +35,7 @@ def get_overlapping_availability(venueid, startDate, endDate):
     start and end dates for a given venue id.
     Returns a list of availability rows.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Availabilities WHERE \
             venueid=? AND startDate<=? AND endDate>=?", (venueid, startDate, endDate))
         return cursor.fetchall()
@@ -63,7 +63,7 @@ def insert(ownerid, addressid, name, bedCount, bathCount,
     # minStay       int           DEFAULT 1
     # maxStay       int
     # details       text
-    with dbc as cursor:
+    with dbCursor() as cursor:
         try:
             cursor.execute("INSERT INTO Venues (ownerid, addressid, name,     \
                 bedCount, bathCount, carCount, description, rate, minStay,    \
@@ -121,7 +121,7 @@ def update(venueid, **fields):
     s = ' AND '.join(s)
     query += s
     query += " WHERE venueid=?"
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute(query, (*vals, venueid))
 
 
@@ -168,7 +168,7 @@ def select(**patterns):
     query += f"{cols[0]} LIKE ?"
     for c in cols[1:]:
         query += f" AND {c} LIKE ?"
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute(query, tuple(patterns[c] for c in cols))
 
         return cursor.fetchall()

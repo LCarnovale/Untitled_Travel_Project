@@ -1,10 +1,10 @@
-from helpers import dbc, execute
+from helpers import dbc, execute, dbCursor
 
 def get(id):
     """
     Return a booking with the matching id.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Bookings WHERE bookid=?", id)
         return cursor.fetchone()
 
@@ -24,7 +24,7 @@ def insert(venueid, userid, startDate, endDate):
     #  userid      int        not null  FK -> Users(id)
     #  startDate   date       not null
     #  endDate     date       not null
-    with dbc as cursor:
+    with dbCursor() as cursor:
         try:
             cursor.execute("INSERT INTO Bookings (venueid, userid, startDate, endDate) \
                 OUTPUT INSERTED.bookid VALUES (?, ?, ?, ?)", (venueid, userid, startDate, endDate))
@@ -69,7 +69,7 @@ def update(bookid, **fields):
     query += s
     query += " WHERE bookid=?"
 
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute(query, (*vals, bookid))
 
 
@@ -102,7 +102,7 @@ def select(**patterns):
     query += f"{cols[0]} LIKE ?"
     for c in cols[1:]:
         query += f" AND {c} LIKE ?"
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute(query, tuple(patterns[c] for c in cols))
 
         return cursor.fetchall()

@@ -11,7 +11,7 @@ Table schema:
     5   description     text
     6   pwdhash         bytes
 """
-from helpers import dbc, execute
+from helpers import dbc, execute, dbCursor
 
 def get(id):
     """
@@ -19,7 +19,7 @@ def get(id):
 
     Returns None if the user does not exist.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Users WHERE userid=?", id)
         return cursor.fetchone()
 
@@ -27,7 +27,7 @@ def get_from_uname(userName):
     """
     Return a single user with the matching username, or None if it doesn't exist.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Users WHERE userName=?", userName)
         return cursor.fetchone()
 
@@ -51,7 +51,7 @@ def insert(name, userName, password, email=None, phone=None, description=None):
     #  description  text
 
     # Make sure username is unique:
-    with dbc as cursor:
+    with dbCursor() as cursor:
         if (cursor.execute("SELECT * FROM users WHERE username = ?", userName).fetchone()):
             raise InsertionError(
                 "Username already exists in users table.", col='userName', _type='duplicate')
@@ -122,7 +122,7 @@ def update(userid, **fields):
     s = ' , '.join(s)
     query += s
     query += " WHERE userid=?"
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute(query, (*vals, userid))
 
 def check_user_pass(username, password_text):
@@ -132,7 +132,7 @@ def check_user_pass(username, password_text):
     If username and password match, return that row.
     Otherwise return None.
     """
-    with dbc as cursor:
+    with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Users \
             WHERE userName=? AND pwdhash=HASHBYTES('SHA2_512', ?)", (username, password_text))
 
