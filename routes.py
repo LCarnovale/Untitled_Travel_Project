@@ -32,7 +32,8 @@ def home():
         try:
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
-            dates = request.form.get('dates').split(' - ')
+            dates = request.form.get('dates')
+            dates = dates.split(' - ')
             startdate = dates[0]
             enddate = dates[1]
 
@@ -218,7 +219,6 @@ def book_main(id):
 	# avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
     reviews = src.review.get_for_venue(id)
-
     return render_template('book.html', acc=acc, owner=owner, id=id,
         address=address, reviews = reviews, images = images)
 
