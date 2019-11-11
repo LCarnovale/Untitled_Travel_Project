@@ -86,8 +86,8 @@ class Accommodation:
         Return a list of paths of images for this venue.
         """
         images = db.images.get_for_venue(self.id)
-        return [img[2] for img in images]
-
+        temp = [img[2] for img in images]
+        return ['/static/'+image.replace("\\","/") for image in temp]
 
     '''
     Properties

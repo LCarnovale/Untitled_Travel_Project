@@ -52,7 +52,7 @@ def home():
             results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                 bathrooms, parking, location, distance)
             results = list(map(accSystem.get_acc, results))
-            # print(results)
+            print(results[0].get_images())
             return render_template('search_results.html', results = results)
 
         except Exception as e:
@@ -212,8 +212,6 @@ def book_main(id):
     owner = db.owners.get(acc.ownerid)
     address = Address(*db.addresses.get(acc.aid)[1:])
     images = acc.get_images()
-    print('images: ' )
-    images = (['/static/'+image.replace("\\","/") for image in images])
     print(images)
 	# avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
