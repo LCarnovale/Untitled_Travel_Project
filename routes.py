@@ -55,6 +55,7 @@ def home():
                                                    bathrooms, parking, location, distance)
                 print(results)
                 results = list(map(accSystem.get_acc, results))
+                print(results)
                 return render_template('search_results.html', results = results)
             else:
                 accSystem.get_all_ads()
@@ -62,6 +63,7 @@ def home():
                                                    bathrooms, parking, location, distance)
                 print(results)
                 results = list(map(accSystem.get_acc, results))
+                print(results)
                 return render_template('search_results.html', results = results)
         except Exception as e:
             print('----------------------------------')

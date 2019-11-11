@@ -128,14 +128,17 @@
 	$(function() {
 		$('#dates').daterangepicker({
 			autoUpdateInput: false,
-			//minDate: new Date(),
-			//endDate: moment().add(60, 'days'),
+			minDate: new Date(),
+			endDate: moment().add(60, 'days'),
         	locale: {
             	cancelLabel: 'Clear',
             	format: 'DD/MM/YYYY'
         	}
 		});
 	});
+	$('#dates').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+  	});
 	$('#dates').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
     });
