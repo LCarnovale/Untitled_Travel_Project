@@ -65,3 +65,10 @@ Week 8:
     Will start working on a program to fill the database with realistic sample data that we can
     use for testing.
     
+    Tuesday:
+    Test data has been created for venues and owners, with somewhat realistic random locations
+    (apart from a couple of underwater venues). At the moment none have images but that should
+    not be too difficult to complete later.
+
+    Now going to be working on optimizing database interactions.
+    
