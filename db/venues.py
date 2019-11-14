@@ -1,5 +1,19 @@
+"""
+    Venue:
+    0   venueid       int           Identity   PRIMARY KEY
+    1   ownerid       int           not null   FK -> Owners(id)
+    2   addressid     int           not null   FK -> Addresses(id)
+    3   name          varchar(200)  not null
+    4   bedCount      tinyint
+    5   bathCount     tinyint
+    6   carCount      tinyint
+    7   description   text
+    8   rate          smallmoney
+    9   minStay       int
+    10  maxStay       int
+    11  details       text
+"""
 from helpers import dbc, execute, dbCursor
-
 
 def get_all():
     """
@@ -124,8 +138,54 @@ def update(venueid, **fields):
     with dbCursor() as cursor:
         cursor.execute(query, (*vals, venueid))
 
+def search_area_circle(centre, radius):
+    """
+    Return venues within the given `radius` from `centre`.
 
-def select(**patterns):
+    Distances are calculated with 
+
+    `centre` should be a (lat, lng) pair and `radius` should be in metres.
+    
+    Returns 3 lists: list of venue rows, list of matching addresses, and list of matching distances
+    from centre (in metres)
+    """
+    query = """
+    SELECT *, geography::Point(lat, lng, 4326).STDistance(geography::Point(?, ?, 4326)) as distance From Venues 
+    INNER JOIN Addresses ON Venues.addressid = Addresses.aid
+    WHERE ?>geography::Point(lat, lng, 4326).STDistance(geography::Point(?, ?, 4326))
+    ORDER BY distance"""
+    with dbCursor() as cursor:
+        cursor.execute(query, (*centre, radius, *centre))
+        result = cursor.fetchall()
+        v_rows = [r[:12] for r in result]
+        a_rows = [r[12:-1] for r in result]
+        d_rows = [r[-1] for r in result]
+        return v_rows, a_rows, d_rows
+
+def search_area_box(lower_left, upper_right):
+    """
+    Return all venues with locations within the given rectangle.
+    lower_left and upper_right should both be (lat, lng) pairs
+
+    Returns 2 lists: a list venue rows, and a list of matching address rows.
+    """
+    minLat, maxLat, minLng, maxLng =  \
+    lower_left[0], upper_right[0], lower_left[1], upper_right[1]
+
+    query = """SELECT * FROM Venues 
+    INNER JOIN Addresses ON Venues.addressid = Addresses.aid 
+    WHERE Addresses.lat > ? AND Addresses.lat < ?
+    AND   Addresses.lng > ? AND Addresses.lng < ?
+    """
+
+    with dbCursor() as cursor:
+        cursor.execute(query, (minLat, maxLat, minLng, maxLng))
+        result = cursor.fetchall()
+        v_rows = [r[:12] for r in result]
+        a_rows = [r[12:] for r in result]
+        return v_rows, a_rows
+    
+def search(**patterns):
     """
     Provide patterns of the form {"column":"pattern"} 
     referring to the following fields,
@@ -156,8 +216,6 @@ def select(**patterns):
         carCount      tinyint
         description   text
         rate          smallmoney
-        availStart    date
-        availEnd      date
         minStay       int          
         maxStay       int
         details       text

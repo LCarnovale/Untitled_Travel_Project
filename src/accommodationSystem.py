@@ -49,6 +49,7 @@ class AccommodationSystem:
 
     def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
+        # self.get_like(name=f"%{search}%", details=f"{search}", description=f"{search}")
         print('SEARCHING')
         #print(self._accommodations)
         s = Search(self._accommodations)
@@ -57,6 +58,44 @@ class AccommodationSystem:
     def clean_system(self):
         """Remove all stored venues (Not from database)"""
         self._accommodations = {}
+
+    def get_near(self, point, distance):
+        """
+        Load all venues within `distance` metres of `point`.
+        `point` should be a lat-lon pair.
+        """
+        venues, addresses, dists = db.venues.search_area_circle(point, distance)
+        for v in venues:
+            new_venue = Accommodation(*v[1:])
+            self.add_acc(v[0], new_venue)
+        
+        return [v[0] for v in venues]
+
+    def get_within(self, lower_left, upper_right):
+        """
+        Load all venues within the given region.
+        """
+        venues, addresses = db.venues.search_area_box(lower_left, upper_right)
+        for v in venues:
+            new_venue = Accommodation(*v[1:])
+            self.add_acc(v[0], new_venue)
+
+        return [v[0] for v in venues]
+    
+    def get_like(self, **patterns):
+        """ Load all venues with matching patterns in the given fields.
+
+        See db.venues.search() for more info.
+        
+        Return a list of the ids of venues found.
+        """
+        venues = db.venues.search(**patterns)
+        for v in venues:
+            new_venue = Accommodation(*v[1:])
+            self.add_acc(v[0], new_venue)
+
+        return [v[0] for v in venues]
+
 
     def get_all_ads(self):
         # TODO: UPDATE CHANGES

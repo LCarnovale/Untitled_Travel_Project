@@ -32,27 +32,49 @@ def home():
         try:
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
-            print(text_bounds)
+            # print('geocoded:', text_bounds)
+            if search and text_bounds:
+                lower_left, upper_right = text_bounds.split('+')
+                lower_left = [float(x) for x in lower_left.split(',')]
+                upper_right = [float(x) for x in upper_right.split(',')]
+                print("geocoded area:")
+                print("        ", upper_right)
+                print(lower_left)
+                
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
             else:
-                startdate = ''
-                enddate = ''
+                startdate = datetime.today().strftime('%d/%m/%Y')
+                enddate = None
 
             beds = request.form.get('beds')
             bathrooms = request.form.get('bathrooms')
             parking = request.form.get('parking')
             location = request.form.get('location')
+            # print(location)
             distance = request.form.get('distance')
+            if location:
+                accSystem.get_near(location.split(', '), distance)
+            elif search and text_bounds:
+                #TODO: use geocode result
+                accSystem.get_within(lower_left, upper_right)
+            else:
+                accSystem.get_like(
+                    name=f'%{search}%',
+                    bedCount=beds,
+                    bathCount=bathrooms,
+                    carCount=parking,
+                )
+            # elif text_bounds:
 
 
-            accSystem.get_all_ads()
+
             results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
                                                 bathrooms, parking, location, distance)
             results = list(map(accSystem.get_acc, results))
-            print(results[0].get_images())
+            # print(results[0].get_images())
             return render_template('search_results.html', results = results)
 
         except Exception as e:

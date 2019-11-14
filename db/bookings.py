@@ -73,7 +73,7 @@ def update(bookid, **fields):
         cursor.execute(query, (*vals, bookid))
 
 
-def select(**patterns):
+def search(**patterns):
     """
     Provide patterns of the form {"column":"pattern"} 
     referring to the following fields,
