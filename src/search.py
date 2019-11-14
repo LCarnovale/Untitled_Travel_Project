@@ -109,10 +109,11 @@ class Search():
                 northeast[0] > lat and
                 northeast[1] > lng):
 
-                print('MATCH', southwest, northeast, lat, lng)
+                # print('MATCH', southwest, northeast, lat, lng)
                 limited.append((ad_id, score))
             else:
-                print('NO MATCH', southwest, northeast, lat, lng)
+                # print('NO MATCH', southwest, northeast, lat, lng)
+                pass
 
         self._scores = limited
 

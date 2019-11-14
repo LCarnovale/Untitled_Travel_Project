@@ -56,11 +56,14 @@ def home():
             # print(location)
             distance = request.form.get('distance')
             if location:
+                print("getting venues near", location)
                 accSystem.get_near(location.split(', '), distance)
             elif search and text_bounds:
                 #TODO: use geocode result
+                print("getting in geocode bounds")
                 accSystem.get_within(lower_left, upper_right)
             else:
+                print("getting venues with matching options ")
                 accSystem.get_like(
                     name=f'%{search}%',
                     bedCount=beds,
@@ -206,8 +209,11 @@ Main Booking page
 '''  
 @app.route('/book/<id>', methods=['GET', 'POST'])
 def book_main(id):
-
-    acc = accSystem.get_acc(id)
+    try:
+        acc = accSystem.get_acc(id)
+    except Exception as e:
+        return render_template('404.html', err_msg=f"""Unable to connect to database.
+Message: {str(e)}""")
     if acc == None:
         abort(404)
 
@@ -223,7 +229,9 @@ def book_main(id):
         form = request.form
         if 'id' in session:
             bookingSystem.create_booking(
-                id, session['id'], form['book_start'], form['book_end']
+                id, session['id'], 
+                datetime.strptime(form['book_start'], "%d/%m/%Y"), 
+                datetime.strptime(form['book_end'], "%d/%m/%Y")
             )
             return render_template('book_confirm.html', acc=acc)
         else:
