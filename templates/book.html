@@ -129,7 +129,7 @@
             </div>
            {% else %}
            <div class="reviewGood">
-                <img src="/static/thumbs_up_selected.png">
+                <img src="/static/thumbs_up_selected.png" style="height 200px; width: 100px;">
                 <h4>The good:</h4><br>{{review.reviewGood}}
                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
            {% endif %}
