@@ -33,6 +33,7 @@ def home():
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
             # print('geocoded:', text_bounds)
+            refine = False
             if search and text_bounds:
                 lower_left, upper_right = text_bounds.split('+')
                 lower_left = [float(x) for x in lower_left.split(',')]
@@ -45,6 +46,7 @@ def home():
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
+                accSystem.get_available(startdate, enddate); refine = True
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
                 enddate = None
@@ -57,24 +59,27 @@ def home():
             distance = request.form.get('distance')
             if location:
                 print("getting venues near", location)
-                print(accSystem.get_near(location.split(', '), distance))
+                print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
             elif search and text_bounds:
                 #TODO: use geocode result
                 print("getting in geocode bounds")
-                print(accSystem.get_within(lower_left, upper_right))
-            else:
-                print("getting venues with matching options ")
-                print(accSystem.get_like(
-                    name=f'%{search}%',
-                    bedCount=beds,
-                    bathCount=bathrooms,
-                    carCount=parking,
-                ))
+                print(accSystem.get_within(lower_left, upper_right, refine=refine)); refine=True
+            
+            print("getting venues with matching options ")
+            print('search term:', search)
+            print(accSystem.get_like(refine=refine,
+                name=f'~%{search}%',
+                bedCount=f'>={beds}' if beds else None,
+                bathCount=f'>={bathrooms}' if beds else None,
+                carCount=f'>={parking}' if beds else None,
+                description=f'~%{search}',
+                details=f'~%{search}'
+            ))
             # elif text_bounds:
 
 
 
-            results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
+            results = accSystem.advancedSearch(search, text_bounds, None, None, beds,
                                                 bathrooms, parking, location, distance)
             results = list(map(accSystem.get_acc, results))
             # print(results[0].get_images())

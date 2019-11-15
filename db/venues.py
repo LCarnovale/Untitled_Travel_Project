@@ -54,6 +54,25 @@ def get_overlapping_availability(venueid, startDate, endDate):
             venueid=? AND startDate<=? AND endDate>=?", (venueid, startDate, endDate))
         return cursor.fetchall()
 
+def get_available(startDate, endDate):
+    """
+    Get all venues available in the given date range.
+
+    `startDate`, `endDate` should be datetime types.
+
+    Returns a list of venues and a list of the matching availbilities.
+    """
+    query = """SELECT * FROM Venues 
+    INNER JOIN Availabilities ON Venues.venueid = Availabilities.venueid
+    WHERE startDate<=? AND endDate>=?
+    """
+    with dbCursor() as cursor:
+        cursor.execute(query, (startDate, endDate))
+        result = cursor.fetchall()
+        v = [r[:12] for r in result]
+        av = [r[12:] for r in result]
+        return (v, av) 
+
 
 def insert(ownerid, addressid, name, bedCount, bathCount,
                  carCount, description, rate,
@@ -192,16 +211,19 @@ def search(**patterns):
     and a query will be constructed like:
 
         SELECT * FROM Venues WHERE 
-        column1 LIKE pattern1 AND
-        column2 LIKE pattern2 ...
+        column1 pattern1 AND
+        column2 pattern2 ...
+    
+    **Place a `~` at the beginning of a pattern to perform a
+    LIKE comparison, ie match a string pattern.
 
     Returns a list of matching rows.    
         
     For example: 
-        select_venues(name="test%", details="%d%") 
+        select_venues(name="~test%", details="~%d%", bedCount=">1") 
 
     will return all venues with names starting with test,
-    and 'd' in the details.
+    'd' in the details, and more than 1 beds.
 
     See https://www.w3schools.com/sql/sql_like.asp for 
     information on patterns.
@@ -220,13 +242,25 @@ def search(**patterns):
         maxStay       int
         details       text
     """
+    # SELECT * FROM Venues WHERE <key> <[LIKE] value>
     query = "SELECT * FROM Venues WHERE "
-    cols = [c for c in patterns]
-
-    query += f"{cols[0]} LIKE ?"
-    for c in cols[1:]:
-        query += f" AND {c} LIKE ?"
+    # Create parts then join by 'AND'
+    parts = []
+    subs = []
+    for field in patterns:
+        val = patterns[field]
+        if type(val) != str:
+            val = f'= {val}'
+        elif val[0] == "~":
+            subs.append(val[1:])
+            val = 'LIKE ?'
+        
+        parts.append(f"{field} {val}")
+    
+    parts = ' AND '.join(parts)
+    query += ' ' + parts
+    
     with dbCursor() as cursor:
-        cursor.execute(query, tuple(patterns[c] for c in cols))
+        cursor.execute(query, subs)#, tuple(patterns[c] for c in fields))
 
         return cursor.fetchall()
