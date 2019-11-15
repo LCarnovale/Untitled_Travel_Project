@@ -38,7 +38,7 @@ class FailedConnectionHandler:
 from connect_config import get_connection
 class dbCursor:
     def __enter__(self):
-        print('Opening connection')
+        #print('Opening connection')
 
         try:
             self._cnxn = get_connection()
@@ -61,12 +61,12 @@ class dbCursor:
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        print('Closing connection')
+        #print('Closing connection')
         self._cnxn.commit()
         self._cnxn.close()
 
     def __getattr__(self, attr):
-        print(attr)
+        #print(attr)
         return self._cursor.__getattribute__(attr)
 
 

@@ -95,3 +95,38 @@ To start the work is split up as follows:
  - Booking backend (Ince)
 
 If this goes smoothly, we will begin the google maps integration before the end of the week. If time allows, we will also consider implementing feedback/recommendations
+
+
+Week 7
+
+During this week, the following work was completed:
+
+ - Advanced searching (mostly) - Ian
+ - DB is finalised sans reviews - Leo
+ - Calendar UI integration - Ince
+ - Google maps API - Bryan
+
+From now, we will start to work on picture uploading and review modules.
+
+By next week we plan to have a working frontend, complete for all the current modules.
+After that, we plan to polish the website and possibly add a web crawler, depending on what is complete by the end of the week.
+
+
+Week 8
+
+The presentation is actually happening in week 11 lab, not the week 10 lab like we thought. This has allowed us to do more work, and pace ourselves a little more.
+
+We have dedicated week 10 to just be for testing and polishing, so all new features need to be done in this or next week.
+
+For now, the work is split as follows:
+
+ - Proper review module, as per proposal (Ian/Leo)
+ - Starting to polish frontend (Ince)
+ - Photo uploading finishing off/photo displaying (Bryan)
+
+After that is done, we will think more about user flow, as well as adding extra features:
+ - Web crawler
+ - Dynamic search results
+(Among other features we may choose to implement)
+
+By Friday, I want to commit to master branch the up-to-date, working version of the software.
