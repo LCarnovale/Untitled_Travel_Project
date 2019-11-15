@@ -31,13 +31,15 @@ class AccommodationSystem:
                 return None
 
     def create_accomodation(self, ownerid, addressid, name, bedCount,
-                            bathCount, carCount, description, rate, minStay, maxStay, details):
+                            bathCount, carCount, description, rate, minStay, 
+                            maxStay, details, url=None):
         """
         Create an accomodation object.
         Takes the arguments for a venue defined in dbTools.py, excluding venueid.        
         """
         args = (ownerid, addressid, name, bedCount,
-                bathCount, carCount, description, rate, minStay, maxStay, details)                
+                bathCount, carCount, description, rate, 
+                minStay, maxStay, details, url)
         new_venueid = db.venues.insert(*args)
         new_venue = Accommodation(*args)
         self.add_acc(new_venueid, new_venue)

@@ -12,6 +12,7 @@
     9   minStay       int
     10  maxStay       int
     11  details       text
+    12  ExtSource     URL           null
 """
 from helpers import dbc, execute, dbCursor
 
@@ -69,14 +70,14 @@ def get_available(startDate, endDate):
     with dbCursor() as cursor:
         cursor.execute(query, (startDate, endDate))
         result = cursor.fetchall()
-        v = [r[:12] for r in result]
-        av = [r[12:] for r in result]
+        v = [r[:13] for r in result]
+        av = [r[13:] for r in result]
         return (v, av) 
 
 
 def insert(ownerid, addressid, name, bedCount, bathCount,
                  carCount, description, rate,
-                 minStay, maxStay, details):
+                 minStay, maxStay, details, source=None):
     """
     Insert a venue.
     ** Dates should be type datetime.date
@@ -96,15 +97,16 @@ def insert(ownerid, addressid, name, bedCount, bathCount,
     # minStay       int           DEFAULT 1
     # maxStay       int
     # details       text
+    # ExtSource     url
     with dbCursor() as cursor:
         try:
             cursor.execute("INSERT INTO Venues (ownerid, addressid, name,     \
                 bedCount, bathCount, carCount, description, rate, minStay,    \
-                maxStay, details) OUTPUT INSERTED.venueid                     \
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                maxStay, details, ExtSource) OUTPUT INSERTED.venueid          \
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                            (ownerid, addressid, name, bedCount, bathCount,
                             carCount, description, rate,
-                            minStay, maxStay, details)
+                            minStay, maxStay, details, source)
                            )
         except pyodbc.IntegrityError as e:
             print("Invalid venueid or userid on insert.")
@@ -134,7 +136,8 @@ def update(venueid, **fields):
 
     valid_fields = (
         "ownerid", "addressid", "name", "bedCount", "bathCount",
-        "carCount", "description", "rate", "minStay", "maxStay", "details"
+        "carCount", "description", "rate", "minStay", "maxStay", 
+        "details", "ExtSource"
     )
 
     if 'venueid' in fields:
@@ -176,8 +179,8 @@ def search_area_circle(centre, radius):
     with dbCursor() as cursor:
         cursor.execute(query, (*centre, radius, *centre))
         result = cursor.fetchall()
-        v_rows = [r[:12] for r in result]
-        a_rows = [r[12:-1] for r in result]
+        v_rows = [r[:13] for r in result]
+        a_rows = [r[13:-1] for r in result]
         d_rows = [r[-1] for r in result]
         return v_rows, a_rows, d_rows
 
@@ -200,8 +203,8 @@ def search_area_box(lower_left, upper_right):
     with dbCursor() as cursor:
         cursor.execute(query, (minLat, maxLat, minLng, maxLng))
         result = cursor.fetchall()
-        v_rows = [r[:12] for r in result]
-        a_rows = [r[12:] for r in result]
+        v_rows = [r[:13] for r in result]
+        a_rows = [r[13:] for r in result]
         return v_rows, a_rows
     
 def search(join='AND', **patterns):
@@ -245,6 +248,7 @@ def search(join='AND', **patterns):
         minStay       int          
         maxStay       int
         details       text
+        ExtSource     url
     """
     # SELECT * FROM Venues WHERE <key> <[LIKE] value>
     query = "SELECT * FROM Venues WHERE "
@@ -267,6 +271,5 @@ def search(join='AND', **patterns):
     # print(query, subs)
 
     with dbCursor() as cursor:
-        cursor.execute(query, subs)#, tuple(patterns[c] for c in fields))
-
+        cursor.execute(query, subs)
         return cursor.fetchall()

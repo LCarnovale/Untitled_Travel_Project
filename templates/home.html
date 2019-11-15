@@ -121,12 +121,13 @@
 								//format = southwest bound+northeast bound
 								document.getElementById("geocodedvalue").value = bounds;
 								//alert(document.getElementById("geocodedvalue").value);
-							} 
-							else {
+								console.log('Result: ' + results);
+							} else {
+								console.log('No results found');
 								//alert('No results found');
 							}
-						} 
-						else {
+						} else {
+							console.log('Geocoder failed due to: ' + status);
 							//alert('Geocoder failed due to: ' + status);
 						}
 						document.getElementById('searchForm').submit();
