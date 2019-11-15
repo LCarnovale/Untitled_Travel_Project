@@ -89,7 +89,9 @@ class AccommodationSystem:
         
         Return a list of the ids of venues found.
         """
+        patterns = {p:patterns[p] for p in patterns if patterns[p]}
         venues = db.venues.search(**patterns)
+        
         for v in venues:
             new_venue = Accommodation(*v[1:])
             self.add_acc(v[0], new_venue)

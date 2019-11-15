@@ -49,27 +49,27 @@ def home():
                 startdate = datetime.today().strftime('%d/%m/%Y')
                 enddate = None
 
-            beds = request.form.get('beds')
-            bathrooms = request.form.get('bathrooms')
-            parking = request.form.get('parking')
+            beds = request.form.get('beds') or None
+            bathrooms = request.form.get('bathrooms') or None
+            parking = request.form.get('parking') or None
             location = request.form.get('location')
             # print(location)
             distance = request.form.get('distance')
             if location:
                 print("getting venues near", location)
-                accSystem.get_near(location.split(', '), distance)
+                print(accSystem.get_near(location.split(', '), distance))
             elif search and text_bounds:
                 #TODO: use geocode result
                 print("getting in geocode bounds")
-                accSystem.get_within(lower_left, upper_right)
+                print(accSystem.get_within(lower_left, upper_right))
             else:
                 print("getting venues with matching options ")
-                accSystem.get_like(
+                print(accSystem.get_like(
                     name=f'%{search}%',
                     bedCount=beds,
                     bathCount=bathrooms,
                     carCount=parking,
-                )
+                ))
             # elif text_bounds:
 
 
@@ -79,6 +79,9 @@ def home():
             results = list(map(accSystem.get_acc, results))
             # print(results[0].get_images())
             return render_template('search_results.html', results = results)
+        except db.OperationalError as e:
+            return render_template('404.html', err_msg=rf"""Unable to connect to database.
+Message: {str(e)}""")
 
         except Exception as e:
             print('----------------------------------')

@@ -1,6 +1,7 @@
 import pyodbc
 import time
 
+
 class ArgumentException(Exception):
     def __init__(self, message):
         super().__init__(message)
@@ -57,7 +58,7 @@ class dbCursor:
             self._cursor = FailedConnectionHandler()
         else:
             self._cursor = self._cnxn.cursor()
-
+        print("entering")
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
@@ -66,7 +67,7 @@ class dbCursor:
         self._cnxn.close()
 
     def __getattr__(self, attr):
-        #print(attr)
+        print("getting:",attr)
         return self._cursor.__getattribute__(attr)
 
 
