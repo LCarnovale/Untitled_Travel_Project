@@ -55,3 +55,12 @@
     padding-bottom:20px;
     background-color: #DDDDDD;
 }
+
+.reviews_container img {
+    width:30px;
+    height:auto;
+}
+
+.reviews_container div {
+    display: inline-block;
+}

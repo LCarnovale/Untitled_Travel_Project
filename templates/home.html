@@ -101,7 +101,12 @@
 		}
 		function getgeocode(){
 			var geocoder = new google.maps.Geocoder;
-			geocoder.geocode({'address': document.getElementById("searchkeyword").value}, function(results, status) {
+			geocoder.geocode({
+				'address': document.getElementById("searchkeyword").value,
+				'componentRestrictions': {
+					'country': 'AU'
+				}
+			}, function(results, status) {
 						if (status === 'OK') {
 							if (results[0] && results[0].geometry &&
 								results[0].geometry.bounds) {
@@ -111,14 +116,14 @@
 										 ","+results[0].geometry.bounds.getNorthEast().lng()
 								//format = southwest bound+northeast bound
 								document.getElementById("geocodedvalue").value = bounds;
-								alert(document.getElementById("geocodedvalue").value);
+								//alert(document.getElementById("geocodedvalue").value);
 							} 
 							else {
-								alert('No results found');
+								//alert('No results found');
 							}
 						} 
 						else {
-							alert('Geocoder failed due to: ' + status);
+							//alert('Geocoder failed due to: ' + status);
 						}
 						document.getElementById('searchForm').submit();
 					});
@@ -129,12 +134,16 @@
 		$('#dates').daterangepicker({
 			autoUpdateInput: false,
 			minDate: new Date(),
+			endDate: moment().add(60, 'days'),
         	locale: {
             	cancelLabel: 'Clear',
             	format: 'DD/MM/YYYY'
         	}
 		});
 	});
+	$('#dates').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+  	});
 	$('#dates').on('cancel.daterangepicker', function(ev, picker) {
         $(this).val('');
     });

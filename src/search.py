@@ -6,9 +6,9 @@ from src.accommodation import Accommodation
 
 class Search():
     def __init__(self, items):
-        self._items = items
-        self._scores = []
-        self._most_recent = []
+        self._items = items   
+        self._scores = []    
+        self._most_recent = [] 
 
     def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
@@ -21,9 +21,14 @@ class Search():
             self._scores = [(x,0.0) for x in self._items]
             #print(self._scores)
 
+        # If the search term looks like a location, don't require the search in the name
+        if text_bounds:
+            self._scores = [(x,0.0) for x in self._items]
+
         print('Done keys')
 
         if text_bounds:
+            print('text')
             self._limitRegion(text_bounds)
 
         print('Done region')
@@ -82,6 +87,7 @@ class Search():
                     body_score += (1/3) * desc.count(keyword)/len(desc)
 
             if title_score + body_score != 0:
+                print('ADD')
                 scores.append((ad_id, title_score + body_score))
 
         self._scores = scores
@@ -95,23 +101,29 @@ class Search():
 
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
-            if (southwest[0] < ad.getLocation()[0] and # TODO: fix location
-                southwest[1] < ad.getLocation()[1] and
-                northeast[0] > ad.getLocation()[0] and
-                northeast[1] > ad.getLocation()[1]):
-                limited.append((ad, score))
+            addr = ad.address
+            lat,lng = float(addr.lat), float(addr.lng)
 
-        if limited != []:
-            self._scores = limited
+            if (southwest[0] < lat and
+                southwest[1] < lng and
+                northeast[0] > lat and
+                northeast[1] > lng):
+
+                print('MATCH', southwest, northeast, lat, lng)
+                limited.append((ad_id, score))
+            else:
+                print('NO MATCH', southwest, northeast, lat, lng)
+
+        self._scores = limited
 
 
     def _filterDates(self, startdate, enddate):
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
-            print('Check avail')
+            #print('Check avail')
             if (ad.isAvailable(startdate, enddate)):
-                result.append((ad, score))
+                result.append((ad_id, score))
 
         self._scores = result
 
@@ -121,7 +133,7 @@ class Search():
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (ad.bed_count >= beds):
-                result.append((ad, score))
+                result.append((ad_id, score))
 
         self._scores = result
 
@@ -130,7 +142,7 @@ class Search():
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (ad.bath_count >= baths):
-                result.append((ad, score))
+                result.append((ad_id, score))
 
         self._scores = result
 
@@ -139,13 +151,13 @@ class Search():
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (ad.car_count >= spots):
-                result.append((ad, score))
+                result.append((ad_id, score))
 
         self._scores = result
 
 
     def _filterLocation(self, location, dist):
-        print(location)
+        # print(location)
         result = []
         lat = float(location.split(',')[0])
         lon = float(location.split(',')[1])
@@ -153,7 +165,7 @@ class Search():
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (geodesic((lat, lon), (ad.address.lat, ad.address.lng)).km <= dist/1000):
-                result.append((ad, score))
+                result.append((ad_id, score))
 
         self._scores = result
 
@@ -194,7 +206,7 @@ class Search():
                     body_score += (1/3) * desc.count(keyword)/len(desc)
 
             if title_score + body_score != 0:
-                scores.append((ad, title_score + body_score))
+                scores.append((ad_id, title_score + body_score))
 
         scores.sort(key=lambda x: -x[1])
 
