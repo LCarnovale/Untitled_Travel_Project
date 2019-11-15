@@ -32,8 +32,27 @@ def home():
         try:
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
-            # print('geocoded:', text_bounds)
             refine = False
+            print('Form:', request.form)
+            print("getting venues with matching options ")
+
+            beds = request.form.get('beds') or None
+            bathrooms = request.form.get('bathrooms') or None
+            parking = request.form.get('parking') or None
+
+
+            found = accSystem.get_like(refine=refine,
+                bedCount=f'>={beds}' if beds else None,
+                bathCount=f'>={bathrooms}' if bathrooms else None,
+                carCount=f'>={parking}' if parking else None,
+            ); refine = True if found else False 
+            print("Filtering by options:", found)
+            print("Filtering by search term:", accSystem.get_like(refine=refine,
+                name=f'~%{search}%',
+                description=f'~%{search}%',
+                details=f'~%{search}%',
+                join="OR"
+            )); refine = True
             if search and text_bounds:
                 lower_left, upper_right = text_bounds.split('+')
                 lower_left = [float(x) for x in lower_left.split(',')]
@@ -46,16 +65,13 @@ def home():
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
-                accSystem.get_available(startdate, enddate); refine = True
+                
+                print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
                 enddate = None
 
-            beds = request.form.get('beds') or None
-            bathrooms = request.form.get('bathrooms') or None
-            parking = request.form.get('parking') or None
             location = request.form.get('location')
-            # print(location)
             distance = request.form.get('distance')
             if location:
                 print("getting venues near", location)
@@ -65,16 +81,6 @@ def home():
                 print("getting in geocode bounds")
                 print(accSystem.get_within(lower_left, upper_right, refine=refine)); refine=True
             
-            print("getting venues with matching options ")
-            print('search term:', search)
-            print(accSystem.get_like(refine=refine,
-                name=f'~%{search}%',
-                bedCount=f'>={beds}' if beds else None,
-                bathCount=f'>={bathrooms}' if beds else None,
-                carCount=f'>={parking}' if beds else None,
-                description=f'~%{search}',
-                details=f'~%{search}'
-            ))
             # elif text_bounds:
 
 

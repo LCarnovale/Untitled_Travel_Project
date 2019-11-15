@@ -111,12 +111,17 @@ class AccommodationSystem:
         search result from the system, and exclude results that don't
         already exist in the system.
 
+        patterns with value None are ignored. (Use `'NULL'` to check for null values.)
+
         See db.venues.search() for more info.
         
-        Return a list of the ids of venues found.
+        Return a list of the ids of venues found, or `None` if all given
+        patterns have None as a value.
         """
         patterns = {p:patterns[p] for p in patterns if patterns[p]}
+        if not patterns: return None
         venues = db.venues.search(**patterns)
+
 
         if refine:
             _refine(self._accommodations, [v[0] for v in venues], venues)

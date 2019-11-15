@@ -204,7 +204,7 @@ def search_area_box(lower_left, upper_right):
         a_rows = [r[12:] for r in result]
         return v_rows, a_rows
     
-def search(**patterns):
+def search(join='AND', **patterns):
     """
     Provide patterns of the form {"column":"pattern"} 
     referring to the following fields,
@@ -214,8 +214,12 @@ def search(**patterns):
         column1 pattern1 AND
         column2 pattern2 ...
     
-    **Place a `~` at the beginning of a pattern to perform a
+    Place a `~` at the beginning of a pattern to perform a
     LIKE comparison, ie match a string pattern.
+
+    By default the comparisons are joined by 'AND', but a different term
+    can be specified with `join`, ie `join='OR'` will do an `or` instead 
+    of an `and` comparison.
 
     Returns a list of matching rows.    
         
@@ -257,9 +261,11 @@ def search(**patterns):
         
         parts.append(f"{field} {val}")
     
-    parts = ' AND '.join(parts)
+    parts = f' {join} '.join(parts)
     query += ' ' + parts
     
+    # print(query, subs)
+
     with dbCursor() as cursor:
         cursor.execute(query, subs)#, tuple(patterns[c] for c in fields))
 
