@@ -33,7 +33,8 @@ class Accommodation:
         self._rate,            \
         self._min_stay,        \
         self._max_stay,        \
-        self._details =     args
+        self._details,         \
+        self._url     =     args
 
         ### Data validation  ### TODO: Add more tests?
         if self._bed_count < 0:
@@ -86,8 +87,8 @@ class Accommodation:
         Return a list of paths of images for this venue.
         """
         images = db.images.get_for_venue(self.id)
-        return [img[2] for img in images]
-
+        temp = [img[2] for img in images]
+        return ['/static/'+image.replace("\\","/") for image in temp]
 
     '''
     Properties
@@ -236,3 +237,8 @@ class Accommodation:
         # Get address for the venue
         address = db.addresses.get(self.aid)
         return src.address.Address(*address[1:])
+
+    @property
+    def url(self):
+        # Get the url of the source of this venue.
+        return self._url

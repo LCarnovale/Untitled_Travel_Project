@@ -32,28 +32,67 @@ def home():
         try:
             search = request.form.get('search')
             text_bounds = request.form.get('geocodedvalue')
-            print(text_bounds)
+            refine = False
+            print('Form:', request.form)
+            print("getting venues with matching options ")
+
+            beds = request.form.get('beds') or None
+            bathrooms = request.form.get('bathrooms') or None
+            parking = request.form.get('parking') or None
+
+
+            found = accSystem.get_like(refine=refine,
+                bedCount=f'>={beds}' if beds else None,
+                bathCount=f'>={bathrooms}' if bathrooms else None,
+                carCount=f'>={parking}' if parking else None,
+            ); refine = True if found else False 
+            print("Filtering by options:", found)
+            print("Filtering by search term:", accSystem.get_like(refine=refine,
+                name=f'~%{search}%',
+                description=f'~%{search}%',
+                details=f'~%{search}%',
+                join="OR"
+            )); refine = True
+            if search and text_bounds:
+                lower_left, upper_right = text_bounds.split('+')
+                lower_left = [float(x) for x in lower_left.split(',')]
+                upper_right = [float(x) for x in upper_right.split(',')]
+                print("geocoded area:")
+                print("        ", upper_right)
+                print(lower_left)
+                
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
+                
+                print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
             else:
-                startdate = ''
-                enddate = ''
+                startdate = datetime.today().strftime('%d/%m/%Y')
+                enddate = None
 
-            beds = request.form.get('beds')
-            bathrooms = request.form.get('bathrooms')
-            parking = request.form.get('parking')
             location = request.form.get('location')
             distance = request.form.get('distance')
+            if location:
+                print("getting venues near", location)
+                print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
+            elif search and text_bounds:
+                #TODO: use geocode result
+                print("getting in geocode bounds")
+                print(accSystem.get_within(lower_left, upper_right, refine=refine)); refine=True
+            
+            # elif text_bounds:
 
 
-            accSystem.get_all_ads()
-            results = accSystem.advancedSearch(search, text_bounds, startdate, enddate, beds,
+
+            results = accSystem.advancedSearch(search, text_bounds, None, None, beds,
                                                 bathrooms, parking, location, distance)
             results = list(map(accSystem.get_acc, results))
-            # print(results)
+            # print(results[0].get_images())
             return render_template('search_results.html', results = results)
+        except db.OperationalError as e:
+            return render_template('404.html', err_msg=rf"""Unable to connect to database.
+Message: {str(e)}""")
 
         except Exception as e:
             print('----------------------------------')
@@ -184,8 +223,11 @@ Main Booking page
 '''  
 @app.route('/book/<id>', methods=['GET', 'POST'])
 def book_main(id):
-
-    acc = accSystem.get_acc(id)
+    try:
+        acc = accSystem.get_acc(id)
+    except Exception as e:
+        return render_template('404.html', err_msg=f"""Unable to connect to database.
+Message: {str(e)}""")
     if acc == None:
         abort(404)
 
@@ -201,7 +243,9 @@ def book_main(id):
         form = request.form
         if 'id' in session:
             bookingSystem.create_booking(
-                id, session['id'], form['book_start'], form['book_end']
+                id, session['id'], 
+                datetime.strptime(form['book_start'], "%d/%m/%Y"), 
+                datetime.strptime(form['book_end'], "%d/%m/%Y")
             )
             return render_template('book_confirm.html', acc=acc)
         else:
@@ -212,8 +256,6 @@ def book_main(id):
     owner = db.owners.get(acc.ownerid)
     address = Address(*db.addresses.get(acc.aid)[1:])
     images = acc.get_images()
-    print('images: ' )
-    images = (['/static/'+image.replace("\\","/") for image in images])
     print(images)
 	# avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     

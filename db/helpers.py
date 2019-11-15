@@ -1,6 +1,7 @@
 import pyodbc
 import time
 
+
 class ArgumentException(Exception):
     def __init__(self, message):
         super().__init__(message)
@@ -35,38 +36,55 @@ class FailedConnectionHandler:
     fetchone = _default
     fetchall = _default
 
+CURSOR_MAX_OPEN_TIME = 30 # seconds
 from connect_config import get_connection
+
+_glob_cnxn = None
+_glob_cnxn_open_time = CURSOR_MAX_OPEN_TIME + 1
 class dbCursor:
     def __enter__(self):
-        #print('Opening connection')
-
-        try:
-            self._cnxn = get_connection()
-        except TypeError:
-            print("Connection has not been established yet. Call init().")
-            self._cnxn = FailedConnectionHandler()
-            self._cursor = FailedConnectionHandler()
-        except pyodbc.ProgrammingError as e:
-            if ("IP address" in str(e)):
-                msg = str(e).split("IP address '")[1]
-                msg = msg.split("' is not")[0]
-                print("Your ip (" + msg + ") was denied.")
-            else:
-                raise e
-            self._cnxn = FailedConnectionHandler()
-            self._cursor = FailedConnectionHandler()
+        global _glob_cnxn
+        global _glob_cnxn_open_time
+        time_delta = time.time() - _glob_cnxn_open_time
+        if time_delta > CURSOR_MAX_OPEN_TIME:
+            # Restart connection
+            # print("restarting connection")
+            try:
+                _glob_cnxn.close()
+            except:
+                pass
+            finally:            
+                try:
+                    self._cnxn = get_connection()
+                except TypeError:
+                    print("Connection has not been established yet. Call init().")
+                    self._cnxn = FailedConnectionHandler()
+                    self._cursor = FailedConnectionHandler()
+                except pyodbc.ProgrammingError as e:
+                    if ("IP address" in str(e)):
+                        msg = str(e).split("IP address '")[1]
+                        msg = msg.split("' is not")[0]
+                        print("Your ip (" + msg + ") was denied.")
+                    else:
+                        raise e
+                _glob_cnxn = self._cnxn
+                _glob_cnxn_open_time = time.time()
         else:
-            self._cursor = self._cnxn.cursor()
+            # Use already open connection
+            self._cnxn = _glob_cnxn
 
+        self._cursor = self._cnxn.cursor()
+
+        # print("entering")
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
         #print('Closing connection')
         self._cnxn.commit()
-        self._cnxn.close()
+        # self._cnxn.close()
 
     def __getattr__(self, attr):
-        #print(attr)
+        # print("getting:",attr)
         return self._cursor.__getattribute__(attr)
 
 

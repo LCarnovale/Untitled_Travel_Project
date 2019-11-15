@@ -34,7 +34,7 @@
 
 .left-grid, .right-grid {
     padding: 10px;
-    height: 500px;
+    height: 600px;
     width: 600px;
 }
 
@@ -73,6 +73,12 @@
 
 
 
+#map {
+        height: 200px;
+		width: 200px;
+		margin-left: auto;
+		margin-right: auto;
+      }
 </style>
 {% endblock %}
 
@@ -92,10 +98,22 @@
         <p>Bathrooms: {{acc.bath_count}}</p>
         <p>Car Spaces: {{acc.car_count}}</p>
         <p>Address: {{acc.address.street_address}}</p>
+		<input type = 'hidden' id = 'lat' value = '{{acc.address.lat}}'>
+		<input type = 'hidden' id = 'lng' value = '{{acc.address.lng}}'>
+		<div id = "map"></div>
+         {% if owner %}
+        <h2> About the owner </h2>
+        <p> Name: {{owner[1]}} </p>
+        <p> {{owner[5]}} </p>
+        <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
+        {% endif %}
     </div>
 
     <div class="right-grid">
         <p>Images</p><br><br>
+		{% for image in images %}
+			<img src = '{{image}}' style = 'width:150px;height:150px'>
+		{% endfor %}
         <p>Booking Details</p>
         <p>Price: {{acc.rate}} / night</p>
         <p>Availability:</p>
@@ -183,7 +201,18 @@ function getDates(dates) {
         document.getElementById('book_end').value = book_end;
     });
 }
+
+var map
+function initMap() {
+	map = new google.maps.Map(
+		document.getElementById('map'), {
+			center: {lat: parseFloat(document.getElementById('lat').value) , lng: parseFloat(document.getElementById('lng').value)},
+			zoom: 15
+		})
+		var marker = new google.maps.Marker({position:{lat: parseFloat(document.getElementById('lat').value) , lng: parseFloat(document.getElementById('lng').value)}, map: map});
+};
 </script>
+
 <!--
 </div>
     <table class = "addr_details">
@@ -230,5 +259,6 @@ function getDates(dates) {
 
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>
 
 {% endblock %}

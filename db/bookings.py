@@ -1,5 +1,12 @@
 from helpers import dbc, execute, dbCursor
-
+import pyodbc
+"""
+ id          int        Identity  PRIMARY KEY
+ venueid     int        not null  FK -> Venues(id)
+ userid      int        not null  FK -> Users(id)
+ startDate   date       not null
+ endDate     date       not null
+"""
 def get(id):
     """
     Return a booking with the matching id.
@@ -73,7 +80,7 @@ def update(bookid, **fields):
         cursor.execute(query, (*vals, bookid))
 
 
-def select(**patterns):
+def search(**patterns):
     """
     Provide patterns of the form {"column":"pattern"} 
     referring to the following fields,
