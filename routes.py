@@ -143,6 +143,7 @@ def logout():
     # Remove any existing sessions
     session.pop('username', None)
     session.pop('id', None)
+    session['login_type'] = None
 
     return redirect(url_for('home'))
 
@@ -217,7 +218,23 @@ def editprofile():
             print("Error user not found")
         return render_template('confirm_edit.html')
     return render_template('edit.html', _user=user)
-	
+
+
+'''
+View Bookings page
+'''
+@app.route('/bookings/', methods=['GET', 'POST'])
+def view_bookings():
+    if request.method == 'POST':
+        pass
+    elif request.method == 'GET':
+        # get current user
+        user  = userSystem.get_user(session['id'])
+
+        return render_template('view_bookings.html',
+                               bookings=user.get_bookings(), ac=accSystem)
+
+
 '''
 Main Booking page
 '''  
@@ -232,13 +249,7 @@ Message: {str(e)}""")
         abort(404)
 
     if request.method == 'POST':
-        '''
-        if request.form.get('review_submit') != None:
-            if request.form.get('rating_input') not in ['1','2','3','4','5']:
-                raise ValueError('Rating not submitted, or form mangled')
-            print(request.form.get('review'))
-            return redirect(url_for('book_main', id=id))
-        '''
+
 
         form = request.form
         if 'id' in session:

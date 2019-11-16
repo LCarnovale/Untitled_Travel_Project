@@ -15,6 +15,13 @@ def get(id):
         cursor.execute("SELECT * FROM Bookings WHERE bookid=?", id)
         return cursor.fetchone()
 
+def get_for_user(uid):
+    """
+    Return all bookings for the given user.
+    """
+    with dbCursor() as cursor:
+        cursor.execute("SELECT * FROM Bookings WHERE userid=?", uid)
+        return cursor.fetchall() 
 
 def insert(venueid, userid, startDate, endDate):
     """

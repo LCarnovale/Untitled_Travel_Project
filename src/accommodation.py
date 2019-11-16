@@ -19,7 +19,7 @@ class Accommodation:
         The output from eg. db.get_venue(n) has the form
             get_venue(n) --> (id, *args)
         so it is easiest to pass around a collection of the return values after
-        the id instead of track each of dozen or so fields individually.
+        the id instead of track each of the dozen or so fields individually.
         """ 
         self._id = -1 # Will be set by the accomodationSystem,
 
