@@ -37,7 +37,11 @@ class FailedConnectionHandler:
     fetchall = _default
 
 CURSOR_MAX_OPEN_TIME = 30 # seconds
-from connect_config import get_connection
+try:
+    from connect_config import get_connection
+except:
+    print("Warning: connect_config.get_connection() could not be imported.")
+    print("Attempts to access the database will likely cause errors.")
 
 _glob_cnxn = None
 _glob_cnxn_open_time = CURSOR_MAX_OPEN_TIME + 1
@@ -64,7 +68,7 @@ class dbCursor:
                     if ("IP address" in str(e)):
                         msg = str(e).split("IP address '")[1]
                         msg = msg.split("' is not")[0]
-                        print("Your ip (" + msg + ") was denied.")
+                        raise Exception("Your ip (" + msg + ") was denied.")
                     else:
                         raise e
                 _glob_cnxn = self._cnxn
@@ -100,4 +104,4 @@ def execute(sql, *params):
     return out
 
 
-dbc = dbCursor()
+# dbc = dbCursor()

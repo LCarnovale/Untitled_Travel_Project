@@ -5,7 +5,7 @@ Addresses:
     2   lat         varchar(10)
     3   lng         varchar(10)
 """
-from helpers import dbc, execute, dbCursor
+from helpers import execute, dbCursor
 
 def get(id):
     """
