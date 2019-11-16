@@ -1,4 +1,4 @@
-from helpers import dbc, execute, dbCursor
+from helpers import execute, dbCursor
 import pyodbc
 """
  id          int        Identity  PRIMARY KEY

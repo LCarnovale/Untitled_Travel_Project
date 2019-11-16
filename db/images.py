@@ -5,7 +5,7 @@ Images:
     path     varchar(250)
 """
 
-from helpers import dbc, execute, dbCursor
+from helpers import execute, dbCursor
 import helpers
 import pyodbc
 

@@ -14,7 +14,7 @@
     11  details       text
     12  ExtSource     URL           null
 """
-from helpers import dbc, execute, dbCursor
+from helpers import execute, dbCursor
 
 def get_all():
     """
