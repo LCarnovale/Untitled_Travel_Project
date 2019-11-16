@@ -31,7 +31,6 @@ def home():
     if request.method == 'POST':
         try:
             search = request.form.get('search')
-            text_bounds = request.form.get('geocodedvalue')
             refine = False
             print('Form:', request.form)
             print("getting venues with matching options ")
@@ -71,20 +70,12 @@ def home():
                 startdate = datetime.today().strftime('%d/%m/%Y')
                 enddate = None
 
-            location = request.form.get('location')
+            location = request.form.get('geocodedvalue')
             distance = request.form.get('distance')
             if location:
                 print("getting venues near", location)
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
-            elif search and text_bounds:
-                #TODO: use geocode result
-                print("getting in geocode bounds")
-                print(accSystem.get_within(lower_left, upper_right, refine=refine)); refine=True
-            
             # elif text_bounds:
-
-
-
             results = accSystem.advancedSearch(search, text_bounds, None, None, beds,
                                                 bathrooms, parking, location, distance)
             results = list(map(accSystem.get_acc, results))
