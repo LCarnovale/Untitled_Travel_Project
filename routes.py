@@ -44,21 +44,28 @@ def home():
                 bedCount=f'>={beds}' if beds else None,
                 bathCount=f'>={bathrooms}' if bathrooms else None,
                 carCount=f'>={parking}' if parking else None,
-            ); refine = True if found else False 
+            )
+            refine = True if found else False 
+            
             print("Filtering by options:", found)
-            print("Filtering by search term:", accSystem.get_like(refine=refine,
+            
+            found = accSystem.get_like(refine=refine,
                 name=f'~%{search}%',
                 description=f'~%{search}%',
                 details=f'~%{search}%',
                 join="OR"
-            )); refine = True
-            if search and text_bounds:
-                lower_left, upper_right = text_bounds.split('+')
-                lower_left = [float(x) for x in lower_left.split(',')]
-                upper_right = [float(x) for x in upper_right.split(',')]
-                print("geocoded area:")
-                print("        ", upper_right)
-                print(lower_left)
+            )
+            refine = found or False
+            
+            print("Filtering by search term:", found)
+            
+            # if search: # TODO: Fix geocoding
+            #     lower_left, upper_right = text_bounds.split('+')
+            #     lower_left = [float(x) for x in lower_left.split(',')]
+            #     upper_right = [float(x) for x in upper_right.split(',')]
+            #     print("geocoded area:")
+            #     print("        ", upper_right)
+            #     print(lower_left)
                 
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
@@ -76,7 +83,9 @@ def home():
                 print("getting venues near", location)
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
             # elif text_bounds:
-            results = accSystem.advancedSearch(search, text_bounds, None, None, beds,
+            # TODO: This is a bit dodgy the target location and search term should be separate
+            if location: search = None
+            results = accSystem.advancedSearch(search, None, None, None, beds,
                                                 bathrooms, parking, location, distance)
             results = list(map(accSystem.get_acc, results))
             # print(results[0].get_images())
