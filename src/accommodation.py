@@ -88,7 +88,7 @@ class Accommodation:
         """
         images = db.images.get_for_venue(self.id)
         temp = [img[2] for img in images]
-        return ['/static/'+image.replace("\\","/") for image in temp]
+        return [image.replace("\\","/") for image in temp]
 
     '''
     Properties
