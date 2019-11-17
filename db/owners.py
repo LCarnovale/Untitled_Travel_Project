@@ -12,7 +12,7 @@ Table schema:
     6   pwdhash         bytes
 
 """
-from helpers import execute, dbCursor
+from helpers import dbCursor
 
 
 def get(id):

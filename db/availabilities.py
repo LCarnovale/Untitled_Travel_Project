@@ -6,7 +6,7 @@ Availabilities:
     3   endDate       date
 """
 
-from helpers import execute, dbCursor
+from helpers import dbCursor
 
 
 def get(id):

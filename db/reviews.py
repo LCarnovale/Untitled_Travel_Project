@@ -9,7 +9,7 @@
     6    reviewGood    text
 
 """
-from helpers import execute, dbCursor
+from helpers import dbCursor
 
 def get(id):
     with dbCursor() as cursor:
