@@ -11,6 +11,14 @@
     <!-- <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/> -->
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+        .myimage {
+            display:block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+    <img src="../static/nsw1.png" class='myimage'>
 </head>
 <body>
     <nav class="light-blue lighten-1" role="navigation">
@@ -19,7 +27,6 @@
                 <i class="material-icons">home</i>
                 Untitled Travel</a>
             <ul class="right hide-on-med-and-down">
-                <!-- <li><a href="#">Sass</a></li> -->
                 <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
                 <li><a href="{{url_for('logout')}}">Logout</a></li>
             </ul>
@@ -30,24 +37,24 @@
             <a href="#" data-target="nav-mobile" class="sidenav-trigger">
                 <i class="material-icons">menu</i></a>
                 
-            </div>
-        </nav>
+        </div>
+    </nav>
+    <div class="container">
         {% if bookings %}
         <!-- Cards for each booking -->
+        <div class="row">
         {% for b in bookings %}
         {% set venue = ac.get_acc(b.venueid) %}
-        <div class="row">
-            <div class="col s12 m7">
+            <div class="col s6 m6 l6">
                 {% set images = venue.get_images() %}
                 <div class="card">
                 {% if images|length > 0 %}
                     <div class="card-image">
-                        <img src="{{venue.get_images()[0]}}">
+                        <img src="{{images[0]}}">
                 {% else %}
-                <div class="card red">
-                    <!-- <div class="card" -->
+                    <div class="card red">
                 {% endif %}
-                    <span class="card-title">{{venue.name}}</span>
+                        <span class="card-title">{{venue.name}}</span>
                     </div>
                     <div class="card-content">
                         <!-- Text to be displayed on card -->
@@ -61,17 +68,18 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <br>
         {% endfor %}
+        </div>
         {% else %}
+        <br>
         <p>You don't have any current or future bookings. (Or past?)</p> <!-- TODO XXX -->
         {% endif %}
         <!--JavaScript at end of body for optimized loading-->
        
-        </body>
-        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <script type="text/javascript" src="{{url_for('static', filename='js/materialize.js')}}"></script>
-        <script type="text/javascript" src="{{url_for('static', filename='js/init.js')}}"></script>
-        
-        </html>
+    </div>
+    </body>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/materialize.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/init.js')}}"></script>
+    
+</html>
