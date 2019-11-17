@@ -229,19 +229,10 @@ def view_bookings():
         pass
     elif request.method == 'GET':
         # get current user
-        # user  = userSystem.get_user(session['id'])
+        user  = userSystem.get_user(session['id'])
 
-        bookings=[
-            Booking(1, 1, "today", "tomorrow"),
-            Booking(2, 1, "today", "tomorrow"),
-            Booking(1, 1, "today", "tomorrow"),
-            Booking(2, 1, "today", "tomorrow"),
-            Booking(1, 1, "today", "tomorrow"),
-            Booking(2, 1, "today", "tomorrow"),
-        ]
-
-        return render_template('view_bookings.html', bookings=bookings)
-                            #    bookings=user.get_bookings(), ac=accSystem)
+        return render_template('view_bookings.html',
+                               bookings=user.get_bookings(), ac=accSystem)
 
 
 '''
