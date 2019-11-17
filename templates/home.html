@@ -114,8 +114,8 @@
 				circlelist[i].setRadius(parseInt(newval));
 			}
 		}
-		var typingTimer;                //timer identifier
-		var doneTypingInterval = 5000;  //time in ms (5 seconds)
+		var typingTimer;
+		var doneTypingInterval = 1000;
 		function getgeocode(){
 			
 			geocoder.geocode({
@@ -137,7 +137,8 @@
 								markerlist.push(marker)
 								console.log(document.getElementById('geocodedvalue').value)
 								console.log(results[0].geometry.location)
-								var radius = google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location,results[0].geometry.bounds.getSouthWest());
+								var radius = Math.round(google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location,results[0].geometry.bounds.getSouthWest()));
+								document.getElementById("radiuschange").value = radius
 								document.getElementById("radiusrange").value = radius
 								var circle = new google.maps.Circle({map: map, radius: radius, fillColor: '#AA0000'});
 								circle.bindTo('center', marker, 'position');
