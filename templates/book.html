@@ -2,65 +2,224 @@
 {% block head %}
     <title>Booking</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='book.css') }}">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src = "{{ url_for('static',filename = 'star_rating.js')}}"></script>
+    <!-- Script for calendar-->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<style>
+.header{
+    grid-area: header;
+    background-color: #fa9183;
+    text-align: center;
+    font-size: 35px;
+    padding: 30px;
+}
+.grid-container {
+    display: grid;
+    grid-template-areas:
+    'header header header header header header'
+    'left left middle middle right right'
+    'footer footer footer footer footer footer';
+}
+
+.left-grid, .right-grid {
+    padding: 10px;
+    height: 500px;
+    width: 600px;
+}
+
+.left-grid {
+    grid-area: left;
+    background-color: #ebb4ad;
+    text-align: left;
+}
+
+.right-grid {
+    grid-area: right;
+    background-color: #deb5b0;
+
+}
+
+.footer {
+    grid-area: footer;
+    background-color: #fcc2bb;
+    height: 1000px;
+    width: 1200px;
+
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
-    <h1>{{acc.getName()}}</h1>
+
+<!-- Header for Accommodation -->
+<div class="grid-container">
+    <div class="header">
+        <h1 style="font-style: oblique; font-size: 60px;">{{acc.name}}</h1>
+    </div>
+<!-- Content Layout -->
+
+    <div class="left-grid">
+        <p>Description</p>
+        <p>{{acc.description}}</p>
+        <p>Beds: {{acc.bed_count}}</p>
+        <p>Bathrooms: {{acc.bath_count}}</p>
+        <p>Car Spaces: {{acc.car_count}}</p>
+        <p>Address: {{acc.address.street_address}}</p>
+         {% if owner %}
+        <h2> About the owner </h2>
+        <p> Name: {{owner[1]}} </p>
+        <p> {{owner[5]}} </p>
+        <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
+        {% endif %}
+    </div>
+
+    <div class="right-grid">
+        <p>Images</p><br><br>
+        <p>Booking Details</p>
+        <p>Price: {{acc.rate}} / night</p>
+
+
+        <p>Availability:</p>
+        <p class = "good_msg">This place is currently available!</p>
+        <form name='book_acc' method='POST'>
+            <input type="text"  id="dateRange, required" value="Booking Dates"class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
+            <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
+            <p><input name = "book_start" type = "hidden" id="book_start"></p>
+            <p><input name = "book_end" type = hidden id="book_end"></p>
+            <input type="submit" value="Book this room"/>
+    </form>
+
+    </div>
+
+    <div class="reviews_container footer">
+        <h2 align="center"> Reviews </h2>
+        <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
+        <br>
+        {% for review in reviews %}
+            <h4>
+                {% if not review.recommends %}
+                    <img src="/static/thumbs_down_selected.png">
+                {% else %}
+                    <img src="/static/thumbs_up_selected.png">
+                {% endif %}
+                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+            </h4>
+            <br>
+            <div style="width:100%;">
+                <div style="width:40%; display: inline-block;">
+                    <h4>The bad:</h4><br>{{review.reviewBad}}
+                </div>
+                <div style="width:40%; display: inline-block;">
+                    <h4>The good:</h4><br>{{review.reviewGood}}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+<script>
+function getDates(dates) {
+    var availDateSize = {{acc.get_dates()|length}};
+    var minStay = {{acc.min_stay}};
+
+    $('.calendar').daterangepicker({
+        minDate: new Date(),
+        locale: {
+            format: "DD/MM/YYYY",
+            cancelLabel: 'Clear'
+        },
+        maxSpan: {
+            days: {{acc.max_stay}}
+        },
+        isInvalidDate: function(date) {
+            var startDate = $('.calendar').data('daterangepicker').startDate;
+            var minDate = moment(startDate).add(minStay, 'days');
+            // Date range between min and max
+            if (date < minDate) {
+                return true;
+            } else {
+                for (var i = 0; i < availDateSize; i++) {
+                    var startRange = new Date(dates[i][0].replace(/(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"));
+                    var endRange = new Date(dates[i][1].replace(/(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"));
+                    if (startRange <= date && date <= endRange) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+    });
+
+    $('.calendar').on('cancel.daterangepicker', function(ev, picker) {
+        $('.calendar').val('');
+    });
+
+    // Set book start and book end dates
+    $('.calendar').on('apply.daterangepicker', function(ev, picker) {
+        var book_start = $('.calendar').data('daterangepicker').startDate.format('DD/MM/YYYY');
+        var book_end = $('.calendar').data('daterangepicker').endDate.format('DD/MM/YYYY');
+        document.getElementById('book_start').value = book_start;
+        document.getElementById('book_end').value = book_end;
+    });
+}
+</script>
+<!--
+</div>
     <table class = "addr_details">
         <tr>
             <th style = "width:50%">Address</th>
             <th>Beds</th>
             <th>Bathrooms</th>
+            <th>Car Spaces</th>
         </tr>
         <tr>
-            <td>{{acc.getAddr()}}</td>
-            <td>{{acc.getBeds()}}</td>
-            <td>{{acc.getBathrooms()}}</td>
+            <td>{{address.street_address}}</td>
+            <td>{{acc.bed_count}}</td>
+            <td>{{acc.bath_count}}</td>
+            <td>{{acc.car_count}}</td>
         </tr>
     </table>
 
     <h2>About the place</h2>
-    <p>{{acc.getDesc()}}</p>
-
+    <p>{{acc.description}}</p>
+	{%for image in images%}
+		 <img src="{{ image }} " style = "width: 100px;height: 100px"></img>
+	{%endfor%}
     <table class = "booking_details">
         <tr>
             <th>Price</th>
             <th>Availability</th>
         </tr>
         <tr>
-            <td>${{acc.getPrice()}}/night</td>
-            <td>{{acc.getAvailStart()}} - {{acc.getAvailEnd()}}</td>
+            <td>${{acc.rate | round(2)}} / night</td>
+            <td><div id="avail_dates" align="center">
+                Fix me
+            </div></td>
+            <script>
+            var dates = {{ acc.get_dates()|tojson }};
+            getDates(dates, false);
+            </script>
         </tr>
     </table>
 
-    {% if acc.isAvailable() %}
-        <p class = "good_msg">This place is currently available!</p>
-        <p> TODO: This will have more information, like choosing when the booking is and how many people are staying </p>
-        <form name='book_acc' method='POST'>
-            <table>
-            <tr>
-                <td>
-                    <p>From:</p>
-                    <p><input name = "avail_start" placeholder = "Start Availability" id = "required" type = date></p>
-                </td>
-                <td>
-                    <p>To:</p>
-			        <p><input name = "avail_end" placeholder = "End Availability" id = "required" type = date></p>
-                </td>
-            </tr>
-            </table>
-            <input type="submit" value="Book this room"/> 
-        </form>
-    {% else %}
-        <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p>
-    {% endif %}
+
+    <p> TODO: This will have more information, like choosing when the booking is and how many people are staying </p>
+
+-->
 
 
-    {% if acc.getOwnerDesc() != null%}
-        <h2> About the owner </h2>
-        <p> {{acc.getOwnerDesc()}} </p>
-    {% endif %}
+    <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
 
-    <p> Have any questions? Contact the owner at {{acc.getOwnerDetails()}} </p>
 
 {% endblock %}

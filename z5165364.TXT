@@ -24,4 +24,36 @@ We made a group call on facebook to discuss the project proposal before it was d
 New gitHub was set up using the repository given. Our team made a minimum value product and took a look at the code. Added code to backend such as Accommodation class and making an instance when creating an ad. Also made an accommodation system class to store all accommodations. We can find each accommadation via a unique ID given when creating an accommodation. Successfully can post an ad (name of place and address) and can book it.
 
 18/10/19
-Worked on backend --- Accommodation functions
+Worked on backend (Accommodation functions) such as varying the form into classes (Accommodation, Stay, User). New instances of classes would then be made to keep track of the accommodation details. Trouble would be finding a simple way to keep track of available dates for the accommodation.
+
+
+21/10/19
+Met up during the lab. I was assigned to work on booking an accommodation. Also talked about work for the next iteration.
+
+
+22/10/19
+Tried to figure out how to get a calendar and use jquery to select dates instead of giving a start and end availability for accommodation. Had trouble finding code to correctly show a calendar and get the correct inputs.
+
+
+24/10/19
+Changed the way we store availability. We now have a calendar where the user can select dates that their accommodation will be available. This will be stored as an array in python. Users that want to book can view the calendar and the availability will be highlighted on the calendar(the calendar will be disabled when viewing only). One trouble I had was finding the correct format when extracting the python array into the javascript so the correct dates will be highlighted.
+
+25/10/19
+When viewing an ad, users will see a calendar with the available dates highlighted but not selectable. When booking an ad, only the available dates will be selectable and the next 3 months will be disabled. It was difficult to only have the available dates since the only way to disable dates were to add them to a list. So I had to use sets to get all dates that should be disabled.
+
+
+27/10/19
+When pulling from the git repository, my work on calendars was deleted. Put it back into new ad but plays no vital role in the form. I will discuss with the group on how we want to approach storing available dates since we are using a cloud database.
+
+4/11/19
+Worked on a new calendar date picker for posting an ad. Using multiple date ranges and also included error checking in javacsript. Had a problem with using multiple date ranges but found a solution using document focus. Might have a problem with javascript regex using str.match function. Might not work on all browsers.
+
+5/11/19
+Worked on tidying up calendar and will work on the frontend of the website.
+
+8/11/19
+Worked on the frontend and changed start and end date in advanced search to a daterangepicker. Tried to make the website look appealing without adding too much.
+
+
+10/11/19
+Worked on the frontend for booking accommodations and edited the calendar showing. Updated calendar so it now disables all dates that are not in the available date ranges. It also must have the minimum/maximum days for staying. Booking works with the new calendar. Booking page is shown in grids, where header is the name of accommodation, left grid is details, right grid is images and booking details and footer is owner details and review. When merging with backend branch, there was a error with the formatting of the reviews and it seems to not be in the right places. Will need to fix that.

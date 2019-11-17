@@ -130,3 +130,33 @@ After that is done, we will think more about user flow, as well as adding extra 
 (Among other features we may choose to implement)
 
 By Friday, I want to commit to master branch the up-to-date, working version of the software.
+
+
+Week 9
+
+The review module is now working, and progress has started on the web crawler. Photo uploading is complete and display is in progress (specifically, a nicer looking display). The front-end is looking better now, but is still in progress.
+
+The distribution of tasks for this week are:
+
+Leo:
+ - DB: only reopen if >1min expired
+ - DB: store for external site (acc has no owner id, and does have a link to external ad/poster)
+ - Bookings per user page backend
+
+Ian:
+ - Backend: needs testing, bugs to be fixed and then merged to master and hosted on azure (Monday)
+ - Crawler: Add another site
+
+Ince:
+ - Image: needs to display nicely
+ - All website should be css-ready
+ - Search results page should be HTML table
+
+Bryan:
+ - Booking page: needs gmap
+ - Search page: main test box should be LOCATION search (that is, geolocate it ONLY), maybe add a keyword search text box in advanced search
+ - If you have time, maybe start on a frontend page for displaying all the locations a logged-in user has made bookings for (as a list)
+
+By next week, we will hopefully have all the intended functionality in place, and next week we intend to just test and make the front-end into the style that will be used for final presentation
+
+We still do not know when the final report will be due, and so our workload next week will change depending on this information.

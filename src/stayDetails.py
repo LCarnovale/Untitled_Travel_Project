@@ -1,12 +1,18 @@
 from accommodation import NegativeNumberError
+import re
 from datetime import datetime
 class TimeError(Exception):
     pass
 
 class StayDetails:
-    def __init__(self, price, avail_start, avail_end, min_stay, max_stay, details):
-        self._price = price
+    def __init__(self, price, avail_dates, min_stay, max_stay, details):
         self._details = details
+        self._avail_dates = []
+        # Check if the price is positive
+        if int(price) < 0:
+            raise NegativeNumberError("Please enter a positive number")
+        else:
+            self._price = price
         # If the min_stay is less than 0 or if the max stay is > min stay
         # Raise an error
         if int(min_stay) < 0 or int(max_stay) < 0:
@@ -16,32 +22,21 @@ class StayDetails:
         else:
             self._min_stay = min_stay
             self._max_stay = max_stay
-        # Checks if the dates are correct
-        start = datetime.strptime(avail_start, '%Y-%m-%d')
-        end = datetime.strptime(avail_end, '%Y-%m-%d')
-        now = datetime.now()
-        print(now)
-        if start < now:
-            raise TimeError("Please enter a date after today")
-        if start > end:
-            raise TimeError("Please enter a valid availability period")
-        else:
-            self._avail_start = start
-            self._avail_end = end
 
+        now = datetime.now()
+        # Dates are given as a string separated by commas
+        # Dates are already sorted
+        dates = re.split(', ', avail_dates)
+        # Check if the first date is after today
+        first_date = dates[0]
+        start = datetime.strptime(first_date, '%d-%m-%Y')
+        if start < now:
+            raise TimeError("Please enter a dates after today")
+        else:
+            self._avail_dates = dates
 
     def getPrice(self):
         return self._price
-
-    def getAvailStart(self):
-        #TODO delete print
-        print(self._avail_start)
-        return self._avail_start
-
-    def getAvailEnd(self):
-        #TODO delete print
-        print(self._avail_end)
-        return self._avail_end
 
     def getMinStay(self):
         return self._min_stay
@@ -51,3 +46,14 @@ class StayDetails:
 
     def getDetails(self):
         return self._details
+
+    def isAvailable(self):
+        if self._avail_dates:
+            return True
+        else:
+            return False
+
+    def getDates(self):
+        return self._avail_dates
+
+
