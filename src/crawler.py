@@ -1,11 +1,11 @@
 import time
 import threading
 from airbnbNavigator import Airbnb_Navigator
+import db
+from datetime import datetime, timedelta
 
 DELAY = 10 # seconds
-LIMIT = 10 # Total pages that can be opened by one crawler
-
-
+LIMIT = 100 # Total pages that can be opened by one crawler
 
 
 class Crawler:
@@ -31,27 +31,72 @@ class Crawler:
         self._child_thread = threading.Thread(target = self._step, args = tuple())
         self._child_thread.start()
 
+    def kill(self):
+        print('Telling crawler to stop')
+        self._running = False
+
+    def wait_for_child(self):
+        self._child_thread.join()
+
     def _step(self):
-        if self._pages_to_explore:
-            page = self._pages_to_explore.pop()
-
-            self._visit(page)
-
-        else:
-            self._pages_to_explore = self._navigator.read_pages_from_route(self._root_pages.pop())
-
-        if self._opened < LIMIT:
+        while self._running and self._opened < LIMIT:
             print('zzZ')
             #time.sleep(DELAY)
             input('<enter to continue>')
-            self._step()
+
+            if self._pages_to_explore:
+                page = self._pages_to_explore.pop()
+                self._visit(page)
+
+            else:
+                self._pages_to_explore = self._navigator.read_pages_from_route(self._root_pages.pop())
+
+        print('Crawler, signing off...')
 
 
     def _visit(self, page):
         result = self._navigator.visit_page(page)
-        for key in result:
-            print(key, ':', result[key]) # Add to db
+
+        venueid = -1
+        '''
+
+        aid = db.addresses.insert(result['location'],
+                                  result['lat'].strip(),
+                                  result['lng'].strip())
+
+        venueid = accSystem.create_accomodation(
+            -1, int(aid), result['name'], int(result['bedCount']),
+            int(result['bathCount']), int(result['carCount']), 
+            result['description'],   float(result['rate']), int(result['minStay']), 
+            int(result['maxStay']), result['details']#, result['ad_url'] #TODO: add this when db ready
+        )
+
+        for url in result['images']:
+            db.images.insert(venueid, url)
+        '''
+
+        self._simplifyDates(venueid, result['dates'])
+
         self._opened += 1
+
+
+    def _simplifyDates(self, venueid, dates):
+        i = 0
+
+        while i < len(dates):
+
+            start_date = dates[i]
+            cur_date = dates[i]
+
+            while i < len(dates) - 1 and cur_date + timedelta(1) == dates[i+1]:
+                cur_date = dates[i+1]
+                i += 1
+
+            print(start_date, cur_date)
+            i += 1
+            #db.availabilities.insert(
+            #    venueid, start_date, cur_date
+            #)
 
 
 if __name__ == '__main__':
@@ -64,3 +109,7 @@ if __name__ == '__main__':
     crawler.start()
 
     print('Thread started')
+
+    crawler._child_thread.join()
+
+    print('Crawler finished')

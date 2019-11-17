@@ -236,3 +236,16 @@ class Accommodation:
         # Get address for the venue
         address = db.addresses.get(self.aid)
         return src.address.Address(*address[1:])
+
+    @property
+    def external_url(self):
+        return ''
+        #TODO: Fix this with db
+        #return self._external_url
+    
+    @property
+    def display_url(self):
+        return self.external_url.split('?')[0]
+
+    def url_base(self):
+        return self.external_url.split('//')[1].split('/')[0]

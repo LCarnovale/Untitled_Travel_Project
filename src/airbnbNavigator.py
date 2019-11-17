@@ -1,5 +1,6 @@
 import requests
 import re
+from datetime import datetime
 
 class Airbnb_Navigator:
     def seed_roots(self):
@@ -53,10 +54,9 @@ class Airbnb_Navigator:
         # This could be better
         carCount = 1 if 'Free parking on premises' else 0
 
-        description = ('(This ad was found at <a href="' + page_path + '">' + 
-                       page_path.split('?')[0] +'</a>)\n\n')
+        description = 'Description not found'
         try:
-            description += html.split('id="details"')[1].split('</span>')[0].split('<span>')[-1]
+            description = html.split('id="details"')[1].split('</span>')[0].split('<span>')[-1]
             description = description.replace('\\n', '\n')
         except IndexError:
             pass
@@ -77,6 +77,30 @@ class Airbnb_Navigator:
         lat = html.split('"lat":')[1].split(',')[0]
         lng = html.split('"lng":')[1].split(',')[0]
 
+        images = []
+        for img in html.split('<img')[1:]:
+            img = img.split('>')[0].split('src="')[1].split('"')[0]
+            if '/user' not in img:
+                images.append(img)
+
+        dates = []
+        api_key = html.split('"api_config"')[1].split('"key":"')[1].split('"')[0]
+        page_num = page_path.split('/rooms/')[1].split('?')[0]
+        for month in ['11', '12']:
+            date_path = 'https://www.airbnb.com.au/api/v2/homes_pdp_availability_calendar?currency=AUD&key='+api_key+'&locale=en-AU&listing_id='+page_num+'&month='+month+'&year=2019'
+            print('Grabbing dates:', date_path)
+
+            date_landing = requests.get(date_path)
+            date_html = str(date_landing.content)
+
+            for date in date_html.split('"date":"')[1:]:
+                if '"available":true' in date:
+                    minStay = int(date.split('"min_nights":')[1].split(',')[0]) + 1
+                    maxStay = int(date.split('"max_nights":')[1].split(',')[0]) + 1
+
+                    date = date.split('"')[0]
+                    dates.append(datetime.strptime(date, '%Y-%m-%d'))
+        
         return {
             'name':         name,
 
@@ -93,6 +117,9 @@ class Airbnb_Navigator:
             'minStay':      minStay,
             'maxStay':      maxStay,
             'details':      details,
+
+            'images':       images,
+            'dates':        dates,
 
             'ad_url':       page_path,
             'poster_url':   poster_url
