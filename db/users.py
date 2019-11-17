@@ -11,7 +11,7 @@ Table schema:
     5   description     text
     6   pwdhash         bytes
 """
-from helpers import dbCursor
+from helpers import dbCursor, InsertionError
 
 def get(id):
     """

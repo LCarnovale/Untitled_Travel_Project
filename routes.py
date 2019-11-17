@@ -172,8 +172,10 @@ def signup():
 
         if uid is not None:
             print("User successfully added.")
+            return redirect('/')
         else:
             print("User insert failed.")
+            return render_template('signup.html', err_msg="User signup failed.")
 
 
     return render_template('signup.html')

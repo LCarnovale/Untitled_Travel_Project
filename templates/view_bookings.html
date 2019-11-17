@@ -17,6 +17,15 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        .cards-container {
+            column-break-inside: avoid;
+        }
+
+        .card {
+            display: inline-block;
+            overflow: visible;
+        }
     </style>
     <img src="../static/nsw1.png" class='myimage'>
 </head>
@@ -26,11 +35,11 @@
             <a href="/" id="logo-container" class="brand-logo">
                 <i class="material-icons">home</i>
                 Untitled Travel</a>
-            <ul class="right hide-on-med-and-down">
+            <ul class="right hide-on-med-and-down"> <!-- Right side of navbar, hide when not a large screen-->
                 <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
                 <li><a href="{{url_for('logout')}}">Logout</a></li>
             </ul>
-            <ul id="nav-mobile" class="sidenav">
+            <ul id="nav-mobile" class="sidenav"> <!-- Visible only on medium and small screens (for mobile use) -->
                 <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
                 <li><a href="{{url_for('logout')}}">Logout</a></li>
             </ul>
@@ -43,32 +52,34 @@
         {% if bookings %}
         <!-- Cards for each booking -->
         <div class="row">
-        {% for b in bookings %}
-        {% set venue = ac.get_acc(b.venueid) %}
-            <div class="col s6 m6 l6">
+            {% for b in bookings %}
+                <div class="col s12 l4 cards-container"> <!--Add style="column-count:2" to change width of cards-->
+                {% set venue = ac.get_acc(b.venueid) %}
                 {% set images = venue.get_images() %}
                 <div class="card">
-                {% if images|length > 0 %}
                     <div class="card-image">
-                        <img src="{{images[0]}}">
-                {% else %}
-                    <div class="card red">
-                {% endif %}
-                        <span class="card-title">{{venue.name}}</span>
+                        <i href="/book/{{b.venueid}}">
+                            {% if images|length > 0 %}
+                            <img src="{{images[0]}}">
+                            {% else %}
+                            <img src="../static/nsw1.png">
+                            {% endif %}
+                        </i>
                     </div>
                     <div class="card-content">
-                        <!-- Text to be displayed on card -->
+                        <span class="card-title">{{venue.name}}</span>
                         Start: {{b.start_date}} <br>
                         End: {{b.end_date}} <br>
                         <p>I am a very simple card. I am good at containing small bits of information.
                             I am convenient because I require little markup to use effectively.</p>
                     </div>
                     <div class="card-action">
-                        <a href="/book/{{b.venueid}}">Go to booking</a>
+                        <a class="btn" href="/book/{{b.venueid}}">Go to booking</a>
                     </div>
                 </div>
+                </div>
+                {% endfor %}
             </div>
-        {% endfor %}
         </div>
         {% else %}
         <br>
