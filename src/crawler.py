@@ -49,7 +49,13 @@ class Crawler:
                 self._visit(page)
 
             else:
-                self._pages_to_explore = self._navigator.read_pages_from_route(self._root_pages.pop())
+                if not self._root_pages:
+                    print('Crawler starved, ending early')
+                    break
+
+                old_root = self._root_pages.pop()
+                self._pages_to_explore = self._navigator.read_pages_from_route(old_root)
+                self._root_pages += self._navigator.next_roots(old_root)
 
         print('Crawler, signing off...')
 
