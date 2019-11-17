@@ -16,7 +16,7 @@ from server import bookingSystem
 from server import app
 import db
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @app.errorhandler(404)
 def page_not_found(e):

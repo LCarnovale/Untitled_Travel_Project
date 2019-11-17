@@ -60,4 +60,7 @@ Worked on the frontend for booking accommodations and edited the calendar showin
 
 
 15/11/19
-Worked on frontend with making grids for the search results. Added image carousel for only search results. However there is a timing delay which wont display the images for a couple seconds.
+Worked on frontend with making grids for the search results. Added image carousel for only search results. However there is a timing delay which wont display the images for a couple seconds because it goes through every venue and slideshows the images for a specific venue before moving on.
+
+17/11/19
+Worked on changing the date ranges in the DB when making a booking

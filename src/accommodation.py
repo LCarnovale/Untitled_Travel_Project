@@ -56,7 +56,7 @@ class Accommodation:
         """
         avails = db.venues.get_availabilities(self._id)
         avails = [[x[2].strftime('%d-%m-%Y'), x[3].strftime('%d-%m-%Y')] for x in avails]
-
+        # TODO also remove dates that are booked and return new date ranges
         # return ['10-10-2019', '11-11-2019']
         return avails
 
