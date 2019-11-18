@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from geopy.distance import geodesic
-
+import src.review
 from src.accommodation import Accommodation
 
 class Search():
@@ -51,7 +51,15 @@ class Search():
             self._filterParking(int(parking))
 
         print('Done half')
-
+		
+        for id,score in self._scores: 
+            reviews = src.review.get_for_venue(id)
+            for review in reviews:
+                if review._recommends:
+                    score+= 1.0 
+                else:
+                    score-= 1.0
+                print((review._recommends))
         if location:
             if not distance:
                 distance = '2000'
@@ -59,6 +67,7 @@ class Search():
             self._filterLocation(location, distance)
 
         print('Done search.')
+        print(self._scores)
         return [x[0] for x in self._scores]
 
     def _keywordSearch(self, search):
@@ -134,6 +143,8 @@ class Search():
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (ad.bed_count >= beds):
+                if ad.bed_count == beds:
+                    score+=0.5
                 result.append((ad_id, score))
 
         self._scores = result
@@ -143,6 +154,8 @@ class Search():
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (ad.bath_count >= baths):
+                if ad.bath_count == baths:
+                    score+=0.5
                 result.append((ad_id, score))
 
         self._scores = result
@@ -152,6 +165,8 @@ class Search():
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (ad.car_count >= spots):
+                if ad.car_count == spots:
+                    score+=0.5
                 result.append((ad_id, score))
 
         self._scores = result
@@ -162,10 +177,13 @@ class Search():
         result = []
         lat = float(location.split(',')[0])
         lon = float(location.split(',')[1])
-
+        currentscore = 2.0
+        step = 2.0/(len(self._scores))
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
             if (geodesic((lat, lon), (ad.address.lat, ad.address.lng)).km <= dist/1000):
+                score+=currentscore
+                currentscore -= step
                 result.append((ad_id, score))
 
         self._scores = result

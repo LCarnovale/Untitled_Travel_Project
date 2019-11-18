@@ -177,7 +177,11 @@ def search_area_circle(centre, radius):
     WHERE ?>geography::Point(lat, lng, 4326).STDistance(geography::Point(?, ?, 4326))
     ORDER BY distance"""
     with dbCursor() as cursor:
-        cursor.execute(query, (*centre, radius, *centre))
+        print(centre)
+        centre = [float(x) for x in centre]
+        print(centre)
+        print(radius)
+        cursor.execute(query, (*centre, float(radius), *centre))
         result = cursor.fetchall()
         v_rows = [r[:13] for r in result]
         a_rows = [r[13:-1] for r in result]
