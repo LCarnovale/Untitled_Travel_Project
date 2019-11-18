@@ -148,6 +148,12 @@ def logout():
     return redirect(url_for('home'))
 
 '''
+Manage ads
+'''
+@app.route('/manage', methods=['GET', 'POST'])
+def manage():
+    abort(404)
+'''
 Signup page
 '''
 @app.route('/signup', methods=['GET', 'POST'])

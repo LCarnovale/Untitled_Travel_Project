@@ -52,8 +52,13 @@
         {% if bookings %}
         <!-- Cards for each booking -->
         <div class="row">
+            {% if bookings|length > 3 %}
+            <div class="col s12 cards-container" style="column-count:3"> <!--Add style="column-count:2" to change width of cards-->
+            {% endif %}
             {% for b in bookings %}
-                <div class="col s12 l4 cards-container"> <!--Add style="column-count:2" to change width of cards-->
+                {% if bookings|length <= 3 %}
+                <div class="col s12 m6 l4 cards-container">
+                {% endif %}
                 {% set venue = ac.get_acc(b.venueid) %}
                 {% set images = venue.get_images() %}
                 <div class="card">
@@ -77,8 +82,8 @@
                         <a class="btn" href="/book/{{b.venueid}}">Go to booking</a>
                     </div>
                 </div>
-                </div>
                 {% endfor %}
+            </div>
             </div>
         </div>
         {% else %}
