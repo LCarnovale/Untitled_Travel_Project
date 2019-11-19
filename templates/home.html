@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block head %}
 	<title>Untitled Travels</title>
-	<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
@@ -15,10 +15,17 @@
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			var elems = document.querySelectorAll('.collapsible');
+			var instances = M.Collapsible.init(elems, options);
+		});
+	</script>
+
 	<style>
 	#map {
-        height: 400px;
-		width: 400px;
+		height: 50vw;
+		width:  50vw;
 		margin-left: auto;
 		margin-right: auto;
       }
@@ -30,44 +37,77 @@
 {% endblock %}
 
 {% block content %}
-	<script>
-	function myFunction() {
-	  var x = document.getElementById("advancesearch");
-	  if (x.style.display == "none") {
-		x.style.display = "block";
-	  } else {
-		x.style.display = "none";
-	  }
-	  console.log(document.getElementById("map"));
-	  
-	}
-	</script>
-	
-    <!-- <p> <img src = "/static/nsw1.png"  style = "width: 250px;height: 250px"> </p> -->
-	<form id = 'searchForm' name = 'search' method = 'POST' >
-		<input type = "text" placeholder = "Search Address.." id = "searchgeocode" name = "search">
-		<input type = "hidden" name = "geocodedvalue" id = "geocodedvalue" readonly>
-		<button type = "submit" style="height: 30px;width: 75px">Submit</button>
-		<br><br>
-		Distance Radius: <output name="radiusrange" id="radiusrange">100</output> m
-		<br>
-		<input type = "range" name= "distance" id = "radiuschange" min = "100" max = "5000" value = "100" oninput = "changeCircle(this.value)">
-		<div id="map"></div>
-		<br><br><br>
-		<p><button type = "button" onclick="myFunction()" style="height: 30px;width: 150px">Advanced Search</button></p>
-		
-		<div id = advancesearch style = "display:none;">
-			<input type = "text" id = "keyword" name = "keyword" placeholder = "Search keyword..">
-			<br>
-			<br>
-			<input type="text" id="dates" name = "dates" placeholder = "Date Range..">
-			Beds: <input type= "number" name = "beds" max = "5" min = "1" placeholder>
-			Bathrooms: <input type= "number" name = "bathrooms" max  = "5" min = "1" >
-			Parking Spaces: <input type= "number" name = "parking" max  = "3" min = "0" >
+<form method='POST'>
+	<div class="container">
+		<div class="row">
+			<div class="col s12">
+				<div class="input-field col s10">
+				<input type="text" id="searchgeocode" name="search">
+				<label for="searchgeocode" id="searchlabel">Search for Accomodation</label>
+				</div><div class="col s2">
+					<br>
+				<button type="submit" class="btn">Search</button>
+				</div>
+			</div>
 		</div>
-	</form>
+		<input type = "hidden" name = "geocodedvalue" id = "geocodedvalue" readonly>
+
+		<div class="col s12">
+			<p class="range-field">
+				<input type="range" id="radiuschange" min="0" max="5000" start="0" oninput="changeCircle(this.value)"/>
+			</p>
+		</div>
+		<div class="center-align">
+			Distance Radius: <output name="radiusrange" id="radiusrange">--</output> m
+		</div>
+		<ul class="collapsible">
+			<li>
+				<div class="collapsible-header"><i class="material-icons">add</i>Advanced Search</div>
+				<div class="collapsible-body">
+					<div class="row">
+						<div class="input-field">
+							<input type="text" id="keywordinput" name="keyword">
+							<label for="keywordinput">Keyword search</label>
+						</div>
+					</div>
+					<div class="row" id="advancesearch">
+						<input type="text" id="dates" name="dates" placeholder="Date Range..">
+						<div>
+							<div class="col s8">
+								<p>Beds:</p>
+							</div>
+							<div class="col s4">
+								<input type="number" name="beds" max="99" min="1" value="1" step="1">
+							</div>
+							<div class="col s8">
+								<p>Bathrooms:</p>
+							</div>
+							<div class="col s4">
+								<input type="number" name="beds" max="99" min="1" value="1" step="1">
+							</div>
+							<div class="col s8">
+								<p>Parking Spaces:</p>
+							</div>
+							<div class="col s4">
+								<input type="number" name="beds" max="99" min="1" value="1" step="1">
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</li>
+		</ul>
+
+			<br>
+			<div class="col s12">
+				<div id="map" class="center-align"></div>
+			</div>
+		</form>
+	</div>
+</form>
 	
     <script>
+
 		var map;
 		var markerlist = [];
 		var circlelist = [];
@@ -93,7 +133,9 @@
 				geocoder.geocode({'location': event.latLng}, function(results, status) {
 						if (status === 'OK') {
 							if (results[0]) {
-								document.getElementById("searchgeocode").value = results[0].formatted_address;
+								var searchBox = document.getElementById('searchgeocode');
+								searchBox.value = results[0].formatted_address;
+								M.updateTextFields(); // Raise the label in the search box
 							} 
 							else {
 								alert('No results found');
@@ -115,7 +157,7 @@
 			}
 		}
 		var typingTimer;                //timer identifier
-		var doneTypingInterval = 5000;  //time in ms (5 seconds)
+		var doneTypingInterval = 1000;  //time in ms
 		function getgeocode(){
 			
 			geocoder.geocode({
@@ -138,18 +180,16 @@
 								console.log(document.getElementById('geocodedvalue').value)
 								console.log(results[0].geometry.location)
 								var radius = google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location,results[0].geometry.bounds.getSouthWest());
-								document.getElementById("radiusrange").value = radius
+								document.getElementById("radiusrange").value = radius.toFixed(0);
 								var circle = new google.maps.Circle({map: map, radius: radius, fillColor: '#AA0000'});
 								circle.bindTo('center', marker, 'position');
 								circlelist.push(circle)
 								console.log('Result: ' + results);
 							} else {
 								console.log('No results found');
-								//alert('No results found');
 							}
 						} else {
 							console.log('Geocoder failed due to: ' + status);
-							//alert('Geocoder failed due to: ' + status);
 						}
 					});
 		}
@@ -180,7 +220,10 @@
     });
     $('#dates').on('apply.daterangepicker', function(ev, picker) {
     	$(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
-    });
+	});
+	$(document).ready(function () {
+		$('.collapsible').collapsible();
+	});
 </script>
 	<!-- Actual link: -->	
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&libraries=geometry&callback=initMap" async defer></script>
