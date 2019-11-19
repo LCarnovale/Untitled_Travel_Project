@@ -78,7 +78,7 @@ def home():
                 enddate = None
 
             location = request.form.get('geocodedvalue')
-            distance = request.form.get('distance')
+            distance = request.form.get('radiusval')
             if location:
                 print("getting venues near", location)
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True

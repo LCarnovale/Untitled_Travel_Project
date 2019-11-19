@@ -239,6 +239,12 @@ class Accommodation:
         return src.address.Address(*address[1:])
 
     @property
-    def url(self):
-        # Get the url of the source of this venue.
+    def external_url(self):
         return self._url
+    
+    @property
+    def display_url(self):
+        return self.external_url.split('?')[0]
+
+    def url_base(self):
+        return self.external_url.split('//')[1].split('/')[0]

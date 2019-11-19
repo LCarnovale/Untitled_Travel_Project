@@ -160,3 +160,26 @@ Bryan:
 By next week, we will hopefully have all the intended functionality in place, and next week we intend to just test and make the front-end into the style that will be used for final presentation
 
 We still do not know when the final report will be due, and so our workload next week will change depending on this information.
+
+
+
+Week 10
+
+The report is due week 11 tuesday, so we have plenty of time to finish it.
+
+The web crawler is finished, and we have decided it will exist on a separate server instance so as to not have any synchronisation issues with the main server.
+
+The only real things we have left to do (feature-wise) is to finish the web crawler (which we have opted to only have crawl airbnb for now), and to order search results better.
+
+Other than that, a significant amount of work should be done on polishing the frontend, so Byran, Ince and Leo will work on that from now until friday. I will make sure everyone is in sync regarding the style. We plan to meet in person on friday at 2pm, so that it is easier to fix any last minute integration issues we may have.
+
+As the scrum master, I will focus on starting the report and writing about group management and challenges/benefits of teamwork, as this was my main focus.
+
+
+Small features we are working on:
+
+Ian/Leo: Integrate crawler finally and get it running on separate server
+Bryan: Variable distance slider, search scores/ranking backend, testing
+
+
+Over the weekend, we plan to just test and write the report, as well as plan our demonstration based on the marking criteria.
