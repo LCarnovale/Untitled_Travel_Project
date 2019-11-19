@@ -6,6 +6,7 @@
 {% block content %}
 	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
 	<h2> Please enter your details: </h2>
+	<a href="{{url_for('signup_owner')}}">Signing up as a host? Click here!</a>
 	<form name='post_ad' id = "regForm" method='POST'>
 		<div class = "tab">Personal Details
 			<p><input name = "account_name" placeholder = "Name" class = "required"></p>
