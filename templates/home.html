@@ -51,7 +51,7 @@
 
 		<div class="col s12">
 			<p class="range-field">
-				<input type="range" id="radiuschange" min="0" max="5000" start="0" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
+				<input type="range" id="radiuschange" min="0" max="6" start="0" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
 			</p>
 		</div>
 		<div class="center-align">
@@ -150,11 +150,11 @@
 		}
 		var distancevalues = [500,1000,1500,2000,3000,4000,5000];
 		function changeCircle(newval){
-			document.getElementById("radiusrange").value = newval//distancevalues[newval];
+			document.getElementById("radiusrange").value = distancevalues[newval];
 			for (i = 0;i<circlelist.length;i++){
 				if(circlelist[i]==null)
 					continue;
-				circlelist[i].setRadius(parseInt(newval));
+				circlelist[i].setRadius(parseInt(distancevalues[newval]));
 			}
 		}
 		var typingTimer;                //timer identifier
@@ -192,6 +192,7 @@
 								}
 								document.getElementById("radiuschange").value = currindex;
 								document.getElementById("radiusrange").value = distancevalues[currindex];
+								document.getElementById("radiusval").value = distancevalues[currindex];
 								var circle = new google.maps.Circle({map: map, radius: distancevalues[currindex], fillColor: '#AA0000'});
 								circle.bindTo('center', marker, 'position');
 								circlelist.push(circle);
