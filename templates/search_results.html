@@ -27,58 +27,56 @@
             overflow: visible;
         }
     </style>
-    <img src="../static/nsw1.png" class='myimage'>
 {% endblock %}
 
 {% block content %}
-    <!-- Nav Bar -->
-    <nav class="light-blue lighten-1" role="navigation">
-        <div class="nav-wrapper container">
-            <a href="/" id="logo-container" class="brand-logo">
-                <i class="material-icons">home</i>
-                Untitled Travel</a>
-            <ul class="right hide-on-med-and-down"> <!-- Right side of navbar, hide when not a large screen-->
-                <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
-                <li><a href="{{url_for('logout')}}">Logout</a></li>
-            </ul>
-            <ul id="nav-mobile" class="sidenav"> <!-- Visible only on medium and small screens (for mobile use) -->
-                <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
-                <li><a href="{{url_for('logout')}}">Logout</a></li>
-            </ul>
-            <a href="#" data-target="nav-mobile" class="sidenav-trigger">
-                <i class="material-icons">menu</i></a>
+   <div class="container">
+        {% if results %}
+        <!-- Cards for each booking -->
+        <div class="row">
+            {% if results|length > 3 %}
+            <div class="col s12 cards-container" style="column-count:3"> <!--Add style="column-count:2" to change width of cards-->
+            {% endif %}
+            {% for venue in results %}
+                {% if results|length <= 3 %}
+                <div class="col s12 m6 l4 cards-container">
+                {% endif %}
+                {% set images = venue.get_images() %}
+                <div class="card">
+                    <div class="card-image">
+                        <i href="/book/{{venue.venueid}}">
+                            {% if images|length > 0 %}
+                            <img src="{{images[0]}}" class="venueimg">
+                            {% else %}
+                            <img src="../static/nsw1.png" class="venueimg">
+                            {% endif %}
+                        </i>
+                    </div>
 
+                    <div class="card-content">
+                        <span class="card-title activator grey-text text-darken-4">{{venue.name}}<i class="material-icons right">more_vert</i></span>
+                    </div>
+                    <div class="card-reveal">
+                        <span class="card-title grey-text text-darken-4">{{venue.name}}<i class="material-icons right">close</i></span>
+                        <p>Desc: {{venue.description}}</p>
+                        <p>Addr: {{venue.address.street_address}}</p>
+                        <p>Bed: {{venue.bed_count}} Bath: {{venue.bath_count}} Cars: {{venue.car_count}}</p>
+                        <p>Price: {{venue.rate}} / night </p>
+                        <p>Min Stay: {{venue.min_stay}} Max Stay: {{venue.max_stay}}</p>
+                    </div>
+                    <div class="card action">
+                        <a class="btn" href="/book/{{venue.id}}">Go to booking</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
         </div>
-    </nav>
-<!--    {% if results %}-->
-<!--<div class="grid">-->
-<!--        {% for result in results %}-->
-<!--            <div class="flip-card">-->
-<!--                <div class="flip-card-inner">-->
-<!--                    <div class="flip-card-front">-->
-<!--                        <h1 style="font-size: 35px;"> {{result.name}} </h1>-->
-<!--                        {% if result.get_images() %}-->
-<!--                            {% for img in result.get_images() %}-->
-<!--                                <div class="mySlides fade">-->
-<!--                                <img src="{{img}}" class="img">-->
-<!--                                </div>-->
-<!--                            {% endfor %}-->
-<!--                        {%endif%}-->
-<!--                    </div>-->
-<!--                    <div class="flip-card-back">-->
-<!--                        <p> {{result.details}}</p>-->
-<!--                        <p>Price {{result.rate}} / night</p>-->
-<!--                        <p> Min nights: {{result.min_stay}}, Max nights: {{result.max_stay}}</p>-->
-<!--                        <p> {{result.address.street_address}}</p>-->
-<!--                        <p><a href = "/book/{{result.id}}"> See more info </a></p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        {% endfor %}-->
-<!--    </div>-->
-<!--    {% else %}-->
-<!--        <p class = "no_results"> Sorry, there were no places matching your search. Please try again. </p>-->
-<!--    {% endif %}-->
+        {% else %}
+        <br>
+        <p> Couldn't find places
+        {% endif %}
+
 
 
 <!--<script>-->
