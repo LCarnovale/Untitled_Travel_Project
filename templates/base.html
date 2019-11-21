@@ -1,56 +1,89 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!--Import Google Icon Font-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/materialize.min.css')}}"
+      media="screen,projection" />
+  
+    <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen"> -->
+
     <style type="text/css">
-      .container {
-        padding-top: 100px;
-        margin-left: auto; 
-        margin-right: auto; 
-        display:block;
+      .myimage {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      div.centre {
         text-align: center;
       }
-        .topnav ul{
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #333333;
-        }
-        .topnav li {
-            float: left;
-        }
-        .topnav li a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 5px 60px;
-            text-decoration: none;
-            /* text-transform: uppercase; */
-            font-size: 20px;
-        }
-        .topnav li a:hover {
-            background-color: #4CAF50;
-            /* background-color: #f6f6f6; */
-        }
-        form {
-            display: inline-block;
-        }
-        #hiuser{
-            color : #ffffff;
-        }
+/*     
+      .cards-container {
+        column-break-inside: avoid;
+      }
+    
+      .card {
+        display: inline-block;
+        overflow: visible;
+      } */
     </style>
+    <img src="../static/nsw1.png" class='myimage'>
     {% block head %}{% endblock %}
   </head>
   <body>	
-
-    <nav class = "topnav">
+    <nav class="light-blue lighten-1" role="navigation">
+      <div class="nav-wrapper container">
+        <a href="/" id="logo-container" class="brand-logo">
+          <i class="material-icons">home</i>Untitled Travel</a>
+        <ul class="right hide-on-med-and-down">
+          <!-- Right side of navbar, hide when not a large screen-->
+          {% if session['login_type'] == 'owner' %}
+          <li><a href="{{url_for('ad_main')}}">Post an Ad</a></li>
+          <li><a href="{{url_for('manage')}}">Manage Ads</a></li>
+          <li><a href="{{url_for('logout')}}">Logout</a></li>
+          {% elif session['login_type'] == 'user' %}
+          <li><a href="{{url_for('view_bookings')}}">View Bookings</a>
+          <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
+          <li><a href="{{url_for('logout')}}">Logout</a></li>
+          {% else %}
+          <li><a href="{{url_for('login')}}">Login</a></li>
+          {% endif %}
+        </ul>
+        <ul id="nav-mobile" class="sidenav">
+          <!-- Visible only on medium and small screens (for mobile use) -->
+          {% if session['login_type'] == 'owner' %}
+          <li><a href="{{url_for('ad_main')}}">Post an Ad</a></li>
+          <li><a href="{{url_for('manage')}}">Manage Ads</a></li>
+          <li><a href="{{url_for('logout')}}">Logout</a></li>
+          {% elif session['login_type'] == 'user' %}
+          <li><a href="{{url_for('view_bookings')}}">View Bookings</a>
+          <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
+          <li><a href="{{url_for('logout')}}">Logout</a></li>
+          {% else %}
+          <li><a href="{{url_for('login')}}">Login</a></li>
+          {% endif %}
+        </ul>
+        <a href="#" data-target="nav-mobile" class="sidenav-trigger">
+          <i class="material-icons">menu</i></a>
+    
+      </div>
+    </nav>
+    <!-- <nav class = "topnav">
       <div>
         <div>
           <a href="/"> <img src = "/static/nsw1.png" style = "width: 200px;height: 200px"></a>
         </div>
-<!--        Dev info <br>-->
-<!--        Database Connected: {{is_connected}} <br>-->
         <div><ul>
             <li><a href="{{url_for('home')}}">Home</a></li>
             {% if session['login_type'] == 'user' %}
@@ -70,7 +103,7 @@
       {% if err_msg %}
       <label style="text-align:center; width:100%; color:red">{{err_msg}}</label>
       {% endif %}
-    </nav>
+    </nav> -->
     <div class="container">
       <br>
       {% block content %}{% endblock %}
@@ -78,4 +111,8 @@
     </div>
     
   </body>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="{{url_for('static', filename='js/materialize.js')}}"></script>
+  <script type="text/javascript" src="{{url_for('static', filename='js/init.js')}}"></script>
+
 </html>

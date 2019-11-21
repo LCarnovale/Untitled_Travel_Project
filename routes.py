@@ -78,7 +78,7 @@ def home():
                 enddate = None
 
             location = request.form.get('geocodedvalue')
-            distance = request.form.get('distance')
+            distance = request.form.get('radiusval')
             if location:
                 print("getting venues near", location)
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
@@ -110,7 +110,17 @@ Message: {str(e)}""")
 Login page
 '''
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login(uid=None, u_t='user'):
+    if uid is not None:
+        # Log them in in the background
+        user = userSystem.get_user(uid, u_t)
+        session['login_type'] = u_t
+        session['id'] = uid
+        d = user.todict()
+        for k, v in zip(d.keys(), d.values()):
+            session[k] = v
+        return True
+
     if request.method == 'POST':
         # Attempt a Login
         form = request.form
@@ -148,9 +158,48 @@ def logout():
     return redirect(url_for('home'))
 
 '''
+Manage ads
+'''
+@app.route('/manage', methods=['GET', 'POST'])
+def manage():
+    abort(404)
+
+'''
+Owner Signup
+'''
+@app.route('/signup/owner', methods=['GET', 'POST'])
+def signup_owner():
+    if request.method == 'POST':
+        form = request.form
+        name = form['name_input']
+        uname = form['uname_input']
+        pwd = form['password_input']
+        email = form['email_input']
+        phone = form['phone_input']
+        desc = form['desc_input']
+
+        # TODO: validate input.
+
+        try:
+            uid = userSystem.create_owner(
+                name, uname, pwd, email, phone, desc
+            )
+        except Exception as e:
+            # TODO: Return errors properly
+            print(e)
+            return render_template('signup_owner.html', err_msg=str(e))
+        else:
+            login(uid, 'owner')
+            return redirect('/')
+
+
+    return render_template('signup_owner.html')
+
+
+'''
 Signup page
 '''
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup/user', methods=['GET', 'POST'])
 def signup():
     form = request.form
     if request.method == 'POST':
@@ -176,6 +225,7 @@ def signup():
         else:
             print("User insert failed.")
             return render_template('signup.html', err_msg="User signup failed.")
+
 
 
     return render_template('signup.html')

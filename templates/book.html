@@ -11,6 +11,10 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src = "{{ url_for('static',filename = 'star_rating.js')}}"></script>
     <!-- Script for calendar-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/resources/demos/style.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -80,6 +84,9 @@
 <div class="grid-container">
     <div class="header">
         <h1 style="font-style: oblique; font-size: 60px;">{{acc.name}}</h1>
+        {% if acc.external_url %}
+        <i>This ad was found at <a href="{{acc.external_url}}">{{acc.display_url}}</a></i>
+        {% endif %}
     </div>
 <!-- Content Layout -->
 
@@ -110,13 +117,19 @@
         <p>Price: {{acc.rate}} / night</p>
         <p>Availability:</p>
         <p class = "good_msg">This place is currently available!</p>
-        <form name='book_acc' method='POST'>
-            <input type="text"  id="dateRange required" value="Booking Dates" class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
-            <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
-            <p><input name = "book_start" type = "hidden" id="book_start"></p>
-            <p><input name = "book_end" type = hidden id="book_end"></p>
-            <input type="submit" value="Book this room"/>
-        </form>
+
+        {% if acc.external_url %}
+            <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
+        {% else %}
+            <form name='book_acc' method='POST'>
+                <input type="text"  id="dateRange, required" value="Booking Dates"class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
+                <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
+                <p><input name = "book_start" type = "hidden" id="book_start"></p>
+                <p><input name = "book_end" type = hidden id="book_end"></p>
+                <input type="submit" value="Book this room"/>
+            </form>
+        {% endif %}
+
     </div>
 
     <div class="review_container footer">
