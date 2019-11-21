@@ -15,6 +15,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			var elems = document.querySelectorAll('.collapsible');
 			var instances = M.Collapsible.init(elems, options);
+			updateRadius(2500);
 		});
 	</script>
 
@@ -38,11 +39,11 @@
 		<div class="row">
 			<div class="col s12">
 				<div class="input-field col s10">
-				<input type="text" id="searchgeocode" name="search">
+				<input type="text" id="searchgeocode" name="search" oninput="changeSearch(this.value)">
 				<label for="searchgeocode" id="searchlabel">Search for Accomodation</label>
 				</div><div class="col s2">
 					<br>
-				<button type="submit" class="btn">Search</button>
+				<button type="submit" class="btn" id="searchBtn" disabled>Search</button>
 				</div>
 			</div>
 		</div>
@@ -51,12 +52,12 @@
 
 		<div class="col s12">
 			<p class="range-field">
-				<input type="range" id="radiuschange" min="0" max="5000" start="0" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
+				<input type="range" id="radiuschange" min="100" max="5000" start="2500" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
 			</p>
 		</div>
 		<div class="center-align">
 			Distance Radius: <output name="radiusrange" id="radiusrange">--</output> m
-		</div>
+		<!-- </div> -->
 		<ul class="collapsible">
 			<li>
 				<div class="collapsible-header"><i class="material-icons">add</i>Advanced Search</div>
@@ -132,7 +133,9 @@
 							if (results[0]) {
 								var searchBox = document.getElementById('searchgeocode');
 								searchBox.value = results[0].formatted_address;
+								document.getElementById("searchBtn").disabled = false; // enable search button
 								M.updateTextFields(); // Raise the label in the search box
+
 							} 
 							else {
 								alert('No results found');
@@ -147,7 +150,23 @@
 		}
 		function updateRadius(newval) {
 			document.getElementById("radiusval").value = newval;
+		// 	if (document.getElementById("searchgeocode").value != '') {
+		// 		document.getElementById("searchBtn").disabled = false;
+		// 	}
 		}
+
+		function changeSearch(newval) {
+			if (newval == '') {
+				document.getElementById("searchBtn").disabled = true;
+			} else {
+				// if (document.getElementById("radiusval").value != null) {
+					document.getElementById("searchBtn").disabled = false;
+				// } else {
+				// 	document.getElementById("searchBtn").disabled = true;
+				// }
+			}
+		}
+
 		var distancevalues = [500,1000,1500,2000,3000,4000,5000];
 		function changeCircle(newval){
 			document.getElementById("radiusrange").value = newval//distancevalues[newval];

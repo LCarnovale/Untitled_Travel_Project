@@ -17,6 +17,7 @@
 {% block content %}
 <form method="POST">
     <div class="container">
+        <a href="{{url_for('signup')}}">Sign up as a User</a>
         <ul class="collapsible">
             <li class="active">
                 <div class="collapsible-header"><i class="material-icons">person</i>About you</div>
@@ -59,7 +60,7 @@
                             <label for="phone_input">Phone Number</label>
                         </div>
                         <div class="input-field col s12">
-                            <input type="password" id="password_input" name="password_input" class="validate" oninput="checkPassMatch()">
+                            <input type="password" id="password_input" name="password_input" oninput="checkPassMatch()">
                             <label for="password_input">Password</label>
                         </div>
                         <div class="input-field col s12">

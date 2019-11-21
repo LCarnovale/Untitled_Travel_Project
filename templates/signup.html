@@ -6,9 +6,9 @@
 {% block content %}
 	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
 	<h2> Please enter your details: </h2>
-	<a href="{{url_for('signup_owner')}}">Signing up as a host? Click here!</a>
 	<form method='POST'>
-			<div class="container">
+		<div class="container">
+				<a href="{{url_for('signup_owner')}}">Signing up as a host? Click here!</a>
 				<ul class="collapsible">
 					<li class="active">
 						<div class="collapsible-header"><i class="material-icons">person</i>About you</div>
