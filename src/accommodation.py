@@ -1,6 +1,7 @@
 import db
 import datetime
 import src
+from datetime import datetime, timedelta, time
 
 class NegativeNumberError(Exception):
     pass
@@ -54,11 +55,55 @@ class Accommodation:
             ]
         With all dates as d-m-yy
         """
+        # Get availability from the database
         avails = db.venues.get_availabilities(self._id)
-        avails = [[x[2].strftime('%d-%m-%Y'), x[3].strftime('%d-%m-%Y')] for x in avails]
-        # TODO also remove dates that are booked and return new date ranges
-        # return ['10-10-2019', '11-11-2019']
-        return avails
+
+        # Get all bookings for this venue
+        dates = db.bookings.get_for_venue(self._id)
+
+        # If there are no booking dates, then return available
+        if (not dates):
+            avails = [[x[2].strftime('%d-%m-%Y'), x[3].strftime('%d-%m-%Y')] for x in avails]
+            return avails
+
+        availableDates = [[x[2], x[3]] for x in avails]
+
+        for i in range(0, len(dates)):
+            for j in range(0, len(availableDates)):
+                # Get the start and end times for the venue from db
+                startAvail = availableDates[j][0]
+                endAvail = availableDates[j][1]
+
+                # Get the booking start and end dates
+                bookStart = dates[i][3]
+                bookEnd = dates[i][4]
+                # TODO INSERT INSTEAD OF APPEND AND REMOVE THE DATERANGE
+                # booking range is within the range from DB
+                if bookStart >= startAvail and bookEnd <= endAvail:
+                    # Remove the start and end time and replace with new start and end
+                    # case 1, bookStart = startAvail and bookEnd < endAvail
+                    if bookStart == startAvail and bookEnd < endAvail:
+                        availableDates.pop(j)
+                        availableDates.insert(j,[(bookEnd+timedelta(days=1)), endAvail])
+                        continue
+                    # case 2, bookEnd = endAvail, bookStart > startAvail
+                    elif bookEnd == endAvail and bookStart > startAvail:
+                        availableDates.pop(j)
+                        availableDates.insert(j,[startAvail, (bookStart-timedelta(days=1))])
+                        continue
+                        # case 3, bookStart > startAvail and bookEnd < endAvail
+                    elif bookStart > startAvail and bookEnd < endAvail:
+                            availableDates.pop(j)
+                            availableDates.insert(j,[startAvail, (bookStart - timedelta(days=1))])
+                            availableDates.insert(j+1,[(bookEnd + timedelta(days=1)), endAvail])
+                            continue
+                        # case 4, bookStart = startAvail and bookEnd = endAvail
+                    elif bookStart == startAvail and bookEnd == endAvail:
+                            # then the available range is unavailable
+                            continue
+
+        availableDates = [[x[0].strftime('%d-%m-%Y'), x[1].strftime('%d-%m-%Y')] for x in availableDates]
+        return availableDates
 
     def isAvailable(self, startDate, endDate=None):
         """
