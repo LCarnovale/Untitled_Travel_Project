@@ -206,26 +206,26 @@ def signup():
         # Create user.
         try:
             uid = userSystem.create_user(
-                form['account_name'],
-                form['account_username'],
-                form['account_password'],
-                form['account_email'],
-                form['account_phone'],
-                form['account_description']
+                form['name_input'],
+                form['uname_input'],
+                form['password_input'],
+                form['email_input'],
+                form['phone_input'],
+                form['desc_input']
             )
         except US.UserCreateError as e:
             if e.col == 'userName':
                 return render_template('signup.html', username_taken=True)
             if e.col == 'email':
                 return render_template('signup.html', invalid_email=True)
-
         if uid is not None:
             print("User successfully added.")
+            login(uid)
             return redirect('/')
         else:
             print("User insert failed.")
             return render_template('signup.html', err_msg="User signup failed.")
-
+        
 
 
     return render_template('signup.html')
