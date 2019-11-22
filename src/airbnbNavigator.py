@@ -1,6 +1,7 @@
 import requests
 import re
 from datetime import datetime
+import time
 
 class Airbnb_Navigator:
     def seed_roots(self):
@@ -8,7 +9,7 @@ class Airbnb_Navigator:
 
     def next_roots(self, prev_root):
         if 'items_offset' in prev_root:
-            prev_offset = int(prev_root.split('=')[-1])
+            prev_offset = prev_root.split('=')[-1]
             new_offset = str(int(prev_offset) + 18)
             return [prev_root.replace('items_offset='+prev_offset, 'items_offset='+new_offset)]
 
@@ -37,12 +38,40 @@ class Airbnb_Navigator:
         landing = requests.get(page_path)
         html = str(landing.content)
 
-        name = html.split('id="summary"')[1].split('</h1>')[0][:-7].split('>')[-1]
+        i = 0
+        while i < 10:
+            if html.split('"lat":')[1].split(',')[0] != 'null':
+                break
+            print('Retrying due to null location...')
+            time.sleep(1)
 
-        location = html.split('data-location="')[1].split('"')[0]
+            landing = requests.get(page_path)
+            html = str(landing.content)
+
+            i += 1
+
+        if i == 10:
+            raise Exception('Couldn\'t get location')
+
+        try:
+            name = html.split('id="summary"')[1]
+            name = name.split('</h1>')[0][:-7]
+            name = name.split('>')[-1]
+        except:
+            print('Newname')
+            name = html.split('"listingTitle":"')[1].split('"')[0]
+
+        try:
+            location = html.split('data-location="')[1].split('"')[0]
+        except:
+            location = html.split(' for Rent in ')[1].split('"')[0]
+            #location = html.split('"id":"neighborhood-preview_')[1].split('"title":"')[1].split('"')[0]
 
         poster_url = 'https://www.airbnb.com.au'
-        poster_url += html.split('id="summary"')[1].split('</a>')[0].split('href="')[1].split('"')[0]
+        try:
+            poster_url += html.split('id="summary"')[1].split('</a>')[0].split('href="')[1].split('"')[0]
+        except:
+            poster_url += '/users/' + html.split('href="/users/')[1].split('"')[0]
 
         bedCount = re.search(r'>([0-9]+) beds?</div>', html)
         bedCount = bedCount.group(1) if bedCount else 0
@@ -58,8 +87,11 @@ class Airbnb_Navigator:
         try:
             description = html.split('id="details"')[1].split('</span>')[0].split('<span>')[-1]
             description = description.replace('\\n', '\n')
-        except IndexError:
-            pass
+        except IndexError as e:
+            description = html.split('section.htmlDescription":')[1].split('"htmlText":"')[1].split('"')[0]
+            description = description.replace('\\\\u003cbr />', '\n')
+            description = description.replace('\\\\u003c/b>', '')
+            description = description.replace('\\\\u003cb>', '')
 
         rate = re.search(r'for \$([0-9\.]+)\.', html)
         rate = rate.group(1) if rate else 0

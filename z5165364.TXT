@@ -60,4 +60,12 @@ Worked on the frontend for booking accommodations and edited the calendar showin
 
 
 15/11/19
-Worked on frontend with making grids for the search results. Added image carousel for only search results. However there is a timing delay which wont display the images for a couple seconds.
+Worked on frontend with making grids for the search results. Added image carousel for only search results. However there is a timing delay which wont display the images for a couple seconds because it goes through every venue and slideshows the images for a specific venue before moving on.
+
+17/11/19
+Worked on changing the date ranges in the DB when making a booking. Instead im modifying the get_dates function to get all available dates in the database and then get all the booking date ranges and return the new available date ranges for the venue. Main problem was working with changing datetime.datetime, datetime.date objects and strings.
+
+20/11/19
+Finished the booking dates. Working on the frontend for search results page.
+
+22/11/10 Working on book.html page.
