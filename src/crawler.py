@@ -49,7 +49,8 @@ class Crawler:
                 page = self._pages_to_explore.pop()
                 try:
                     self._visit(page)
-                except: pass
+                except:
+                    print('Error visiting page, skipping...')
             else:
                 if not self._root_pages:
                     print('Crawler starved, ending early')
