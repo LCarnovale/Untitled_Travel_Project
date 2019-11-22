@@ -72,7 +72,7 @@ class AccommodationSystem:
         `point` should be a lat-lon pair.
         """
         venues, addresses, dists = db.venues.search_area_circle(point, distance)
-
+        print(venues)
         if refine:
             _refine(self._accommodations, [v[0] for v in venues],
                     venues, addresses, dists)
