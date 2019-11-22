@@ -4,7 +4,7 @@ from airbnbNavigator import Airbnb_Navigator
 import db
 from datetime import datetime, timedelta
 
-DELAY = 5 # seconds
+DELAY = 3 # seconds
 LIMIT = 100 # Total pages that can be opened by one crawler
 
 
@@ -49,8 +49,9 @@ class Crawler:
                 page = self._pages_to_explore.pop()
                 try:
                     self._visit(page)
-                except:
+                except Exception as e:
                     print('Error visiting page, skipping...')
+                    raise e
             else:
                 if not self._root_pages:
                     print('Crawler starved, ending early')
@@ -69,6 +70,10 @@ class Crawler:
 
         venueid = -1
 
+        #for key in result:
+        #    print(key, ':', result[key])
+
+        '''
         aid = db.addresses.insert(result['location'],
                                   result['lat'].strip(),
                                   result['lng'].strip())
@@ -84,6 +89,7 @@ class Crawler:
             db.images.insert(venueid, url)
 
         self._simplifyDates(venueid, result['dates'])
+        '''
 
         self._opened += 1
 

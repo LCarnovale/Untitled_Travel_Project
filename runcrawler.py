@@ -10,7 +10,7 @@ if __name__ == '__main__':
     print('Thread started')
 
     try:
-        time.sleep(600)
+        time.sleep(900)
     except KeyboardInterrupt:
         print("** Killing crawler")
     else:
