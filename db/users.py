@@ -12,7 +12,7 @@ Table schema:
     6   pwdhash         bytes
 """
 from helpers import dbCursor, InsertionError
-
+import pyodbc
 def get(id):
     """
     Return a single user with the matching id from the database
@@ -55,7 +55,7 @@ def insert(name, userName, password, email=None, phone=None, description=None):
         if (cursor.execute("SELECT * FROM users WHERE username = ?", userName).fetchone()):
             raise InsertionError(
                 "Username already exists in users table.", col='userName', _type='duplicate')
-
+        print(name,userName, password, email, phone, description)
         try:
             cursor.execute(
                 "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \

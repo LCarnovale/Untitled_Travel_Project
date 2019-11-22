@@ -199,13 +199,7 @@ def signup():
     if request.method == 'POST':
         # Create user.
         try:
-            uid = userSystem.create_user(
-                form['account_name'],
-                form['account_username'],
-                form['account_password'],
-                form['account_email'],
-                form['account_phone'],
-                form['account_description']
+            uid = userSystem.create_user(form['name_input'],form['uname_input'],form['password_input'],form['email_input'],form['phone_input'],form['desc_input']
             )
         except US.UserCreateError as e:
             if e.col == 'userName':
