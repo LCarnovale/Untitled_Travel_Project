@@ -1,5 +1,7 @@
 import db
 from booking import Booking
+from accommodationSystem import AccommodationSystem
+from accommodation import Accommodation
 
 class BookingSystem:
     def __init__(self):
@@ -19,6 +21,7 @@ class BookingSystem:
         new_bookingid = db.bookings.insert(venueid, userid, startDate, endDate)
         new_booking = Booking(venueid, userid, startDate, endDate)
         self.add_booking(new_bookingid, new_booking)
+
         return new_bookingid
 
     def get_booking(self, bookid):
@@ -37,5 +40,4 @@ class BookingSystem:
                 return book
             else:
                 return None
-
 

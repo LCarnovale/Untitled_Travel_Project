@@ -16,7 +16,7 @@ from server import bookingSystem
 from server import app
 import db
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -30,7 +30,7 @@ def home():
     
     if request.method == 'POST':
         try:
-            search = request.form.get('search')
+            keyword = request.form.get('keyword')
             refine = False
             print('Form:', request.form)
             print("getting venues with matching options ")
@@ -50,23 +50,16 @@ def home():
             print("Filtering by options:", found)
             
             found = accSystem.get_like(refine=refine,
-                name=f'~%{search}%',
-                description=f'~%{search}%',
-                details=f'~%{search}%',
+                name=f'~%{keyword}%',
+                description=f'~%{keyword}%',
+                details=f'~%{keyword}%',
                 join="OR"
             )
             refine = found or False
             
             print("Filtering by search term:", found)
             
-            # if search: # TODO: Fix geocoding
-            #     lower_left, upper_right = text_bounds.split('+')
-            #     lower_left = [float(x) for x in lower_left.split(',')]
-            #     upper_right = [float(x) for x in upper_right.split(',')]
-            #     print("geocoded area:")
-            #     print("        ", upper_right)
-            #     print(lower_left)
-                
+			
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
@@ -81,6 +74,7 @@ def home():
             distance = request.form.get('radiusval')
             if location:
                 print("getting venues near", location)
+                print('distance = ', distance)
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
             # elif text_bounds:
             # TODO: This is a bit dodgy the target location and search term should be separate
@@ -206,26 +200,26 @@ def signup():
         # Create user.
         try:
             uid = userSystem.create_user(
-                form['account_name'],
-                form['account_username'],
-                form['account_password'],
-                form['account_email'],
-                form['account_phone'],
-                form['account_description']
+                form['name_input'],
+                form['uname_input'],
+                form['password_input'],
+                form['email_input'],
+                form['phone_input'],
+                form['desc_input']
             )
         except US.UserCreateError as e:
             if e.col == 'userName':
                 return render_template('signup.html', username_taken=True)
             if e.col == 'email':
                 return render_template('signup.html', invalid_email=True)
-
         if uid is not None:
             print("User successfully added.")
+            login(uid)
             return redirect('/')
         else:
             print("User insert failed.")
             return render_template('signup.html', err_msg="User signup failed.")
-
+        
 
 
     return render_template('signup.html')
