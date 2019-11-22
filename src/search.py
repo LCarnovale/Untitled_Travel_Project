@@ -14,6 +14,8 @@ class Search():
                        bathrooms, parking, location, distance):
         self._scores = []
         print('ADV search')
+        if len(self._items) == 0:
+            return []
 
         if search:
             self._keywordSearch(search)

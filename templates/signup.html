@@ -6,57 +6,96 @@
 {% block content %}
 	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
 	<h2> Please enter your details: </h2>
-	<a href="{{url_for('signup_owner')}}">Signing up as a host? Click here!</a>
-	<form name='post_ad' id = "regForm" method='POST'>
-		<div class = "tab">Personal Details
-			<p><input name = "account_name" placeholder = "Name" class = "required"></p>
-			{% if username_taken %}
-			<label style="color: red">Username is taken.</label>
-			{% endif %}
-			<p><input name = "account_username" placeholder = "Username" class = "required"></p>
-			<p><input name = "account_password" placeholder = "Password" type = "password"
-				oninput="checkPassMatch()"></p>
-			<p><input name = "account_password_confirm" placeholder = "Confirm Password" type = "password"
-				oninput="checkPassMatch()"></p>
-
-			<label id="pass_match_label", style="color: red; float:left; display:none">Passwords must match.</label>
-		</div>
-		<div class = "tab">
-				{%if invalid_email %}
-				<label style="color: red">Invalid email address.</label>
-				{% endif %}
-				<p><input name = "account_email" placeholder = "Email" type = "email"></p>
-				<p><input name = "account_phone" placeholder = "Mobile"></p>
-				<p><input name = "account_description" placeholder = "Description" type = "paragraph">
-		</div>
-		<div style="overflow:auto;">
-			<div style="float:right;">
-				<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-				<button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+	<form method='POST'>
+		<div class="container">
+				<a href="{{url_for('signup_owner')}}">Signing up as a host? Click here!</a>
+				<ul class="collapsible">
+					<li class="active">
+						<div class="collapsible-header"><i class="material-icons">person</i>About you</div>
+						<div class="collapsible-body">
+							<div class="row">
+								<div class="col s12">
+									<label>
+										All fields are required.
+									</label>
+								</div>
+			
+								<div class="input-field col s12">
+									<input type="text" id="name_input" name="name_input" class="required" />
+									<label for="name_input">Full Name</label>
+			
+								</div>
+								<div class="input-field col s12">
+									<input type="text" id="uname_input" name="uname_input" />
+									<label for="uname_input">Username</label>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="collapsible-header"><i class="material-icons">info</i>Extra Information</div>
+						<div class="collapsible-body">
+							<div class="row">
+								<div class="input-field col s12">
+									<textarea id="desc_input" name="desc_input" class="materialize-textarea"></textarea>
+									<label for="desc_input">Description (optional)</label>
+								</div>
+			
+								<div class="input-field col s12 m12 l6">
+									<input type="email" id="email_input" name="email_input" class="validate">
+									<label for="email_input">Email</label>
+									<span class="helper-text" data-error="Invalid email" data-success="Valid">
+								</div>
+								<div class="input-field col s12 m12 l6">
+									<input type="tel" id="phone_input" name="phone_input">
+									<label for="phone_input">Phone Number</label>
+								</div>
+								<div class="input-field col s12">
+									<input type="password" id="password_input" name="password_input" class="validate"
+										oninput="checkPassMatch()">
+									<label for="password_input">Password</label>
+								</div>
+								<div class="input-field col s12">
+									<input type="password" id="password_confirm_input" name="password_confirm_input"
+										class="validate" oninput="checkPassMatch()">
+									<label for="password_confirm_input">Confirm Password</label>
+									<span class="helper-text" data-error="Passwords must match">
+			
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<div class="right-align">
+					<button class="btn waves-effect waves-light light-blue" type="submit" name="action" id="sub_btn" disabled>Submit
+						<i class="material-icons right">send</i>
+					</button>
+				</div>
 			</div>
-		</div>
-		<div style="text-align:center;margin-top:40px;">
-			<span class="step"></span>
-			<span class="step"></span>
-		</div>
+
 	</form>
 
 	<script>
 		function checkPassMatch() {
-			var newpass = document.getElementsByName("account_password")[0];
-			var confirm = document.getElementsByName("account_password_confirm")[0];
-			if (newpass.value == confirm.value) {
-				newpass.setAttribute('style', 'border:green 2px solid');
-				confirm.setAttribute('style', 'border:green 2px solid');
-				document.getElementById('nextBtn').disabled = false
-				document.getElementById('pass_match_label').style.display = "none";
+			var newpass = document.getElementById("password_input");
+			var confirm = document.getElementById("password_confirm_input");
+			var subBtn = document.getElementById("sub_btn");
+			console.log(newpass.value == confirm.value)
+			if (newpass.value && (newpass.value == confirm.value)) {
+				confirm.setCustomValidity("");
+				newpass.setCustomValidity("");
+				subBtn.disabled = false;
 			} else {
-				newpass.setAttribute('style', 'border:red 1px solid');
-				confirm.setAttribute('style', 'border:red 1px solid');
-				document.getElementById('nextBtn').disabled = true
-				document.getElementById('pass_match_label').style.display = 'block';
+				confirm.setCustomValidity("invalid");
+				newpass.setCustomValidity("invalid");
+				subBtn.disabled = true;
 			}
+			M.updateTextFields();
 		}
+
+		$(document).ready(function () {
+			$('.collapsible').collapsible();
+		});
 	</script>
 	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
 {% endblock %}

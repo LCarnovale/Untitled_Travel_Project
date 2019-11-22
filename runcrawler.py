@@ -9,10 +9,17 @@ if __name__ == '__main__':
 
     print('Thread started')
 
-    time.sleep(20)
+    try:
+        time.sleep(600)
+    except KeyboardInterrupt:
+        print("** Killing crawler")
+    else:
+        print("** Times up, ending crawl.")
+    finally:
+        crawler.kill()
 
-    crawler.kill()
+
 
     crawler.wait_for_child()
 
-    print('Crawler finished')
+    print('** Crawler finished')
