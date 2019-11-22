@@ -77,7 +77,6 @@ class Accommodation:
                 # Get the booking start and end dates
                 bookStart = dates[i][3]
                 bookEnd = dates[i][4]
-                # TODO INSERT INSTEAD OF APPEND AND REMOVE THE DATERANGE
                 # booking range is within the range from DB
                 if bookStart >= startAvail and bookEnd <= endAvail:
                     # Remove the start and end time and replace with new start and end
@@ -103,6 +102,7 @@ class Accommodation:
                             continue
 
         availableDates = [[x[0].strftime('%d-%m-%Y'), x[1].strftime('%d-%m-%Y')] for x in availableDates]
+        print(availableDates)
         return availableDates
 
     def isAvailable(self, startDate, endDate=None):

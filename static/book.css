@@ -1,5 +1,3 @@
-
-
 .addr_details {
     width: 100%;
     text-align: center;
@@ -68,8 +66,25 @@
 }
 
 #map {
-        height: 200px;
-		width: 200px;
+        height: 300px;
+		width: 300px;
 		margin-left: auto;
 		margin-right: auto;
+}
+.header {
+
+}
+
+.reviewGood {
+    grid-area: reviewGood;
+    background-color: #ebb4ad;
+    height: 500px;
+    width: 600px;
+}
+
+.reviewBad {
+    grid-area: reviewBad;
+    background-color: #deb5b0;
+    height: 500px;
+    width: 600px;
 }
