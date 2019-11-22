@@ -291,5 +291,6 @@ class Accommodation:
     def display_url(self):
         return self.external_url.split('?')[0]
 
+    @property
     def url_base(self):
         return self.external_url.split('//')[1].split('/')[0]

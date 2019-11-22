@@ -22,32 +22,36 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
  <style>
-.img {
-display:block;
-margin-left: auto;
-margin-right: auto;
-}
 
+.mySlides {display: none}
  </style>
 {% endblock %}
 
 {% block content %}
 
-
 <!-- Content -->
 <div class="w3-main w3-white" style="margin-left:260px">
     <div class="w3-hide-large" style="margin-top:80px"></div>
-    <!-- Image SlideShow -->
+
+    <!-- Image SlideShow  Large image -->
     {% if images %}
-    <div class="slideshow-container">
         {% for img in images %}
-        <div class="mySlides fade">
-            <img src="{{img}}" height="400" width="700" class="image">
+        <div class="w3-display-container mySlides">
+            <img src="{{img}}" style="width:100%; margin-bottom:-6px">
         </div>
         {% endfor %}
-    </div>
-    {% endif %}
 
+    <!-- Small images on the bottom -->
+    <div class="w3-row-padding w3-section">
+        {% set n = 0 %}
+        {% for img in images %}
+        <div class="w3-col s3">
+        <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:100%;cursor:pointer" onclick="currentDiv({{n}})">
+        {% set n = n + 1 %}
+        </div>
+        {% endfor %}
+    {% endif %}
+    </div>
     <!-- Header -->
     <div class="header" align="center">
         <h1 style="font-style: oblique; font-size: 60px;">{{acc.name}}</h1>
@@ -55,7 +59,7 @@ margin-right: auto;
         <i>This ad was found at <a href="{{acc.external_url}}">{{acc.display_url}}</a></i>
         {% endif %}
     </div>
-
+    <!-- Acc detail Section -->
     <div class="w3-container">
         <h4 class="w3-left w3-col s9"><strong>The space</strong></h4>
         <div class="w3-row w3-large">
@@ -67,7 +71,7 @@ margin-right: auto;
     </div>
 
     <hr>
-
+    <!-- Extr desc Section -->
     <h4 class="w3-left w3-col s9"><strong>Extra Info</strong></h4>
     <div class="w3-row w3-large">
       <div class="w3-col s9">
@@ -80,19 +84,21 @@ margin-right: auto;
     </div>
 
     <hr>
-    <!-- Owner Details -->
+    <!-- Owner Details Section -->
     <h4 class="w3-left w3-col s9"><strong>Owner Details</strong></h4>
     <div class="w3-row w3-large">
       <div class="w3-col s9">
+        {% if acc.external_url %}
+         {% endif % }
         {% if owner %}
         <p align="left"> Name: {{owner[1]}} </p>
-        <p align="elft"> {{owner[2]}} </p>
-        <p align="left"> Have any questions? Contact the owner at {{owner[4]}}.</p>
+        <p align="left"> {{owner[2]}} </p>
+        <p align="left"> Have any questions? Contact the owner at {{owner[4]}}</p>
         {% endif %}
       </div>
     </div>
     <hr>
-
+    <!-- Booking Section -->
     <div class="w3-container">
         <h4 class="w3-left w3-col s9"><strong>Booking</strong></h4>
         <div class="w3-row w3-large">
@@ -117,7 +123,7 @@ margin-right: auto;
     </div>
 
     <hr>
-
+    <!-- Review Section -->
 </div>
 
 
@@ -244,19 +250,31 @@ function initMap() {
 
 
 <script>
-var slideIndex = 0;
-showSlides();
+var slideIndex = 1;
+showDivs(slideIndex);
 
-function showSlides() {
+function plusDivs(n) {
+  showDivs(slideIndex += n);
+}
+
+function currentDiv(n) {
+  showDivs(slideIndex = n);
+}
+
+function showDivs(n) {
   var i;
-  var slides = document.getElementsByClassName("mySlides");
-  for (i = 0; i < slides.length; i++) {
-    slides[i].style.display = "none";
+  var x = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("demo");
+  if (n > x.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = x.length}
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
   }
-  slideIndex++;
-  if (slideIndex > slides.length) {slideIndex = 1}
-  slides[slideIndex-1].style.display = "block";
-  setTimeout(showSlides, 5000); // Change image every 1.5 seconds
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace(" w3-opacity-off", "");
+  }
+  x[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " w3-opacity-off";
 }
 </script>
 
