@@ -38,24 +38,24 @@
 		<div class="row">
 			<div class="col s12">
 				<div class="input-field col s10">
-				<input type="text" id="searchgeocode" name="search">
+				<input type="text" id="searchgeocode" name="search" onkeydown="return (event.keyCode!=13);">
 				<label for="searchgeocode" id="searchlabel">Search for Accomodation</label>
 				</div><div class="col s2">
 					<br>
-				<button type="submit" class="btn">Search</button>
+				<button type="submit" class="btn" >Search</button>
 				</div>
 			</div>
 		</div>
 		<input type = "hidden" name = "geocodedvalue" id = "geocodedvalue" readonly>
-		<input type="text" name="radiusval" id="radiusval" hidden>
+		<input type="text" name="radiusval" id="radiusval" value = "2000" hidden>
 
 		<div class="col s12">
 			<p class="range-field">
-				<input type="range" id="radiuschange" min="0" max="6" start="0" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
+				<input type="range" id="radiuschange" min="0" max="6" start="3" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
 			</p>
 		</div>
 		<div class="center-align">
-			Distance Radius: <output name="radiusrange" id="radiusrange">--</output> m
+			Distance Radius: <output name="radiusrange" id="radiusrange">2000</output> m
 		</div>
 		<ul class="collapsible">
 			<li>
