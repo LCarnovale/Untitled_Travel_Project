@@ -15,6 +15,7 @@
     12  ExtSource     URL           null
 """
 from helpers import execute, dbCursor
+import pyodbc
 
 def get_all():
     """
