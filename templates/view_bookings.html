@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/materialize.min.css')}}" media="screen,projection" />
+    
+    <!-- <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection" /> -->
+    <!-- <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/> -->
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+        .myimage {
+            display:block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cards-container {
+            column-break-inside: avoid;
+        }
+
+        .card {
+            display: inline-block;
+            overflow: visible;
+        }
+    </style>
+    <img src="../static/nsw1.png" class='myimage'>
+</head>
+<body>
+    <nav class="light-blue lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+            <a href="/" id="logo-container" class="brand-logo">
+                <i class="material-icons">home</i>
+                Untitled Travel</a>
+            <ul class="right hide-on-med-and-down"> <!-- Right side of navbar, hide when not a large screen-->
+                <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
+                <li><a href="{{url_for('logout')}}">Logout</a></li>
+            </ul>
+            <ul id="nav-mobile" class="sidenav"> <!-- Visible only on medium and small screens (for mobile use) -->
+                <li><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
+                <li><a href="{{url_for('logout')}}">Logout</a></li>
+            </ul>
+            <a href="#" data-target="nav-mobile" class="sidenav-trigger">
+                <i class="material-icons">menu</i></a>
+                
+        </div>
+    </nav>
+    <div class="container">
+        {% if bookings %}
+        <!-- Cards for each booking -->
+        <div class="row">
+            {% if bookings|length > 3 %}
+            <div class="col s12 cards-container" style="column-count:3"> <!--Add style="column-count:2" to change width of cards-->
+            {% endif %}
+            {% for b in bookings %}
+                {% if bookings|length <= 3 %}
+                <div class="col s12 m6 l4 cards-container">
+                {% endif %}
+                {% set venue = ac.get_acc(b.venueid) %}
+                {% set images = venue.get_images() %}
+                <div class="card">
+                    <div class="card-image">
+                        <i href="/book/{{b.venueid}}">
+                            {% if images|length > 0 %}
+                            <img src="{{images[0]}}">
+                            {% else %}
+                            <img src="../static/nsw1.png">
+                            {% endif %}
+                        </i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">{{venue.name}}</span>
+                        Start: {{b.start_date}} <br>
+                        End: {{b.end_date}} <br>
+                        <p>I am a very simple card. I am good at containing small bits of information.
+                            I am convenient because I require little markup to use effectively.</p>
+                    </div>
+                    <div class="card-action">
+                        <a class="btn" href="/book/{{b.venueid}}">Go to booking</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+        {% else %}
+        <br>
+        <p>You don't have any current or future bookings. (Or past?)</p> <!-- TODO XXX -->
+        {% endif %}
+        <!--JavaScript at end of body for optimized loading-->
+       
+    </div>
+    </body>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/materialize.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/init.js')}}"></script>
+    
+</html>

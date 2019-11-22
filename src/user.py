@@ -1,6 +1,7 @@
 import re
 import json
-
+import db
+from booking import Booking
 class EmailError(Exception):
     def __init__(self, msg="Attempting to set email with invalid email address."):
         super().__init__(msg)
@@ -22,13 +23,11 @@ class User:
         self._type = None
         # self._bookings = [] Use this or use the database?
 
-    # ''' Adds a booking into the user'''
-    # def addBooking(self, booking):
-    #     self._bookings.append(booking)
+    def get_bookings(self):
+        booking_rows = db.bookings.get_for_user(self._id)
+        return [Booking(*row[1:]) for row in booking_rows]
 
- 
-    
-    
+
     def todict(self):
         """
         Return a dict object with attributes other than pwdhash.
@@ -94,13 +93,6 @@ class User:
     @property
     def pwdhash(self):
         return self._pwdhash
-
-    # @pwd.setter
-    # def pwd(self, new_pwd):
-    #     """
-    #     Takes a plain text password and updates the database.
-    #     Equivalent to calling userSystem.set_password(<id>, new_pwd).
-    #     """
 
         
     @property

@@ -1,74 +1,28 @@
 {% extends "base.html" %}
 {% block head %}
-    <title>(STUB) Search Results</title>
-<style>
-/* CSS taken from https://www.w3schools.com/howto/howto_css_flip_card.asp */
-/* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
-.flip-card {
-  background-color: #641e16 ;
-  display: inline-block;
-  width: 300px;
-  height: 300px;
-  border: 3px solid #f1f1f1;
-  perspective: 1000px; /* Remove this if you don't want the 3D effect */
-}
-
-/* This container is needed to position the front and back side */
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-}
-
-/* Do an horizontal flip when you move the mouse over the flip box container */
-.flip-card:hover .flip-card-inner {
-  transform: rotateY(180deg);
-}
-
-/* Position the front and back side */
-.flip-card-front, .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-}
-
-/* Style the front side (fallback if image is missing) */
-.flip-card-front {
-  background-color: #d82715 ;
-  color: black;
-}
-
-/* Style the back side */
-.flip-card-back {
-  background-color: #ec7063 ;
-  color: black;
-  transform: rotateY(180deg);
-}
-</style>
+    <title>Search Results</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='search_results.css') }}">
 {% endblock %}
 
 {% block content %}
     <h2> Here are the search results: </h2>
-    <p> Note: this is a temporary page, please update to better format #TODO </p>
     <br>
     {% if results %}
-    <table style="width:100%">
-
+<div class="grid">
         {% for result in results %}
-
-        <tr>
-        <td>
             <div class="flip-card">
                 <div class="flip-card-inner">
                     <div class="flip-card-front">
-                        <h1> {{result.name}} </h1>
+                        <h1 style="font-size: 35px;"> {{result.name}} </h1>
                         {% if result.get_images() %}
-                        <img src="{{result.get_images()[0]}}" style = "width:150px;height:150px">
-                        {% endif %}
+                            {% for img in result.get_images() %}
+                                <div class="mySlides fade">
+                                <img src="{{img}}" class="img">
+                                </div>
+                            {% endfor %}
+                        {%endif%}
                     </div>
                     <div class="flip-card-back">
                         <p> {{result.details}}</p>
@@ -79,12 +33,25 @@
                     </div>
                 </div>
             </div>
-         </td>
-        </tr>
         {% endfor %}
-
-    </table>
+    </div>
     {% else %}
-    <p class = "no_results"> Sorry, there were no places matching your search. Please try again. </p>
+        <p class = "no_results"> Sorry, there were no places matching your search. Please try again. </p>
     {% endif %}
+<script>
+var slideIndex = 0;
+showSlides();
+
+function showSlides() {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
+  }
+  slideIndex++;
+  if (slideIndex > slides.length) {slideIndex = 1}
+  slides[slideIndex-1].style.display = "block";
+  setTimeout(showSlides, 1500); // Change image every 1.5 seconds
+}
+</script>
 {% endblock %}

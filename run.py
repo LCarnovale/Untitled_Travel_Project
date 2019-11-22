@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from routes import app
 import db
-from src.crawler import Crawler
+# from src.crawler import Crawler
 import os
 
 if __name__ == '__main__':

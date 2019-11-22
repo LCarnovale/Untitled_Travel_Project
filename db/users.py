@@ -11,7 +11,7 @@ Table schema:
     5   description     text
     6   pwdhash         bytes
 """
-from helpers import execute, dbCursor
+from helpers import dbCursor, InsertionError
 
 def get(id):
     """
@@ -76,12 +76,12 @@ def update(userid, **fields):
     """
     Update a user record. Takes the id of the user to be updated (userid)
     and keyword arguments corresponding to the table's schema.
-    pwdhash and pwdplain must not be supplied at the same time, as both
-    affect the pwdhash field.
+    `pwdhash` and `pwdplain` must not be supplied at the same time, as both
+    affect the `pwdhash` field.
 
     ** To update the password: **
     Changing the pwdhash is not recommended. Instead, provide a plain text 
-    password for the keyword pwdplain and the hash will be calculated and
+    password for the keyword `pwdplain` and the hash will be calculated and
     stored.
 
     valid fields are:

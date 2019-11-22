@@ -57,3 +57,7 @@ Worked on the frontend and changed start and end date in advanced search to a da
 
 10/11/19
 Worked on the frontend for booking accommodations and edited the calendar showing. Updated calendar so it now disables all dates that are not in the available date ranges. It also must have the minimum/maximum days for staying. Booking works with the new calendar. Booking page is shown in grids, where header is the name of accommodation, left grid is details, right grid is images and booking details and footer is owner details and review. When merging with backend branch, there was a error with the formatting of the reviews and it seems to not be in the right places. Will need to fix that.
+
+
+15/11/19
+Worked on frontend with making grids for the search results. Added image carousel for only search results. However there is a timing delay which wont display the images for a couple seconds.

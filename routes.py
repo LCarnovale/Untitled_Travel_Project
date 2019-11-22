@@ -78,7 +78,7 @@ def home():
                 enddate = None
 
             location = request.form.get('geocodedvalue')
-            distance = request.form.get('distance')
+            distance = request.form.get('radiusval')
             if location:
                 print("getting venues near", location)
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
@@ -110,7 +110,17 @@ Message: {str(e)}""")
 Login page
 '''
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login(uid=None, u_t='user'):
+    if uid is not None:
+        # Log them in in the background
+        user = userSystem.get_user(uid, u_t)
+        session['login_type'] = u_t
+        session['id'] = uid
+        d = user.todict()
+        for k, v in zip(d.keys(), d.values()):
+            session[k] = v
+        return True
+
     if request.method == 'POST':
         # Attempt a Login
         form = request.form
@@ -143,13 +153,53 @@ def logout():
     # Remove any existing sessions
     session.pop('username', None)
     session.pop('id', None)
+    session['login_type'] = None
 
     return redirect(url_for('home'))
 
 '''
+Manage ads
+'''
+@app.route('/manage', methods=['GET', 'POST'])
+def manage():
+    abort(404)
+
+'''
+Owner Signup
+'''
+@app.route('/signup/owner', methods=['GET', 'POST'])
+def signup_owner():
+    if request.method == 'POST':
+        form = request.form
+        name = form['name_input']
+        uname = form['uname_input']
+        pwd = form['password_input']
+        email = form['email_input']
+        phone = form['phone_input']
+        desc = form['desc_input']
+
+        # TODO: validate input.
+
+        try:
+            uid = userSystem.create_owner(
+                name, uname, pwd, email, phone, desc
+            )
+        except Exception as e:
+            # TODO: Return errors properly
+            print(e)
+            return render_template('signup_owner.html', err_msg=str(e))
+        else:
+            login(uid, 'owner')
+            return redirect('/')
+
+
+    return render_template('signup_owner.html')
+
+
+'''
 Signup page
 '''
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup/user', methods=['GET', 'POST'])
 def signup():
     form = request.form
     if request.method == 'POST':
@@ -171,8 +221,11 @@ def signup():
 
         if uid is not None:
             print("User successfully added.")
+            return redirect('/')
         else:
             print("User insert failed.")
+            return render_template('signup.html', err_msg="User signup failed.")
+
 
 
     return render_template('signup.html')
@@ -217,7 +270,23 @@ def editprofile():
             print("Error user not found")
         return render_template('confirm_edit.html')
     return render_template('edit.html', _user=user)
-	
+
+
+'''
+View Bookings page
+'''
+@app.route('/bookings/', methods=['GET', 'POST'])
+def view_bookings():
+    if request.method == 'POST':
+        pass
+    elif request.method == 'GET':
+        # get current user
+        user  = userSystem.get_user(session['id'])
+
+        return render_template('view_bookings.html',
+                               bookings=user.get_bookings(), ac=accSystem)
+
+
 '''
 Main Booking page
 '''  
@@ -232,13 +301,7 @@ Message: {str(e)}""")
         abort(404)
 
     if request.method == 'POST':
-        '''
-        if request.form.get('review_submit') != None:
-            if request.form.get('rating_input') not in ['1','2','3','4','5']:
-                raise ValueError('Rating not submitted, or form mangled')
-            print(request.form.get('review'))
-            return redirect(url_for('book_main', id=id))
-        '''
+
 
         form = request.form
         if 'id' in session:
@@ -260,7 +323,6 @@ Message: {str(e)}""")
 	# avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
     
     reviews = src.review.get_for_venue(id)
-
     return render_template('book.html', acc=acc, owner=owner, id=id,
         address=address, reviews = reviews, images = images)
 

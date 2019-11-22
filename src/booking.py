@@ -1,3 +1,5 @@
+import db
+
 class Booking:
 
     #_bookingID = -1
@@ -11,6 +13,9 @@ class Booking:
         self._userid = userid
         self._start_date = startDate
         self._end_date = endDate
+
+        
+
 
     def checkOverlap(self, startDate, endDate):
         """

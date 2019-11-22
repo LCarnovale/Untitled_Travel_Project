@@ -11,6 +11,10 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src = "{{ url_for('static',filename = 'star_rating.js')}}"></script>
     <!-- Script for calendar-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/resources/demos/style.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -27,8 +31,9 @@
     display: grid;
     grid-template-areas:
     'header header header header header header'
-    'left left middle middle right right'
-    'footer footer footer footer footer footer';
+    'left left left right right right'
+    'footer footer footer footer footer footer'
+    'reviewGood reviewGood reviewGood reviewBad reviewBad reviewBad';
 }
 
 .left-grid, .right-grid {
@@ -52,10 +57,26 @@
 .footer {
     grid-area: footer;
     background-color: #fcc2bb;
-    height: 1000px;
+    height: 300px;
     width: 1200px;
-
 }
+
+.reviewGood {
+    grid-area: reviewGood;
+    background-color: #ebb4ad;
+    height: 500px;
+    width: 600px;
+}
+
+.reviewBad {
+    grid-area: reviewBad;
+    background-color: #deb5b0;
+    height: 500px;
+    width: 600px;
+}
+
+
+
 #map {
         height: 200px;
 		width: 200px;
@@ -102,8 +123,6 @@
 		{% endfor %}
         <p>Booking Details</p>
         <p>Price: {{acc.rate}} / night</p>
-
-
         <p>Availability:</p>
         <p class = "good_msg">This place is currently available!</p>
 
@@ -121,32 +140,35 @@
 
     </div>
 
-    <div class="reviews_container footer">
-        <h2 align="center"> Reviews </h2>
+    <div class="review_container footer">
+        {% if owner %}
+        <h2> About the owner </h2>
+        <p> Name: {{owner[1]}} </p>
+        <p> {{owner[2]}} </p>
+        <p> Have any questions? Contact the owner at {{owner[4]}}.</p>
+        {% endif %}
+        <h3 align="center"> Reviews </h3>
         <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
-        <br>
-        {% for review in reviews %}
-            <h4>
-                {% if not review.recommends %}
-                    <img src="/static/thumbs_down_selected.png">
-                {% else %}
-                    <img src="/static/thumbs_up_selected.png">
-                {% endif %}
-                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
-            </h4>
-            <br>
-            <div style="width:100%;">
-                <div style="width:40%; display: inline-block;">
-                    <h4>The bad:</h4><br>{{review.reviewBad}}
-                </div>
-                <div style="width:40%; display: inline-block;">
-                    <h4>The good:</h4><br>{{review.reviewGood}}
-                </div>
-            </div>
-        {% endfor %}
     </div>
 
+    {% for review in reviews %}
+    {% if not review.recommends %}
+            <div class="reviewBad">
+                <img src="/static/thumbs_down_selected.png">
+                <h4>The bad:</h4><br>{{review.reviewBad}}
+                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+            </div>
+           {% else %}
+           <div class="reviewGood">
+                <img src="/static/thumbs_up_selected.png" style="height 200px; width: 100px;">
+                <h4>The good:</h4><br>{{review.reviewGood}}
+               {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+           {% endif %}
+           </div>
+    {% endfor %}
 </div>
+
+
 <script>
 function getDates(dates) {
     var availDateSize = {{acc.get_dates()|length}};
@@ -251,6 +273,5 @@ function initMap() {
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>
-
 
 {% endblock %}
