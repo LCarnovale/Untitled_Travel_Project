@@ -70,6 +70,8 @@ class Search():
 
         print('Done search.')
         print(self._scores)
+        self._scores = sorted(self._scores,key = lambda score: score[1],reverse = True)
+        print(self._scores)
         return [x[0] for x in self._scores]
 
     def _keywordSearch(self, search):

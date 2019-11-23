@@ -30,7 +30,7 @@
 {% endblock %}
 
 {% block content %}
-   <div class="container">
+   <!-- <div class="container"> -->
         {% if results %}
         <!-- Cards for each booking -->
         <div class="row">
@@ -61,20 +61,23 @@
                         <p>Desc: {{venue.description}}</p>
                         <p>Addr: {{venue.address.street_address}}</p>
                         <p>Bed: {{venue.bed_count}} Bath: {{venue.bath_count}} Cars: {{venue.car_count}}</p>
-                        <p>Price: {{venue.rate}} / night </p>
+                        <p>Price: {{"%.2f" % venue.rate}}</p> / night </p>
                         <p>Min Stay: {{venue.min_stay}} Max Stay: {{venue.max_stay}}</p>
                     </div>
                     <div class="card action">
-                        <a class="btn" href="/book/{{venue.id}}">Go to booking</a>
+                        <a class="btn" href="/book/{{venue.id}}">Go to venue</a>
                     </div>
                 </div>
+                {% if results|length <= 3 %}
+                </div>
+                {% endif %}
                 {% endfor %}
             </div>
             </div>
         </div>
         {% else %}
         <br>
-       <p> Couldn't find places</p>
+       <h2> Couldn't find places</h2>
         {% endif %}
-   </div>
+   <!-- </div> -->
 {% endblock %}

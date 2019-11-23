@@ -21,50 +21,38 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
- <style>
-
-
- </style>
 {% endblock %}
 
 {% block content %}
-<body onload="makeImageDisplay({{images}}, {{images|length}})">
+<body>
 <!-- Content -->
-<div class="w3-main w3-white" style="margin-left:260px">
-    <div class="w3-hide-large" style="margin-top:80px"></div>
+<!-- <div class="w3-main w3-white" style="margin-left:260px">
+    <div class="w3-hide-large" style="margin-top:80px"></div> -->
 
     <!-- Image SlideShow  Large image -->
     {% if images %}
-        {% for img in images %}
-        <div class="w3-display-container mySlides" align="center">
-            <img src="{{img}}" style="width:100%; margin-bottom:-6px">
-        </div>
-        {% endfor %}
+      <div class="row">  
+        <div class = "center-align col s12">
+          {% for img in images %}
+          <div class="w3-display-container mySlides">
+            <img src="{{img}}" style="width:800px; height: 600px;margin-bottom:-6px">
+          </div>
+          {% endfor %}
 
+        </div>
+      </div>
     <!-- Small images on the bottom -->
-    <div class="w3-row-padding w3-section mySlidesSmall">
-<!--        {% for img in images %}-->
-<!--        <div class="w3-col s3">-->
-<!--        <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:100%;cursor:pointer" onclick="currentDiv({{n}})">-->
-<!--        </div>-->
-<!--        {% endfor %}-->
+    <div class="row">
+        {% for img in images %}
+          <div class="col s3">
+            <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:200px;cursor:pointer" onclick="currentDiv({{loop.index}})">
+          </div>
+          {% if loop.index % 4 == 0 %}
+          </div><div class="row"> <!-- Start a new row -->
+          {% endif %}
+        {% endfor %}
     {% endif %}
-        <script>
-            function makeImageDisplay(images, size) {
-            var n;
-            var x = document.getElementsByClassName("mySlidesSmall")[0];
-                for (n = 0; n < size; n++) {
-                    var newDiv = document.createElement('div');
-                    newDiv.class = 'w3-col s3';
-                    var img = document.createElement('img');
-                    img.class = 'demo w3-opacity w3-hover-opacity-off';
-                    img.src = images[n];
-                    img.setAttribute('onclick',"currentDiv("+ n +")");
-                    newDiv.appendChild(img);
-                    x.appendChild(newDiv);
-                }
-            }
-        </script>
+
     </div>
     <!-- Header -->
     <div class="header" align="center">
@@ -147,28 +135,37 @@
         {% for review in reviews %}
             {% if review.recommends %}
             <!-- Good Reviews -->
-            <img src="/static/thumbs_up_selected.png" style="height 200px; width: 100px;" class="w3-left">
-              <div class="w3-left">
-                {{review.reviewGood}}<br>
-                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+            <div class="w3-left">
+                <img src="/static/thumbs_up_selected.png" style="height 50px; width: 75px; display: block;">
+            </div>
+                <div style="margin-left: 100px" align="left">
+                    <h3>{{review.username}}</h3>
                 </div>
-                <br><br><br><br><hr>
+                <div style="margin-top:50px; margin-left:100px" align="left">
+                    {{review.reviewGood}}
+                </div>
+                <br><br><hr>
             {% else %}
             <!-- Bad Reviews -->
-                <img src="/static/thumbs_down_selected.png"style="height 200px; width: 100px;" class="w3-left">
                 <div class="w3-left">
-                    {{review.reviewBad}}<br>
-                    {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+                    <img src="/static/thumbs_down_selected.png" style="height 50px; width: 75px; display: block">
                 </div>
-                <br><br><br><br><hr>
+                    <div style="margin-left: 100px" align="left">
+                        <h3>{{review.username}}</h3>
+                    </div>
+                <div style="margin-top:50px; margin-left:100px" align="left">
+                    {{review.reviewBad}}
+                 </div>
+                <br><br><hr>
             {% endif %}
         {% endfor %}
     </div>
+    <br><br><hr>
     {% endif %}
 
 
-<!--        <h3 align="center"> Reviews </h3>-->
-<!--        <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>-->
+<!--        <h3 align="center"> Write a ReReviews </h3>-->
+        <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
 
 </div>
 
@@ -193,8 +190,10 @@ function getDates(dates) {
             days: {{acc.max_stay}}
         },
         isInvalidDate: function(date) {
-            var startDate = $('.calendar').data('daterangepicker').startDate;
+            var startDate = $('.calendar').data('daterangepicker').startDate.format('DD/MM/YYYY');
             var minDate = moment(startDate).add(minStay, 'days');
+            console.log("BOOK START");
+            console.log(startDate);
             // Date range between min and max
             if (date < minDate) {
                 return true;
@@ -202,6 +201,11 @@ function getDates(dates) {
                 for (var i = 0; i < availDateSize; i++) {
                     var startRange = new Date(dates[i][0].replace(/(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"));
                     var endRange = new Date(dates[i][1].replace(/(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"));
+                    // Cannot pick from two different date ranges
+                    if (startDate >= startRange && startDate <= endRange
+                        && date > endRange) {
+                        return true;
+                    }
                     if (date >= startRange && date <= endRange) {
                         return false;
                     }
@@ -266,9 +270,6 @@ function showDivs(n) {
   dots[slideIndex-1].className += " w3-opacity-off";
 }
 </script>
-
-
-
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>
