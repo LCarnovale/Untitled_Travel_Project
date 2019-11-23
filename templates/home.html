@@ -40,10 +40,10 @@
 			<div class="col s12">
 				<div class="input-field col s10">
 				<input type="text" id="searchgeocode" name="search" onkeydown="return (event.keyCode!=13);">
-				<label for="searchgeocode" id="searchlabel">Search for Accomodation</label>
+				<label for="searchgeocode" id="searchlabel">Search by Location</label>
 				</div><div class="col s2">
 					<br>
-				<button type="submit" class="btn" >Search</button>
+				<button type="submit" class="btn">Search</button>
 				</div>
 			</div>
 		</div>
@@ -167,6 +167,8 @@
 				// 	document.getElementById("searchBtn").disabled = true;
 				// }
 			}
+			M.updateTextFields(); // Raise the label in the search box
+
 		}
 
 		function changeCircle(newval){

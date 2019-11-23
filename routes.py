@@ -59,12 +59,10 @@ def home():
             
             print("Filtering by search term:", found)
             
-			
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
-                
                 print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
@@ -78,9 +76,10 @@ def home():
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
             # elif text_bounds:
             # TODO: This is a bit dodgy the target location and search term should be separate
-            if location: search = None
+            # if location: search = None
+            search = request.form['keyword']
             results = accSystem.advancedSearch(search, None, None, None, beds,
-                                                bathrooms, parking, location, distance)
+                                               bathrooms, parking, location, distance)
             results = list(map(accSystem.get_acc, results))
             # print(results[0].get_images())
             return render_template('search_results.html', results = results)
@@ -206,7 +205,6 @@ def signup():
                 form['email_input'],
                 form['phone_input'],
                 form['desc_input']
-
             )
         except US.UserCreateError as e:
             if e.col == 'userName':
@@ -235,7 +233,6 @@ def editprofile():
     user = userSystem.get_user(uid, u_type=session['login_type'])
     if request.method == 'POST':
         form = request.form
-
         if user is not None:
             if form['account_pwd_new']:
                 pwd_check = userSystem.check_user_pass(
@@ -247,6 +244,7 @@ def editprofile():
                     # Correct password given
                     user = userSystem.set_password(
                         uid, form['account_pwd_new'], u_type=user.type)
+
             user.name = form['account_name']
             user.username = form['account_username']
             user.email = form['account_email']
@@ -378,9 +376,10 @@ def ad_main():
         print(request.files)
         for i in (request.files):
             f = request.files[i]
-            f.save(os.path.join('static/'+app.config['UPLOAD_FOLDER'], f.filename))
+            dir = '../static/'+app.config['UPLOAD_FOLDER']
+            f.save(os.path.join(dir, f.filename))
             print(type(f))
-            url = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
+            url = os.path.join(dir, f.filename)
             db.images.insert(venueid, url)
 
         # Create associated date ranges
