@@ -1,30 +1,78 @@
 {% extends "base.html" %}
 {% block head %}
 	<title>Edit details</title>
+	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<meta charset="utf-8">
+	<!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 {% endblock %}
 
 {% block content %}
-	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
-	<h2> Please enter your details: </h2>
+<h2> Change your details here: </h2>
 	<form name='post_ad' id = "regForm" method='POST'>
-		<div class = "tab"> Edit details
-				<p><input name = "account_name" placeholder = "Name" type="text" value="{{_user.name}}"></p>
-				<p><input name = "account_username" placeholder = "Username" type="text" value="{{_user.username}}"></p>
-				<p><input name = "account_email" placeholder = "Email" type = "email" value = "{{_user.email}}"></p>
-				<p><input name = "account_phone" placeholder = "Mobile" value = "{{_user.mobile}}"></p>
-				<p><input name = "account_description" placeholder = "Description" type = "paragraph" value = "{{_user.desc}}">
-				<br>
-				Update password:
-				<p><input name = "account_pwd_current" placeholder = "Current password" type ="password"></p>
-				{% if pass_fail %}<label style="color: red; float: left" >Incorrect password</label>{% endif %}
-				<p><input name = "account_pwd_new" placeholder = "New password" type ="password" oninput="checkPassMatch()"></p>
-				<p><input name = "account_pwd_confirm" placeholder = "Confirm new password" type ="password" oninput="checkPassMatch()"></p>
-				<label id="pass_match_label", style="color: red; float:left; display:none">Passwords must match.</label>
-		</div>
-		<div style="overflow:auto;">
-			<div style="float:right;">
-				<button id='btn_submit' type="submit">Submit</button>
+		<!-- <ul class="collapsible">
+			<li class="active">
+				<div class="collapsible-header"><i class="material-icons">person</i>Account Details</div>
+				<div class="collapsible-body">
+					<div class="row">
+						<div class="input-field col s12">
+							<input type="text" id="name_input" id="name_input" value="{{_user.name}}">
+							<label for="name_input">Full Name</label>
+						</div>
+						<div class="input-field col s12">
+							<input type="text" id="uname_input" name="uname_input" value="{{_user.username}}">
+							<label for="uname_input">Username</label>
+						</div>
+					</div>
+				</div>
+			</li>
+		</ul> -->
+		<div class = "row">
+			<div class="input-field col s12">
+				<input id="account_name" name="account_name" type="text" value="{{_user.name}}">
+				<label for="account_name">Full Name</label>
 			</div>
+			<div class="input-field col s12">
+				<input id="account_username" name="account_username" type="text" value="{{_user.username}}">
+				<label for="account_username">Username</label>
+			</div>
+			<div class="input-field col s12 m6">
+				<input id="account_email" name="account_email" type = "email" value = "{{_user.email}}" class="validate">
+				<label for="account_email">Email</label>
+				<span class="helper-text" data-error="Invalid email" data-success="Valid">
+			</div>
+			<div class="input-field col s12 m6">
+				<input id="account_phone" name="account_phone" value = "{{_user.mobile}}" type='tel'>
+				<label for="account_phone">Phone number</label>
+			</div>
+			<div class="input-field col s12">
+				<textarea id="account_description" name="account_description" class="materialize-textarea">{{_user.desc}}</textarea>
+				<label for="account_description">About you</label>
+				<p>
+					Update password:
+				</p>
+			</div>
+			<div class="input-field col s12">
+				<input name="account_pwd_current"  type ="password">
+				<label for="account_pwd_current">Current Password</label>
+				{% if pass_fail %}<a style="color: red; float: left">Incorrect password</a>{% endif %}
+			</div>
+			<div class="input-field col s12">
+				<input name="account_pwd_new"  type ="password" oninput="checkPassMatch()">
+				<label for="account_pwd_new">New Password</label>
+			</div>
+			<div class="input-field col s12">
+				<input name="account_pwd_confirm" type ="password" oninput="checkPassMatch()">
+				<label for="account_pwd_confirm">Confirm Password</label>
+			</div>
+			<label id="pass_match_label" style="color: red; float:left; display:none">Passwords must match.</label>
+		</div>
+		<div class="row right-align">
+			<button class="btn waves-effect waves-light light-blue" type="submit" name="action" id="sub_btn">Submit
+				<i class="material-icons right">send</i>
+			</button>
 		</div>
 	</form>
 
@@ -35,15 +83,19 @@
 			if (newpass.value == confirm.value) {
 				newpass.setAttribute('style', 'border:green 2px solid');
 				confirm.setAttribute('style', 'border:green 2px solid');
-				document.getElementById('btn_submit').disabled = false
+				document.getElementById('sub_btn').disabled = false
 				document.getElementById('pass_match_label').style.display = "none";
 			} else {
 				newpass.setAttribute('style', 'border:red 1px solid');
 				confirm.setAttribute('style', 'border:red 1px solid');
-				document.getElementById('btn_submit').disabled = true
+				document.getElementById('sub_btn').disabled = true
 				document.getElementById('pass_match_label').style.display = 'block';
 			}
 		}
+
+	$(document).ready(function () {
+		$('.collapsible').collapsible();
+	});
 	</script>
-	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
+	<!-- <script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script> -->
 {% endblock %}
