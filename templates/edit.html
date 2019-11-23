@@ -10,25 +10,8 @@
 {% endblock %}
 
 {% block content %}
-<h2> Change your details here: </h2>
+<h4> Change your details here: </h4>
 	<form name='post_ad' id = "regForm" method='POST'>
-		<!-- <ul class="collapsible">
-			<li class="active">
-				<div class="collapsible-header"><i class="material-icons">person</i>Account Details</div>
-				<div class="collapsible-body">
-					<div class="row">
-						<div class="input-field col s12">
-							<input type="text" id="name_input" id="name_input" value="{{_user.name}}">
-							<label for="name_input">Full Name</label>
-						</div>
-						<div class="input-field col s12">
-							<input type="text" id="uname_input" name="uname_input" value="{{_user.username}}">
-							<label for="uname_input">Username</label>
-						</div>
-					</div>
-				</div>
-			</li>
-		</ul> -->
 		<div class = "row">
 			<div class="input-field col s12">
 				<input id="account_name" name="account_name" type="text" value="{{_user.name}}">

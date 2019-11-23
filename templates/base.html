@@ -80,31 +80,6 @@
     
       </div>
     </nav>
-    <!-- <nav class = "topnav">
-      <div>
-        <div>
-          <a href="/"> <img src = "/static/nsw1.png" style = "width: 200px;height: 200px"></a>
-        </div>
-        <div><ul>
-            <li><a href="{{url_for('home')}}">Home</a></li>
-            {% if session['login_type'] == 'user' %}
-            <li><a href="{{url_for('view_bookings')}}">Booking</a></li>
-            {% endif %}
-            {% if session['login_type'] == 'owner' %}
-            <li><a href="{{url_for('ad_main')}}">Post Ad</a></li>
-            {% endif %}
-            {% if 'username' in session %}
-            <li style= "float:right"><a href="{{url_for('logout')}}">Logout</a></li>
-            <li style= "float:right"><a href="{{url_for('editprofile')}}">Edit Profile</a></li>
-            {% else %}
-            <li style= "float:right"> <a href="{{url_for('login')}}">Login</a></li>
-            {%endif%}
-        </ul></div>
-      </div>
-      {% if err_msg %}
-      <label style="text-align:center; width:100%; color:red">{{err_msg}}</label>
-      {% endif %}
-    </nav> -->
     <div class="container">
       <br>
       {% block content %}{% endblock %}
