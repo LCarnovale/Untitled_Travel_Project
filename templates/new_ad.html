@@ -11,7 +11,6 @@
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-
 	<!-- For new date range picker -->
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
@@ -45,80 +44,101 @@
 {% endblock %}
 
 {% block content %}
-	<body onload="createTable()">
-	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
 
-	<h2> Please enter the details of your accommodation: </h2>
-	<form name='post_ad' id = "regForm" method='POST' formaction='submit()' enctype="multipart/form-data">
-		<div class = "tab">Place Details
-			<p><input name = "acc_name" placeholder = "Name" class = "required"></p>
-			<p><input name = "acc_nbed" placeholder = "Beds" class = "required" type = number></p>
-			<p><input name = "acc_nbath" placeholder = "Bathrooms" class = "required" type = number></p>
-			<p><input name = "acc_ncar" placeholder = "Car spaces" class = "required" type = number></p>
-			<p><input name = "acc_details" placeholder = "Accommodation description" type = text></p>		
-		</div>
-		<div class = "tab">Place Details
-			<ul id = "imagelist">
-			<li><input name = "acc_image-0" id="file-input" type="file" accept="image/*">
-			</li>
-			</ul>
-			<input type="button" id="addImageButton" value="Add Image" onclick = "addImage()"/>
-			<div id="preview"></div>
-		</div>
-		<div class = "tab">Location Details
-			<p><input name = "acc_addr" placeholder = "Address" class = "required" id = "hiddenaddress"></p>
-			<p><input name = "acc_location" id = "hiddenlocation" class = "required" type = "hidden"></p>
-			<div id="map"></div>
-		</div>
-		{%if 'username' not in session%}
-		<div class = "tab">Owner Details
-			<p><input name = "own_name" placeholder = "Name" class = "required"></p>
-			<p><input name = "own_email" placeholder = "Email" type = "email" class = "required"></p>
-			<p><input name = "own_phone" placeholder = "Mobile" class = "required"></p>
-			<p><input name = "description" placeholder = "Owner details"></p>
-		</div>
-		{%else%}
-			<p><input name = "own_name" placeholder = "Name" class = "required" type=hidden value = '{{session["username"]}}'></p>
-			<p><input name = "own_email" placeholder = "Email" class = "required" type=hidden value = '{{session["email"]}}'></p>
-			<p><input name = "own_phone" placeholder = "Mobile" class = "required" type=hidden value = '{{session["mobile"]}}'></p>
-			<p><input name = "own_details" placeholder = "Owner details" type = "hidden"></p>
-		{%endif%}
-		<div class = "tab">Availability Details
+<body onload="createTable()">
+<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
 
-			<p><input name = "price" placeholder = "Price" class = "required" type = number step = 0.01></p>
-
-			<p>
-				<input id="dateCountOut" name=dateCount type=hidden value=0 method='POST'>
-
-				<div id="t_cont">
-					<!-- The table will be put here by the js below -->
-					Available Date Ranges:
+<h2> Please enter the details of your accommodation: </h2>
+<form name='post_ad' id = "regForm" method='POST' formaction='submit()' enctype="multipart/form-data">
+	<!-- <div class = "tab"> -->
+	<ul class="collapsible">
+		<li class="active">
+			<div class="collapsible-header"><i class="material-icons">information</i>Place Details</div>
+			<div class="collapsible-body">
+				<div class="row">
+					<div class="input-field col s12">
+						<input  name = "acc_name"  class = "required">
+						<label>Place Name</label>
+					</div>
+					<div class="input-field col s12 m4">
+						<input  name = "acc_nbed"  class = "required" type = number>
+						<label>Number of Beds</label>
+					</div>
+					<div class="input-field col s12 m4">
+						<input  name = "acc_nbath"  class = "required" type = number>
+						<label>Number of Bathrooms</label>
+					</div>
+					<div class="input-field col s12 m4">
+						<input  name = "acc_ncar"  class = "required" type = number>
+						<label>Number of Parking Spaces</label>
+					</div>
+					<div class="input-field col s12">
+						<textarea  name = "acc_details" type = text class="materialize-textarea"></textarea>
+						<label>Description</label>
+					</div>
 				</div>
-
-			<input type="button" id="addRangeButton" value="Add Range" onclick="addRange()"/>
-			</p>
-
-			<p><input name = "min_stay" placeholder = "Minimum Stay" type = number></p>
-			<p><input name = "max_stay" placeholder = "Maximum Stay" type = number></p>
-			<p><input name = "details" placeholder = "Additional Details (Noise policy, etc.)"></p>
-		</div>
-		
-		<div style="overflow:auto;">
-			<div style="float:right;">
-				<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-				<button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
 			</div>
-		</div>
-		<div style="text-align:center;margin-top:40px;">
-			<span class="step"></span>
-			<span class="step"></span>
-			<span class="step"></span>
-			<span class="step"></span>
-			{%if 'username' not in session%}
-			<span class="step"></span>
-			{%endif%}
-		</div>
-	</form>
+		</li>
+		<li>
+			<div class="collapsible-header"><i class="material-icons">image</i>Images</div>
+			<div class="collapsible-body">
+				<ul id = "imagelist">
+				<li><input name = "acc_image-0" id="file-input" type="file" accept="image/*">
+				</li>
+				</ul>
+				<input type="button" id="addImageButton" value="Add Image" onclick = "addImage()"/>
+				<div id="preview"></div>
+			</div>
+		</li>
+		<li>
+			<div class="collapsible-header"><i class="material-icons">location_on</i>Location</div>
+			<div class="collapsible-body">
+				<div class="input-field col s12">
+					<input type="text" name="acc_addr" class="required" id="hiddenaddress">
+					<label>Location</label>
+				</div>
+				<input name="acc_location" id="hiddenlocation" class="required" type="hidden">
+				<div id="map"></div>
+			</div>
+		</li>
+		<li>
+			<div class="collapsible-header"><i class="material-icons">date_range</i>Availability</div>
+			<div class="collapsible-body">
+				<div class="row">
+					<div class="input-field col s12 m4">
+						<input name = "price" class = "required" type = number step = 0.01>
+						<label>Rate per night</label>
+					</div>
+					<input id="dateCountOut" name=dateCount type=hidden value=0 method='POST'>
+					<div class="input-field col s12 m4">
+						<input name = "min_stay"  type = number>
+						<label>Minimum stay length</label>
+					</div>
+					<div class="input-field col s12 m4">
+						<input name = "max_stay"  type = number>
+						<label>Maximum stay length</label>
+					</div>
+					<div class="input-field col s12">
+						<textarea class="materialize-textarea" name = "details"></textarea>
+						<label>Additional Details (Noise policy, etc.)</label>
+					</div>
+					<div id="t_cont" class="col s12">
+						<!-- The table will be put here by the js below -->
+						Available Date Ranges:
+					</div>
+					<div class="col s12">
+						<input type="button" id="addRangeButton" value="Add Range" onclick="addRange()" />
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
+	<div class="right-align">
+		<button class="btn waves-effect waves-light light-blue" type="submit" name="action" id="sub_btn">Submit
+			<i class="material-icons right">send</i>
+		</button>
+	</div>
+</form>
 
 	<!-------------------------- Scripts \/ /\ HTML --------------------------------->
 	
@@ -274,6 +294,9 @@
 			}
 		});
 	document.querySelector('#file-input').addEventListener("change", previewImage);
+	$(document).ready(function () {
+		$('.collapsible').collapsible();
+	});
 	</script>
 	<!-- Actual link: -->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"async defer></script>
