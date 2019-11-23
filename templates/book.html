@@ -23,12 +23,12 @@
 
  <style>
 
-.mySlides {display: none}
+
  </style>
 {% endblock %}
 
 {% block content %}
-
+<body onload="makeImageDisplay({{images}}, {{images|length}})">
 <!-- Content -->
 <div class="w3-main w3-white" style="margin-left:260px">
     <div class="w3-hide-large" style="margin-top:80px"></div>
@@ -36,21 +36,35 @@
     <!-- Image SlideShow  Large image -->
     {% if images %}
         {% for img in images %}
-        <div class="w3-display-container mySlides">
+        <div class="w3-display-container mySlides" align="center">
             <img src="{{img}}" style="width:100%; margin-bottom:-6px">
         </div>
         {% endfor %}
 
     <!-- Small images on the bottom -->
-    <div class="w3-row-padding w3-section">
-        {% set n = 0 %}
-        {% for img in images %}
-        <div class="w3-col s3">
-        <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:100%;cursor:pointer" onclick="currentDiv({{n}})">
-        {% set n = n + 1 %}
-        </div>
-        {% endfor %}
+    <div class="w3-row-padding w3-section mySlidesSmall">
+<!--        {% for img in images %}-->
+<!--        <div class="w3-col s3">-->
+<!--        <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:100%;cursor:pointer" onclick="currentDiv({{n}})">-->
+<!--        </div>-->
+<!--        {% endfor %}-->
     {% endif %}
+        <script>
+            function makeImageDisplay(images, size) {
+            var n;
+            var x = document.getElementsByClassName("mySlidesSmall")[0];
+                for (n = 0; n < size; n++) {
+                    var newDiv = document.createElement('div');
+                    newDiv.class = 'w3-col s3';
+                    var img = document.createElement('img');
+                    img.class = 'demo w3-opacity w3-hover-opacity-off';
+                    img.src = images[n];
+                    img.setAttribute('onclick',"currentDiv("+ n +")");
+                    newDiv.appendChild(img);
+                    x.appendChild(newDiv);
+                }
+            }
+        </script>
     </div>
     <!-- Header -->
     <div class="header" align="center">
@@ -89,14 +103,15 @@
     <div class="w3-row w3-large">
       <div class="w3-col s9">
         {% if acc.external_url %}
-         {% endif % }
-        {% if owner %}
+            Contact Owner at <a href="{{acc.external_url}}">{{acc.display_url}}</a>
+        {% elif owner %}
         <p align="left"> Name: {{owner[1]}} </p>
         <p align="left"> {{owner[2]}} </p>
         <p align="left"> Have any questions? Contact the owner at {{owner[4]}}</p>
         {% endif %}
       </div>
     </div>
+
     <hr>
     <!-- Booking Section -->
     <div class="w3-container">
@@ -107,15 +122,17 @@
             <h3>${{acc.rate}}</h3>
             <h6>per night</h6>
             {% if acc.external_url %}
-            <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
+              <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
             {% else %}
+              <p class = "good_msg w3-left">This place is currently available!</p>
               <form name='book_acc' method='POST'>
                   <input type="text"  id="dateRange required" value="Booking Dates" class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
                   <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
-                  <p class = "good_msg">This place is currently available!</p>
+
                   <p><input name = "book_start" type = "hidden" id="book_start"></p>
                   <p><input name = "book_end" type = hidden id="book_end"></p>
-                  <input type="submit" value="Book this room"/>
+                  <input class="btn" type="submit" value="Book this room">
+
               </form>
             {% endif %}
           </div>
@@ -123,72 +140,42 @@
     </div>
 
     <hr>
+    {% if reviews%}
     <!-- Review Section -->
+    <h4 class="w3-left w3-col s9"><strong>Reviews</strong></h4>
+    <div class="w3-row w3-large">
+        {% for review in reviews %}
+            {% if review.recommends %}
+            <!-- Good Reviews -->
+            <img src="/static/thumbs_up_selected.png" style="height 200px; width: 100px;" class="w3-left">
+              <div class="w3-left">
+                {{review.reviewGood}}<br>
+                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+                </div>
+                <br><br><br><br><hr>
+            {% else %}
+            <!-- Bad Reviews -->
+                <img src="/static/thumbs_down_selected.png"style="height 200px; width: 100px;" class="w3-left">
+                <div class="w3-left">
+                    {{review.reviewBad}}<br>
+                    {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.
+                </div>
+                <br><br><br><br><hr>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+<!--        <h3 align="center"> Reviews </h3>-->
+<!--        <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>-->
+
 </div>
 
 
 
 <div></div>
 
-
-
-<!-- Content Layout -->
-
-<!--    <div class="left-grid">-->
-<!--        <p>Description</p>-->
-<!--        <p>{{acc.description}}</p>-->
-<!--        <p>Beds: {{acc.bed_count}}</p>-->
-<!--        <p>Bathrooms: {{acc.bath_count}}</p>-->
-<!--        <p>Car Spaces: {{acc.car_count}}</p>-->
-
-<!--    </div>-->
-
-<!--    <div class="right-grid">-->
-<!--        <p>Images</p><br><br>-->
-<!--		{% for image in images %}-->
-<!--			<img src = '{{image}}' style = 'width:150px;height:150px'>-->
-<!--		{% endfor %}-->
-<!--        <p>Booking Details</p>-->
-<!--        <p>Price: {{acc.rate}} / night</p>-->
-<!--        <p>Availability:</p>-->
-
-
-<!--        {% if acc.external_url %}-->
-<!--            <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>-->
-<!--        {% else %}-->
-<!--            <form name='book_acc' method='POST'>-->
-<!--                <input type="text"  id="dateRange required" value="Booking Dates" class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">-->
-<!--                <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>-->
-<!--                <p><input name = "book_start" type = "hidden" id="book_start"></p>-->
-<!--                <p><input name = "book_end" type = hidden id="book_end"></p>-->
-<!--                <input type="submit" value="Book this room"/>-->
-<!--            </form>-->
-<!--        {% endif %}-->
-
-<!--    </div>-->
-
-<!--    <div class="review_container footer">-->
-
-<!--        <h3 align="center"> Reviews </h3>-->
-<!--        <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>-->
-<!--    </div>-->
-
-<!--    {% for review in reviews %}-->
-<!--    {% if not review.recommends %}-->
-<!--            <div class="reviewBad">-->
-<!--                <img src="/static/thumbs_down_selected.png"style="height 200px; width: 100px;">-->
-<!--                <h4>The bad:</h4><br>{{review.reviewBad}}-->
-<!--                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.-->
-<!--            </div>-->
-<!--           {% else %}-->
-<!--           <div class="reviewGood">-->
-<!--                <img src="/static/thumbs_up_selected.png" style="height 200px; width: 100px;">-->
-<!--                <h4>The good:</h4><br>{{review.reviewGood}}-->
-<!--               {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.-->
-<!--           {% endif %}-->
-<!--           </div>-->
-<!--    {% endfor %}-->
-<!--</div>-->
 
 
 <script>
@@ -248,7 +235,7 @@ function initMap() {
 };
 </script>
 
-
+<!-- Code from https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_apartment_rental&stacked=h-->
 <script>
 var slideIndex = 1;
 showDivs(slideIndex);
@@ -273,11 +260,17 @@ function showDivs(n) {
   for (i = 0; i < dots.length; i++) {
     dots[i].className = dots[i].className.replace(" w3-opacity-off", "");
   }
+  console.log(slideIndex);
+  console.log(x[slideIndex-1].style);
   x[slideIndex-1].style.display = "block";
   dots[slideIndex-1].className += " w3-opacity-off";
 }
 </script>
 
+
+
+
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>
+</body>
 {% endblock %}

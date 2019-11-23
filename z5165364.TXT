@@ -68,4 +68,4 @@ Worked on changing the date ranges in the DB when making a booking. Instead im m
 20/11/19
 Finished the booking dates. Working on the frontend for search results page.
 
-22/11/10 Working on book.html page.
+22/11/10 Working on book.html page. Image hover not working properly.
