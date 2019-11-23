@@ -30,13 +30,18 @@
                         </div>
 
                         <div class="input-field col s12">
-                            <input type="text" id="name_input" name="name_input" class="required"/>
+                            <input type="text" id="name_input" name="name_input" required = "true"/>
                             <label for="name_input">Full Name</label>
 
                         </div>
                         <div class="input-field col s12">
-                            <input type="text" id="uname_input" name="uname_input"/>
+                            <input type="text" id="uname_input" name="uname_input" required = "true"/>
                             <label for="uname_input">Username</label>
+                        </div>
+						<div class="input-field col s12">
+                            <input type="email" id="email_input" name="email_input" class="validate" required = "true">
+                            <label for="email_input">Email</label>
+                            <span class="helper-text" data-error="Invalid email" data-success="Valid">
                         </div>
                     </div>
                 </div>
@@ -50,11 +55,7 @@
                             <label for="desc_input">Description (optional)</label>
                         </div>
 
-                        <div class="input-field col s12 m12 l6">
-                            <input type="email" id="email_input" name="email_input" class="validate">
-                            <label for="email_input">Email</label>
-                            <span class="helper-text" data-error="Invalid email" data-success="Valid">
-                        </div>
+                        
                         <div class="input-field col s12 m12 l6">
                             <input type="tel" id="phone_input" name="phone_input">
                             <label for="phone_input">Phone Number</label>
