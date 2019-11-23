@@ -35,28 +35,28 @@
 
     <!-- Image SlideShow  Large image -->
     {% if images %}
-      <div class="row">  
+      <div class="row">
         <div class = "center-align col s12">
           {% for img in images %}
           <div class="w3-display-container mySlides">
-            <img src="{{img}}">
+            <img src="{{img}}" style="width:70vw">
           </div>
           {% endfor %}
         </div>
       </div>
 
-    <!-- Small images on the bottom -->
-    <div class="row">
-        {% for img in images %}
-          <div class="col s3">
-            <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:100%;cursor:pointer" onclick="currentDiv({{loop.index}})">
-          </div>
-          {% if loop.index % 4 == 0 %}
-          </div><div class="row"> <!-- Start a new row -->
-          {% endif %}
-        {% endfor %}
-    {% endif %}
+      <!-- Small images on the bottom -->
+      <div class="row">
+      {% for img in images %}
+        <div class="col s3">
+          <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:100%;cursor:pointer" onclick="currentDiv({{loop.index}})">
+        </div>
+        {% if loop.index % 4 == 0 %}
+        </div><div class="row"> <!-- Start a new row -->
+        {% endif %}
+      {% endfor %}
     </div>
+    {% endif %}
     <!-- Header -->
     <div class="header" align="center">
         <h1 style="font-style: oblique; font-size: 60px;">{{acc.name}}</h1>
@@ -66,25 +66,25 @@
     </div>
     <!-- Acc detail Section -->
     <div class="w3-container">
-        <h4 class="w3-left w3-col s9"><strong>The space</strong></h4>
+        <h4 class="w3-left w3-col s9"><strong>The venue</strong></h4>
         <div class="w3-row w3-large">
           <div class="w3-col s9 w3-left">
             <p><i class="fa fa-fw fa-bed"></i> Bedrooms: {{acc.bed_count}}</p>
             <p><i class="fa fa-fw fa-bath"></i> Bathrooms: {{acc.bath_count}}</p>
           </div>
         </div>
-    </div>
 
     <hr>
     <!-- Extr desc Section -->
     <h4 class="w3-left w3-col s9"><strong>Extra Info</strong></h4>
     <div class="w3-row w3-large">
-      <div class="w3-col s9">
+      <div class="w3-col s6">
         <p align="left">Description: {{acc.description}}</p>
         <p align="left">Address: {{acc.address.street_address}}</p>
-		<input type = 'hidden' id = 'lat' value = '{{acc.address.lat}}'>
-		<input type = 'hidden' id = 'lng' value = '{{acc.address.lng}}'>
-		<div id = "map"></div>
+        <input type = 'hidden' id = 'lat' value = '{{acc.address.lat}}'>
+        <input type = 'hidden' id = 'lng' value = '{{acc.address.lng}}'>
+      </div><div class="w3-col s6">
+        <div id = "map" style="width:30vw;height:30vw"></div>
       </div>
     </div>
 
@@ -104,12 +104,12 @@
     </div>
     <hr>
     <!-- Booking Section -->
-    <div class="w3-container">
+    <!-- <div class="w3-container"> -->
         <h4 class="w3-left w3-col s9"><strong>Booking</strong></h4>
         <div class="w3-row w3-large">
           <div class="w3-col s9 w3-left">
             <h3>Rental</h3>
-            <h3>${{acc.rate}}</h3>
+            <h3>${{"%.2f" % acc.rate}}</h3>
             <h6>per night</h6>
             {% if acc.external_url %}
             <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
@@ -130,11 +130,6 @@
     <hr>
     <!-- Review Section -->
 </div>
-
-
-
-<div></div>
-
 
 
 <!-- Content Layout -->
