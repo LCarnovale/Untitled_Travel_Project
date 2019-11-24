@@ -5,6 +5,18 @@
 
 {% block content %}
     <h2> Your booking of {{acc.name}} was successful! </h2>
-    <h3> What to do now: </h3>
-    <p> <a href = {{url_for('home')}}> Home </a> </p>
+    <div>
+        <b>Check-in:</b> {{booking.start_date.strftime('%d %B, %Y')}}
+    </div>
+    <div>
+        <b>Check-out:</b> {{booking.end_date.strftime('%d %B, %Y')}}
+    </div>
+    <br>
+    <p> The owner ({{owner[1]}}) will be in contact with you shortly. If you need any further details, please contact them on {{owner[4]}}</p>
+    <br>
+    <div style="text-align: center">
+        <a href = {{url_for('home')}}> Homepage </a>
+        <br>
+        <a href = {{url_for('view_bookings')}}> View all bookings </a>
+    </div>
 {% endblock %}

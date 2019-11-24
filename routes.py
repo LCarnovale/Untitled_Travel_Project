@@ -322,11 +322,12 @@ Message: {str(e)}""")
         form = request.form
         if 'id' in session:
             try:
-                bookingSystem.create_booking(
+                bid = bookingSystem.create_booking(
                     id, session['id'], 
                     datetime.strptime(form['book_start'], "%d/%m/%Y"), 
                     datetime.strptime(form['book_end'], "%d/%m/%Y")
                 )
+                booking = bookingSystem.get_booking(bid)
             except ValueError as e:
                 print("*** Booking date error: ***")
                 print(e)
@@ -337,6 +338,8 @@ Message: {str(e)}""")
                 return render_template('book.html', **kwargs, 
                     booking_fail=e.msg,
                     err_msg="The booking could not be made.")
+
+            return render_template('book_confirm.html', booking=booking, **kwargs)
         # else:
         #     global send_to
         #     send_to = url_for('book_main', id=id)
