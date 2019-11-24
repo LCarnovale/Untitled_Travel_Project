@@ -10,6 +10,7 @@ from src.stayDetails import StayDetails
 from src.accommodation import Accommodation
 
 USE_DATABASE = True
+RESULTS_PER_PAGE = 21 # 7 rows of 3
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'

@@ -17,6 +17,7 @@ from server import app
 import db
 import os
 from datetime import datetime, timedelta, date
+from server import RESULTS_PER_PAGE
 
 @app.template_filter('pluralise')
 def pluralise(num, singular='', plural='s'):
@@ -92,7 +93,10 @@ def home():
             results = accSystem.advancedSearch(search, None, None, None, beds,
                                                bathrooms, parking, location, distance)
             results = accSystem.get_acc(results)
-            return render_template('search_results.html', results = results)
+            # return render_template('search_results.html', results = results)
+            global _results
+            _results = results
+            return redirect(url_for('view_search'))
         except db.OperationalError as e:
             return render_template('404.html', err_msg=rf"""Unable to connect to database.
 Message: {str(e)}""")
@@ -103,6 +107,32 @@ Message: {str(e)}""")
         return render_template('search_results.html', results = [])
 
     return render_template('home.html')
+
+_results = []
+'''
+Search result viewing
+'''
+@app.route('/results/', methods=['GET', 'POST'])
+@app.route('/results/<page>', methods=['GET', 'POST'])
+def view_search(page=1):
+    print(request.form)
+    page = int(page)
+    kwargs = {
+        'page_num':page, 
+        'page_count':(len(_results) // RESULTS_PER_PAGE) + (1 if (len(_results) % RESULTS_PER_PAGE) else 0)
+    }
+    if request.method == 'GET':
+        start = (page - 1) * RESULTS_PER_PAGE
+        end = start + RESULTS_PER_PAGE
+        return render_template('search_results.html', 
+            results=_results[start:end], **kwargs)
+    
+    elif request.method == 'POST':
+        if 'next' in request.form:
+            return redirect(url_for('view_search', page=page + 1))
+        elif 'prev' in request.form:
+            return redirect(url_for('view_search', page=page - 1))
+        
 
 '''
 Login page
