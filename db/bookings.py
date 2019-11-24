@@ -18,9 +18,11 @@ def get(id):
 def get_for_user(uid):
     """
     Return all bookings for the given user.
+
+    Orders the output by start date.
     """
     with dbCursor() as cursor:
-        cursor.execute("SELECT * FROM Bookings WHERE userid=?", uid)
+        cursor.execute("SELECT * FROM Bookings WHERE userid=? ORDER BY startDate", uid)
         return cursor.fetchall()
 
 

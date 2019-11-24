@@ -25,9 +25,27 @@
         margin-right: auto;
       }
 
+      body {
+        margin: 0;
+        height: 100%;
+      }
+
+      /* .wrapper {
+        box-sizing: border-box;
+        position: relative;
+        padding-bottom: 1em; /* Height of footer */
+        min-height: 100%;
+      } */
+
       div.centre {
         text-align: center;
       }
+      /* footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        color: #fff;
+      } */
 /*     
       .cards-container {
         column-break-inside: avoid;
@@ -80,10 +98,18 @@
     
       </div>
     </nav>
-    <div class="container">
-      <br>
-      {% block content %}{% endblock %}
-      <br>
+    <div class="wrapper">
+
+      <div class="container">
+        <br>
+        {% block content %}{% endblock %}
+        <br>
+      </div>
+      <footer>
+        <hr>
+        <img src="../static/nsw1.png" class='myimage'>
+      </footer>
+
     </div>
     
   </body>
