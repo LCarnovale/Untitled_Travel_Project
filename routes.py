@@ -334,7 +334,9 @@ Message: {str(e)}""")
             except BS.BookingError as e:
                 print("*** Booking failed, error: ***")
                 print(e)
-                return render_template('book.html', **kwargs, err_msg="The booking could not be made.")
+                return render_template('book.html', **kwargs, 
+                    booking_fail=e.msg,
+                    err_msg="The booking could not be made.")
         # else:
         #     global send_to
         #     send_to = url_for('book_main', id=id)
@@ -398,11 +400,12 @@ def ad_main():
         print(request.files)
         for i in (request.files):
             f = request.files[i]
-            dir = '../static/'+app.config['UPLOAD_FOLDER']
+            if not f: continue 
+            dir = 'static/'+app.config['UPLOAD_FOLDER']
             f.save(os.path.join(dir, f.filename))
             print(type(f))
             url = os.path.join(dir, f.filename)
-            db.images.insert(venueid, url)
+            db.images.insert(venueid, '../' + url)
 
         # Create associated date ranges
         # This could be moved to another module?

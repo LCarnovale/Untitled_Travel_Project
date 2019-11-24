@@ -115,6 +115,9 @@
               <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
             {% else %}
               <!-- <p class = "good_msg w3-left">This place is currently available!</p> -->
+              {% if booking_fail %}
+              <p class="bad_msg">{{booking_fail}}</p>
+              {% endif %}
               <form name='book_acc' method='POST'>
                   <div class="input-field col s12 m6">
                     <input type="text"  id="dateRange required" class="calendar"  onfocus="getDates({{acc.get_dates()}})">
@@ -123,15 +126,15 @@
                   <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
                   <p><input name = "book_start" type = "hidden" id="book_start"></p>
                   <p><input name = "book_end" type = hidden id="book_end"></p>
-                  <!-- <button class="btn waves-effect waves-light light-blue" type="submit" id="bookbutton" name="bookbutton">
-                    Book this room
-                  </button> -->
-                  {% if session['id'] %}
+ 
+                  {% if session['login_type'] == 'user' %}
                   <button class="btn tooltipped waves-effect waves-light light-blue" 
                     data-position="bottom" data-tooltip="Select dates"
                     type="submit">Book this room</button>
+                  {% elif session['login_type'] == 'owner' %}
+                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login as a user to make a booking.</a>
                   {% else %}
-                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>To make a booking please login.</a>
+                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login to make a booking.</a>
                   {% endif %}
               </form>
             {% endif %}

@@ -5,6 +5,7 @@ from accommodation import Accommodation
 
 class BookingError(Exception):
     def __init__(self, msg):
+        self.msg = msg
         super().__init__(self, msg)
 
 class BookingSystem:
