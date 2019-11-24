@@ -66,11 +66,14 @@ class User:
 
     @email.setter
     def email(self, email):
-        x = re.search(r'[\w\.-]+@[\w\.-]+(\.[\w])+', email)
-        if x is not None:
-            self._email = email
+        if email:
+            x = re.search(r'[\w\.-]+@[\w\.-]+(\.[\w])+', email)
+            if x is not None:
+                self._email = email
+            else:
+                raise EmailError
         else:
-            raise EmailError
+            self._email = email # Allow null emails
         
     @property
     def mobile(self):

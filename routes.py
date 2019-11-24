@@ -54,22 +54,6 @@ def home():
             bathrooms = request.form.get('bathrooms') or None
             parking = request.form.get('parking') or None
 
-
-            found = accSystem.get_like(refine=refine,
-                bedCount=f'>={beds}' if beds else None,
-                bathCount=f'>={bathrooms}' if bathrooms else None,
-                carCount=f'>={parking}' if parking else None,
-            )
-            refine = True if found else False 
-            
-            found = accSystem.get_like(refine=refine,
-                name=f'~%{keyword}%',
-                description=f'~%{keyword}%',
-                details=f'~%{keyword}%',
-                join="OR"
-            )
-            refine = found or False
-            
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
@@ -92,6 +76,7 @@ def home():
             search = request.form['keyword']
             results = accSystem.advancedSearch(search, None, None, None, beds,
                                                bathrooms, parking, location, distance)
+            print(results)
             results = accSystem.get_acc(results)
             # return render_template('search_results.html', results = results)
             global _results
