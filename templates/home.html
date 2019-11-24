@@ -15,7 +15,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			var elems = document.querySelectorAll('.collapsible');
 			var instances = M.Collapsible.init(elems, options);
-			updateRadius(2500);
+			updateRadius(3);
 		});
 	</script>
 
@@ -43,7 +43,7 @@
 				<label for="searchgeocode" id="searchlabel">Search by Location</label>
 				</div><div class="col s2">
 					<br>
-				<button type="submit" class="btn">Search</button>
+				<button disabled id="searchBtn" type="submit" class="btn">Search</button>
 				</div>
 			</div>
 		</div>
@@ -52,7 +52,7 @@
 
 		<div class="col s12">
 			<p class="range-field">
-				<input type="range" id="radiuschange" min="0" max="6" start="3" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
+				<input type="range" id="radiuschange" min="0" max="9" start="3" value="3" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
 			</p>
 		</div>
 		<div class="center-align">
@@ -64,7 +64,7 @@
 				<div class="collapsible-body">
 					<div class="row">
 						<div class="input-field">
-							<input type="text" id="keywordinput" name="keyword">
+							<input type="text" id="keywordinput" name="keyword" oninput="changeSearch(this.value)">
 							<label for="keywordinput">Keyword search</label>
 						</div>
 					</div>
@@ -110,7 +110,7 @@
 		var markerlist = [];
 		var circlelist = [];
 		var geocoder;
-		var distancevalues = [500,1000,1500,2000,3000,4000,5000];
+		var distancevalues = [500,1000,1500,2000,3000,4000,5000,7500,10000,20000];
 		function initMap() {
 			map = new google.maps.Map(document.getElementById('map'), {
 			  center: {lat: -33.91538902145825 , lng: 151.11207767686824},
@@ -141,10 +141,12 @@
 							} 
 							else {
 								alert('No results found');
+								document.getElementById("searchBtn").disabled = true;
 							}
 						} 
 						else {
 							alert('Geocoder failed due to: ' + status);
+							document.getElementById("searchBtn").disabled = true;
 						}
 					});
 			});
@@ -222,6 +224,7 @@
 								circle.bindTo('center', marker, 'position');
 								circlelist.push(circle);
 								console.log('Result: ' + results);
+								document.getElementById("searchBtn").disabled = false; // enable search button
 							} else {
 								console.log('No results found');
 							}

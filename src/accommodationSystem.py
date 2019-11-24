@@ -34,6 +34,7 @@ class AccommodationSystem:
         If id is a list of id's, returns a list of corresponding objects.
         '''
         # Try the stored list:
+        print('GET', id)
         if type(id) == str:
             id = int(id)
         else:
@@ -42,11 +43,12 @@ class AccommodationSystem:
             except:
                 pass
             else:
-                return [self.get_acc(_) for _ in id] 
+                return [self._accommodations[x] for x in id] 
                 
         if id in self._accommodations:
             return self._accommodations[id]
         else:
+            print('FETCHING')
             # Fetch from database
             acc = db.venues.get(id)
             if acc is not None:
@@ -80,10 +82,13 @@ class AccommodationSystem:
                        bathrooms, parking, location, distance):
         # self.get_like(name=f"%{search}%", details=f"{search}", description=f"{search}")
         print('SEARCHING')
-        #print(self._accommodations)
+        print(self._accommodations.keys())
         s = Search(self._accommodations)
-        return s.advancedSearch(search, text_bounds, startdate, enddate, beds,
-                                bathrooms, parking, location, distance)
+        result = s.advancedSearch(search, text_bounds, startdate, enddate, beds,
+                                  bathrooms, parking, location, distance)
+        print('AFTER')
+        print(self._accommodations.keys())
+        return result
     def clean_system(self):
         """Remove all stored venues (Not from database)"""
         self._accommodations = {}
@@ -105,7 +110,7 @@ class AccommodationSystem:
         `point` should be a lat-lon pair.
         """
         venues, addresses, dists = db.venues.search_area_circle(point, distance)
-        print(venues)
+        #print(venues)
         if refine:
             _refine(self._accommodations, [v[0] for v in venues],
                     venues, addresses, dists)
