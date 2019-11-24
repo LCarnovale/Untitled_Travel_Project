@@ -122,11 +122,7 @@
                   <div class="input-field col s12 m6">
                     <input type="text"  id="dateRange" class="calendar" 
                       onchange="changeDates()" onblur="checkDateField()"  
-                      onfocus="getDates({{acc.get_dates()}})" required="true"
-                      <!-- {% if session['login_type'] == 'owner' and session['id']|int == acc.ownerid %} -->
-                      <!-- disabled{% endif %}> -->
-                    >
-                    <!-- <input  type="text"  id="dateRange" class="calendar"  onfocus="getDates({{acc.get_dates()}})" required = "true"> -->
+                      onfocus="getDates({{acc.get_dates()}})" required="true">
                     <label>Booking dates</label>
                   </div>
                   {% endif %}
@@ -256,6 +252,10 @@ function getDates(dates) {
             }
         }
     });
+
+    $('.calendar').on('blur', function(ev, picker) {
+      console.log('blurring');
+    })
 
     $('.calendar').on('cancel.daterangepicker', function(ev, picker) {
         document.getElementById('book_start').value = '';

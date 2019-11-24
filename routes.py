@@ -33,6 +33,11 @@ app.add_template_global(f=date.today(), name='today')
 def page_not_found(e):
     return render_template('404.html')
 
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html')
+
+
 '''
 Landing page
 '''
@@ -43,8 +48,6 @@ def home():
         try:
             keyword = request.form.get('keyword')
             refine = False
-            print('Form:', request.form)
-            print("getting venues with matching options ")
 
             beds = request.form.get('beds') or None
             bathrooms = request.form.get('bathrooms') or None
@@ -58,8 +61,6 @@ def home():
             )
             refine = True if found else False 
             
-            print("Filtering by options:", found)
-            
             found = accSystem.get_like(refine=refine,
                 name=f'~%{keyword}%',
                 description=f'~%{keyword}%',
@@ -68,13 +69,12 @@ def home():
             )
             refine = found or False
             
-            print("Filtering by search term:", found)
-            
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
-                print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
+                accSystem.get_available(startdate, enddate, refine=refine)
+                refine = True
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
                 enddate = None
@@ -82,9 +82,8 @@ def home():
             location = request.form.get('geocodedvalue')
             distance = request.form.get('radiusval')
             if location:
-                print("getting venues near", location)
-                print('distance = ', distance)
-                print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
+                accSystem.get_near(location.split(', '), distance, refine=refine)
+                refine=True
             # elif text_bounds:
             # TODO: This is a bit dodgy the target location and search term should be separate
             # if location: search = None
@@ -92,18 +91,12 @@ def home():
             results = accSystem.advancedSearch(search, None, None, None, beds,
                                                bathrooms, parking, location, distance)
             results = accSystem.get_acc(results)
-            # print(results[0].get_images())
             return render_template('search_results.html', results = results)
         except db.OperationalError as e:
             return render_template('404.html', err_msg=rf"""Unable to connect to database.
 Message: {str(e)}""")
 
         except Exception as e:
-            print('----------------------------------')
-            print('INVALID DATA WAS ENTERED TO SEARCH')
-            print('Error as follows:')
-            print(e)
-            print('----------------------------------')
             raise e
 
         return render_template('search_results.html', results = [])
@@ -245,39 +238,43 @@ Edit profile page
 @app.route('/edit', methods=['GET', 'POST'])
 def editprofile():
     # Create user.
-    uid = session['id']
-    user = userSystem.get_user(uid, u_type=session['login_type'])
-    if request.method == 'POST':
-        form = request.form
-        if user is not None:
-            if form['account_pwd_new']:
-                pwd_check = userSystem.check_user_pass(
-                    user.username, form['account_pwd_current'], u_type=user.type)
-                if pwd_check is None:
-                    # Incorrect password given
-                    return render_template('edit.html', _user=user, pass_fail=True)
-                else:
-                    # Correct password given
-                    user = userSystem.set_password(
-                        uid, form['account_pwd_new'], u_type=user.type)
+    try:
+        uid = session['id']
+        user = userSystem.get_user(uid, u_type=session['login_type'])
+        if request.method == 'POST':
+            form = request.form
+            if user is not None:
+                if form['account_pwd_new']:
+                    pwd_check = userSystem.check_user_pass(
+                        user.username, form['account_pwd_current'], u_type=user.type)
+                    if pwd_check is None:
+                        # Incorrect password given
+                        return render_template('edit.html', _user=user, pass_fail=True)
+                    else:
+                        # Correct password given
+                        user = userSystem.set_password(
+                            uid, form['account_pwd_new'], u_type=user.type)
 
-            user.name = form['account_name']
-            user.username = form['account_username']
-            user.email = form['account_email']
-            user.mobile = form['account_phone']
-            user.desc = form['account_description']
-            
-            # Assume edits successful
-            d = user.todict()
-            for k, v in zip(d.keys(), d.values()):
-                session[k] = v
-            # session['email'] = user.email
-            # session['phone'] = user.phone
-            # session['desc'] = user.desc
-            userSystem.update_user(uid, u_type=user.type)
-        else:
-            print("Error user not found")
-        return render_template('confirm_edit.html')
+                user.name = form['account_name']
+                user.username = form['account_username']
+                user.email = form['account_email']
+                user.mobile = form['account_phone']
+                user.desc = form['account_description']
+                
+                # Assume edits successful
+                d = user.todict()
+                for k, v in zip(d.keys(), d.values()):
+                    session[k] = v
+                # session['email'] = user.email
+                # session['phone'] = user.phone
+                # session['desc'] = user.desc
+                userSystem.update_user(uid, u_type=user.type)
+            else:
+                print("Error user not found")
+                abort(500)
+            return render_template('confirm_edit.html')
+    except Exception as e:
+        abort(500)
     return render_template('edit.html', _user=user)
 
 
@@ -352,7 +349,7 @@ Message: {str(e)}""")
             except ValueError as e:
                 print("*** Booking date error: ***")
                 print(e)
-                return render_template('book.html', booking_fail="Please enter a valid date range", **kwargs)
+                return render_template('book.html', booking_fail="Please enter a valid date range using the calendar.", **kwargs)
             except BS.BookingError as e:
                 print("*** Booking failed, error: ***")
                 print(e)
