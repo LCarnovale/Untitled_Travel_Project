@@ -71,20 +71,14 @@
 		margin-left: auto;
 		margin-right: auto;
 }
-.header {
-
+.vl {
+  border-left: 6px solid green;
+  height: 500px;
 }
+.mySlides {display: none}
 
-.reviewGood {
-    grid-area: reviewGood;
-    background-color: #ebb4ad;
-    height: 500px;
-    width: 600px;
-}
-
-.reviewBad {
-    grid-area: reviewBad;
-    background-color: #deb5b0;
-    height: 500px;
-    width: 600px;
+.demo {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
 }

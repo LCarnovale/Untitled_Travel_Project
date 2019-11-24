@@ -44,13 +44,13 @@
                 {% set images = venue.get_images() %}
                 <div class="card">
                     <div class="card-image">
-                        <i href="/book/{{venue.venueid}}">
+                        <a href="{{url_for('book_main', id=venue.id)}}">
                             {% if images|length > 0 %}
                             <img src="{{images[0]}}" class="venueimg">
                             {% else %}
                             <img src="../static/nsw1.png" class="venueimg">
                             {% endif %}
-                        </i>
+                        </a>
                     </div>
 
                     <div class="card-content">
@@ -65,7 +65,7 @@
                         <p>Min Stay: {{venue.min_stay}} Max Stay: {{venue.max_stay}}</p>
                     </div>
                     <div class="card action">
-                        <a class="btn" href="/book/{{venue.id}}">Go to venue</a>
+                        <a class="btn" href="{{url_for('book_main', id=venue.id)}}">Go to venue</a>
                     </div>
                 </div>
                 {% if results|length <= 3 %}
@@ -77,7 +77,7 @@
         </div>
         {% else %}
         <br>
-       <p> Couldn't find places</p>
+       <h2> Couldn't find places</h2>
         {% endif %}
    <!-- </div> -->
 {% endblock %}

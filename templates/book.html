@@ -21,14 +21,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
- <style>
-
-.mySlides {display: none}
- </style>
 {% endblock %}
 
 {% block content %}
-
+<body>
 <!-- Content -->
 <!-- <div class="w3-main w3-white" style="margin-left:260px">
     <div class="w3-hide-large" style="margin-top:80px"></div> -->
@@ -42,23 +38,25 @@
             <img src="{{img}}" style="width:70vw">
           </div>
           {% endfor %}
+
         </div>
       </div>
 
-      <!-- Small images on the bottom -->
-      <div class="row">
-      {% for img in images %}
-        <div class="col s3">
-          <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:100%;cursor:pointer" onclick="currentDiv({{loop.index}})">
-        </div>
-        {% if loop.index % 4 == 0 %}
-        </div><div class="row"> <!-- Start a new row -->
-        {% endif %}
-      {% endfor %}
-    </div>
+    <!-- Small images on the bottom -->
+    <div class="row">
+        {% for img in images %}
+          <div class="col s3">
+            <img class="demo w3-opacity w3-hover-opacity-off" src="{{img}}" style="width:200px;cursor:pointer" onclick="currentDiv({{loop.index}})">
+          </div>
+          {% if loop.index % 4 == 0 %}
+          </div><div class="row"> <!-- Start a new row -->
+          {% endif %}
+        {% endfor %}
+      </div>
     {% endif %}
+
     <!-- Header -->
-    <div class="header" align="center">
+    <div class="center-align header">
         <h1 style="font-style: oblique; font-size: 60px;">{{acc.name}}</h1>
         {% if acc.external_url %}
         <i>This ad was found at <a href="{{acc.external_url}}">{{acc.display_url}}</a></i>
@@ -94,14 +92,15 @@
     <div class="w3-row w3-large">
       <div class="w3-col s9">
         {% if acc.external_url %}
-        {% endif %}
-        {% if owner %}
+            Contact Owner at <a href="{{acc.external_url}}">{{acc.display_url}}</a>
+        {% elif owner %}
         <p align="left"> Name: {{owner[1]}} </p>
         <p align="left"> {{owner[2]}} </p>
         <p align="left"> Have any questions? Contact the owner at {{owner[4]}}</p>
         {% endif %}
       </div>
     </div>
+
     <hr>
     <!-- Booking Section -->
     <!-- <div class="w3-container"> -->
@@ -109,18 +108,34 @@
         <div class="w3-row w3-large">
           <div class="w3-col s9 w3-left">
             <h3>Rental</h3>
-            <h3>${{"%.2f" % acc.rate}}</h3>
-            <h6>per night</h6>
+            <h3>${{"%.2f" % acc.rate}}  
+              <label>per night</label>
+            </h3>
             {% if acc.external_url %}
-            <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
+              <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
             {% else %}
+              <!-- <p class = "good_msg w3-left">This place is currently available!</p> -->
+              {% if booking_fail %}
+              <p class="bad_msg">{{booking_fail}}</p>
+              {% endif %}
               <form name='book_acc' method='POST'>
-                  <input type="text"  id="dateRange required" value="Booking Dates" class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
+                  <div class="input-field col s12 m6">
+                    <input type="text"  id="dateRange required" class="calendar"  onfocus="getDates({{acc.get_dates()}})">
+                    <label>Booking dates</label>
+                  </div>
                   <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
-                  <p class = "good_msg">This place is currently available!</p>
                   <p><input name = "book_start" type = "hidden" id="book_start"></p>
                   <p><input name = "book_end" type = hidden id="book_end"></p>
-                  <input type="submit" value="Book this room"/>
+ 
+                  {% if session['login_type'] == 'user' %}
+                  <button class="btn tooltipped waves-effect waves-light light-blue" 
+                    data-position="bottom" data-tooltip="Select dates"
+                    type="submit">Book this room</button>
+                  {% elif session['login_type'] == 'owner' %}
+                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login as a user to make a booking.</a>
+                  {% else %}
+                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login to make a booking.</a>
+                  {% endif %}
               </form>
             {% endif %}
           </div>
@@ -128,68 +143,47 @@
     </div>
 
     <hr>
+
+
     <!-- Review Section -->
+    {% if reviews%}
+    <h4 class="w3-left w3-col s9"><strong>Reviews</strong></h4>
+    <div class="w3-row w3-large">
+        {% for review in reviews %}
+            {% if review.recommends %}
+            <!-- Good Reviews -->
+            <div class="w3-left">
+                <img src="/static/thumbs_up_selected.png" style="height 50px; width: 75px; display: block;">
+            </div>
+                <div style="margin-left: 100px" align="left">
+                    <h3>{{review.username}}</h3>
+                </div>
+                <div style="margin-top:50px; margin-left:100px" align="left">
+                    {{review.reviewGood}}
+                </div>
+                <br><br><hr>
+            {% else %}
+            <!-- Bad Reviews -->
+                <div class="w3-left">
+                    <img src="/static/thumbs_down_selected.png" style="height 50px; width: 75px; display: block">
+                </div>
+                    <div style="margin-left: 100px" align="left">
+                        <h3>{{review.username}}</h3>
+                    </div>
+                <div style="margin-top:50px; margin-left:100px" align="left">
+                    {{review.reviewBad}}
+                 </div>
+                <br><br><hr>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+<!--        <h3 align="center"> Write a Reviews </h3>-->
+<div class="w3-row w3-large">
+           <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
 </div>
-
-
-<!-- Content Layout -->
-
-<!--    <div class="left-grid">-->
-<!--        <p>Description</p>-->
-<!--        <p>{{acc.description}}</p>-->
-<!--        <p>Beds: {{acc.bed_count}}</p>-->
-<!--        <p>Bathrooms: {{acc.bath_count}}</p>-->
-<!--        <p>Car Spaces: {{acc.car_count}}</p>-->
-
-<!--    </div>-->
-
-<!--    <div class="right-grid">-->
-<!--        <p>Images</p><br><br>-->
-<!--		{% for image in images %}-->
-<!--			<img src = '{{image}}' style = 'width:150px;height:150px'>-->
-<!--		{% endfor %}-->
-<!--        <p>Booking Details</p>-->
-<!--        <p>Price: {{acc.rate}} / night</p>-->
-<!--        <p>Availability:</p>-->
-
-
-<!--        {% if acc.external_url %}-->
-<!--            <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>-->
-<!--        {% else %}-->
-<!--            <form name='book_acc' method='POST'>-->
-<!--                <input type="text"  id="dateRange required" value="Booking Dates" class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">-->
-<!--                <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>-->
-<!--                <p><input name = "book_start" type = "hidden" id="book_start"></p>-->
-<!--                <p><input name = "book_end" type = hidden id="book_end"></p>-->
-<!--                <input type="submit" value="Book this room"/>-->
-<!--            </form>-->
-<!--        {% endif %}-->
-
-<!--    </div>-->
-
-<!--    <div class="review_container footer">-->
-
-<!--        <h3 align="center"> Reviews </h3>-->
-<!--        <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>-->
-<!--    </div>-->
-
-<!--    {% for review in reviews %}-->
-<!--    {% if not review.recommends %}-->
-<!--            <div class="reviewBad">-->
-<!--                <img src="/static/thumbs_down_selected.png"style="height 200px; width: 100px;">-->
-<!--                <h4>The bad:</h4><br>{{review.reviewBad}}-->
-<!--                {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.-->
-<!--            </div>-->
-<!--           {% else %}-->
-<!--           <div class="reviewGood">-->
-<!--                <img src="/static/thumbs_up_selected.png" style="height 200px; width: 100px;">-->
-<!--                <h4>The good:</h4><br>{{review.reviewGood}}-->
-<!--               {{review.username}} {% if not review.recommends %} does not {% else %} would {% endif %} reccommend staying here.-->
-<!--           {% endif %}-->
-<!--           </div>-->
-<!--    {% endfor %}-->
-<!--</div>-->
-
+</div>
 
 <script>
 function getDates(dates) {
@@ -206,8 +200,10 @@ function getDates(dates) {
             days: {{acc.max_stay}}
         },
         isInvalidDate: function(date) {
-            var startDate = $('.calendar').data('daterangepicker').startDate;
+            var startDate = $('.calendar').data('daterangepicker').startDate.format('DD/MM/YYYY');
             var minDate = moment(startDate).add(minStay, 'days');
+            console.log("BOOK START");
+            console.log(startDate);
             // Date range between min and max
             if (date < minDate) {
                 return true;
@@ -215,6 +211,11 @@ function getDates(dates) {
                 for (var i = 0; i < availDateSize; i++) {
                     var startRange = new Date(dates[i][0].replace(/(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"));
                     var endRange = new Date(dates[i][1].replace(/(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"));
+                    // Cannot pick from two different date ranges
+                    if (startDate >= startRange && startDate <= endRange
+                        && date > endRange) {
+                        return true;
+                    }
                     if (date >= startRange && date <= endRange) {
                         return false;
                     }
@@ -248,7 +249,7 @@ function initMap() {
 };
 </script>
 
-
+<!-- Code from https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_apartment_rental&stacked=h-->
 <script>
 var slideIndex = 1;
 showDivs(slideIndex);
@@ -273,11 +274,17 @@ function showDivs(n) {
   for (i = 0; i < dots.length; i++) {
     dots[i].className = dots[i].className.replace(" w3-opacity-off", "");
   }
+  console.log(slideIndex);
+  console.log(x[slideIndex-1].style);
   x[slideIndex-1].style.display = "block";
   dots[slideIndex-1].className += " w3-opacity-off";
 }
+$(document).ready(function () {
+  $('.tooltipped').tooltip();
+});
 </script>
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap" async defer></script>
+</body>
 {% endblock %}

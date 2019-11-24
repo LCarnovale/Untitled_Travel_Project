@@ -9,15 +9,41 @@ class AccommodationSystem:
 
     def add_acc(self, id, acc):
         '''Adds accommodations into the system'''
+        try:
+            id = int(id)
+        except ValueError:
+            raise ValueError("Can not convert %s to an int." % id)
         acc._id = id
         self._accommodations[id] = acc
+    
+    def add_acc_row(self, row):
+        """
+        Insert an accommodation object created from a row returned
+        from the database. Use this to avoid calling the database multiple times.
+        """
+        new_acc = Accommodation(*row[1:])
+        self.add_acc(row[0], new_acc)
+        return new_acc
+
 
     def get_acc(self, id):
         '''
         Finds an accommodation by a unique ID
         Returns None if none are found.
+
+        If id is a list of id's, returns a list of corresponding objects.
         '''
         # Try the stored list:
+        if type(id) == str:
+            id = int(id)
+        else:
+            try:
+                iter(id)
+            except:
+                pass
+            else:
+                return [self.get_acc(_) for _ in id] 
+                
         if id in self._accommodations:
             return self._accommodations[id]
         else:
@@ -62,6 +88,13 @@ class AccommodationSystem:
         """Remove all stored venues (Not from database)"""
         self._accommodations = {}
 
+    def get_for_owner(self, ownerid):
+        """
+        Get all venues associated with the given owner.
+        """
+        venues = db.venues.get_for_owner(ownerid)
+        return [self.add_acc_row(v) for v in venues]
+
     def get_near(self, point, distance, refine=False):
         """
         Load all venues within `distance` metres of `point`.
@@ -81,8 +114,8 @@ class AccommodationSystem:
         
         
         for v in venues:
-            new_venue = Accommodation(*v[1:])
-            self.add_acc(v[0], new_venue)
+            # new_venue = Accommodation(*v[1:])
+            self.add_acc_row(v)#[0], new_venue)
         
         return [v[0] for v in venues]
 

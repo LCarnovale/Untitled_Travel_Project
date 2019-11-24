@@ -76,4 +76,11 @@ Week 9:
     Thursday:
     Have created some db functions that will be useful for quickly getting a list of venues
     near a certain location. This should help speed up the website.
-     
+
+Week 10:
+    The frontend is being drastically updated with material design styling and is starting to look
+    quite good. Search speed is generally much faster than earlier versions also thanks to limiting
+    how broad the search can be. 
+
+    We are in the last phase of adding functionality to the frontend and are primarily now working
+    on finding bugs and making small improvements to the user experience.
