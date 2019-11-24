@@ -120,7 +120,7 @@
               {% endif %}
               <form name='book_acc' method='POST'>
                   <div class="input-field col s12 m6">
-                    <input {% if session['login_type'] == 'owner' and session['id']|int == acc.ownerid %}disabled{% endif %} type="text"  id="dateRange required" class="calendar"  onfocus="getDates({{acc.get_dates()}})">
+                    <input {% if session['login_type'] == 'owner' and session['id']|int == acc.ownerid %}disabled{% endif %} type="text"  id="dateRange" class="calendar"  onfocus="getDates({{acc.get_dates()}})" required = "true">
                     <label>Booking dates</label>
                   </div>
                   <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
