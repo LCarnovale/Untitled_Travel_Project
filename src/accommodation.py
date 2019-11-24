@@ -135,6 +135,7 @@ class Accommodation:
         temp = [img[2] for img in images]
         return [image.replace("\\","/") for image in temp]
 
+
     '''
     Properties
     '''
@@ -294,3 +295,9 @@ class Accommodation:
     @property
     def url_base(self):
         return self.external_url.split('//')[1].split('/')[0]
+
+    @property
+
+    def reviews(self):
+        revs = db.reviews.get_for_venue(self._id)
+        return [src.review.Review(*x[1:]) for x in revs]

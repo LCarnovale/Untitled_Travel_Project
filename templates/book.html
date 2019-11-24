@@ -66,37 +66,36 @@
     <div class="w3-container">
         <h4 class="w3-left w3-col s9"><strong>The venue</strong></h4>
         <div class="w3-row w3-large">
-          <div class="w3-col s9 w3-left">
+          <div class="w3-col s6 w3-left">
             <p><i class="fa fa-fw fa-bed"></i> Bedrooms: {{acc.bed_count}}</p>
             <p><i class="fa fa-fw fa-bath"></i> Bathrooms: {{acc.bath_count}}</p>
           </div>
+          <div class="w3-col s6">
+            <div id="map" style="width:30vw;height:30vw"></div>
+          </div>
         </div>
-
+      </div>
     <hr>
     <!-- Extr desc Section -->
-    <h4 class="w3-left w3-col s9"><strong>Extra Info</strong></h4>
+    <h4><strong>About</strong></h4>
     <div class="w3-row w3-large">
-      <div class="w3-col s6">
-        <p align="left">Description: {{acc.description}}</p>
+      <div class="w3-col s12">
+        <p align="left">{{acc.description}}</p>
         <p align="left">Address: {{acc.address.street_address}}</p>
         <input type = 'hidden' id = 'lat' value = '{{acc.address.lat}}'>
         <input type = 'hidden' id = 'lng' value = '{{acc.address.lng}}'>
-      </div><div class="w3-col s6">
-        <div id = "map" style="width:30vw;height:30vw"></div>
-      </div>
     </div>
 
     <hr>
     <!-- Owner Details Section -->
-    <h4 class="w3-left w3-col s9"><strong>Owner Details</strong></h4>
+    <h4><strong>Owner Details</strong></h4>
     <div class="w3-row w3-large">
       <div class="w3-col s9">
         {% if acc.external_url %}
             Contact Owner at <a href="{{acc.external_url}}">{{acc.display_url}}</a>
         {% elif owner %}
-        <p align="left"> Name: {{owner[1]}} </p>
-        <p align="left"> {{owner[2]}} </p>
-        <p align="left"> Have any questions? Contact the owner at {{owner[4]}}</p>
+        <p align="left"> Name: {{owner.name}} </p>
+        <p align="left"> Have any questions? Contact the owner at {{owner.mobile}}</p>
         {% endif %}
       </div>
     </div>
@@ -132,7 +131,7 @@
                     data-position="bottom" data-tooltip="Select dates"
                     type="submit">Book this room</button>
                   {% elif session['login_type'] == 'owner' %}
-                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login as a user to make a booking.</a>
+                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>You're currently logged in as a host. Click here to login as a user to make a booking.</a>
                   {% else %}
                   <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login to make a booking.</a>
                   {% endif %}

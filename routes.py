@@ -310,10 +310,10 @@ Message: {str(e)}""")
         abort(404)
 
     # Get owner details, address details, availabilities.
-    owner = db.owners.get(acc.ownerid)
-    address = Address(*db.addresses.get(acc.aid)[1:])
+    owner = userSystem.get_owner(acc.ownerid)
+    address = acc.address
     images = acc.get_images()
-    reviews = src.review.get_for_venue(id)
+    reviews = acc.reviews
 
     kwargs = {'acc': acc, 'owner': owner, 'id':id,
         'address':address, 'images':images, 'reviews':reviews}
