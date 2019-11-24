@@ -51,7 +51,6 @@ class Crawler:
                     self._visit(page)
                 except Exception as e:
                     print('Error visiting page, skipping...')
-                    raise e
             else:
                 if not self._root_pages:
                     print('Crawler starved, ending early')
@@ -73,7 +72,7 @@ class Crawler:
         #for key in result:
         #    print(key, ':', result[key])
 
-        '''
+
         aid = db.addresses.insert(result['location'],
                                   result['lat'].strip(),
                                   result['lng'].strip())
@@ -89,7 +88,7 @@ class Crawler:
             db.images.insert(venueid, url)
 
         self._simplifyDates(venueid, result['dates'])
-        '''
+
 
         self._opened += 1
 

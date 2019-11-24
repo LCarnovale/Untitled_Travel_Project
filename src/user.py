@@ -66,8 +66,7 @@ class User:
 
     @email.setter
     def email(self, email):
-        x = re.search(r"[\w0-9]+@[\w0-9]+\.com", email)
-        
+        x = re.search(r'[\w\.-]+@[\w\.-]+(\.[\w])+', email)
         if x is not None:
             self._email = email
         else:

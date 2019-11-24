@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, abort, flash, session, url_for
+from flask import render_template, request, redirect, abort, flash, session, url_for, g
 from flask_login import LoginManager, login_user
 from src.accommodation import Accommodation
 from src.accommodationSystem import AccommodationSystem
@@ -16,7 +16,18 @@ from server import bookingSystem
 from server import app
 import db
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+
+@app.template_filter('pluralise')
+def pluralise(num, singular='', plural='s'):
+    if num == 1:
+        return f"{num} {singular}"
+    else:
+        return f"{num} {plural}"
+
+app.add_template_global(f=date.today(), name='today')
+# def today():
+#     return date.today()
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -59,12 +70,10 @@ def home():
             
             print("Filtering by search term:", found)
             
-			
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
-                
                 print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
@@ -78,10 +87,11 @@ def home():
                 print(accSystem.get_near(location.split(', '), distance, refine=refine)); refine=True
             # elif text_bounds:
             # TODO: This is a bit dodgy the target location and search term should be separate
-            if location: search = None
+            # if location: search = None
+            search = request.form['keyword']
             results = accSystem.advancedSearch(search, None, None, None, beds,
-                                                bathrooms, parking, location, distance)
-            results = list(map(accSystem.get_acc, results))
+                                               bathrooms, parking, location, distance)
+            results = accSystem.get_acc(results)
             # print(results[0].get_images())
             return render_template('search_results.html', results = results)
         except db.OperationalError as e:
@@ -103,8 +113,9 @@ Message: {str(e)}""")
 '''
 Login page
 '''
-@app.route('/login', methods=['GET', 'POST'])
-def login(uid=None, u_t='user'):
+@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login/<send_to>', methods=['GET', 'POST'])
+def login(uid=None, u_t='user', send_to='/'):
     if uid is not None:
         # Log them in in the background
         user = userSystem.get_user(uid, u_t)
@@ -114,6 +125,9 @@ def login(uid=None, u_t='user'):
         for k, v in zip(d.keys(), d.values()):
             session[k] = v
         return True
+    
+    if r'%' in send_to:
+        send_to = send_to.replace(r'%', '/')
 
     if request.method == 'POST':
         # Attempt a Login
@@ -136,7 +150,7 @@ def login(uid=None, u_t='user'):
             for k, v in zip(d.keys(), d.values()):
                 session[k] = v
 
-        return redirect('/')
+        return redirect(send_to)
     return render_template('login.html')
 
 '''
@@ -156,7 +170,8 @@ Manage ads
 '''
 @app.route('/manage', methods=['GET', 'POST'])
 def manage():
-    abort(404)
+    ads = accSystem.get_for_owner(session['id'])
+    return render_template('search_results.html', results=ads)
 
 '''
 Owner Signup
@@ -234,7 +249,6 @@ def editprofile():
     user = userSystem.get_user(uid, u_type=session['login_type'])
     if request.method == 'POST':
         form = request.form
-
         if user is not None:
             if form['account_pwd_new']:
                 pwd_check = userSystem.check_user_pass(
@@ -246,6 +260,7 @@ def editprofile():
                     # Correct password given
                     user = userSystem.set_password(
                         uid, form['account_pwd_new'], u_type=user.type)
+
             user.name = form['account_name']
             user.username = form['account_username']
             user.email = form['account_email']
@@ -294,35 +309,43 @@ Message: {str(e)}""")
     if acc == None:
         abort(404)
 
-    if request.method == 'POST':
-
-
-        form = request.form
-        if 'id' in session:
-            bookingSystem.create_booking(
-                id, session['id'], 
-                datetime.strptime(form['book_start'], "%d/%m/%Y"), 
-                datetime.strptime(form['book_end'], "%d/%m/%Y")
-            )
-            return render_template('book_confirm.html', acc=acc)
-        else:
-            return render_template('login.html', 
-                err_msg = "Please login to make a booking.")
-
     # Get owner details, address details, availabilities.
     owner = db.owners.get(acc.ownerid)
     address = Address(*db.addresses.get(acc.aid)[1:])
     images = acc.get_images()
-    print(images)
-	# avails = [[str(x[2]), str(x[3])] for x in db.venues.get_availabilities(id)]
-    
     reviews = src.review.get_for_venue(id)
-    return render_template('book.html', acc=acc, owner=owner, id=id,
-        address=address, reviews = reviews, images = images)
+
+    kwargs = {'acc': acc, 'owner': owner, 'id':id,
+        'address':address, 'images':images, 'reviews':reviews}
+
+    if request.method == 'POST':
+        form = request.form
+        if 'id' in session:
+            try:
+                bookingSystem.create_booking(
+                    id, session['id'], 
+                    datetime.strptime(form['book_start'], "%d/%m/%Y"), 
+                    datetime.strptime(form['book_end'], "%d/%m/%Y")
+                )
+            except ValueError as e:
+                print("*** Booking date error: ***")
+                print(e)
+                return render_template('book.html', **kwargs, err_msg="Please enter a valid date range")
+            except BS.BookingError as e:
+                print("*** Booking failed, error: ***")
+                print(e)
+                return render_template('book.html', **kwargs, 
+                    booking_fail=e.msg,
+                    err_msg="The booking could not be made.")
+        # else:
+        #     global send_to
+        #     send_to = url_for('book_main', id=id)
+    
+    return render_template('book.html', **kwargs)
 
 
 '''
-Booking page, accessed via the booking page
+Review page, accessed via the booking page
 '''
 @app.route('/review/<id>', methods = ['GET', 'POST'])
 def review(id):
@@ -377,10 +400,12 @@ def ad_main():
         print(request.files)
         for i in (request.files):
             f = request.files[i]
-            f.save(os.path.join('static/'+app.config['UPLOAD_FOLDER'], f.filename))
+            if not f: continue 
+            dir = 'static/'+app.config['UPLOAD_FOLDER']
+            f.save(os.path.join(dir, f.filename))
             print(type(f))
-            url = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
-            db.images.insert(venueid, url)
+            url = os.path.join(dir, f.filename)
+            db.images.insert(venueid, '../' + url)
 
         # Create associated date ranges
         # This could be moved to another module?

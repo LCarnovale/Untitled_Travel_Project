@@ -41,10 +41,13 @@ class Search():
             startdate = datetime.today()
         if enddate:
             enddate = datetime.strptime(enddate, '%d/%m/%Y')
-            self._filterDates(startdate, enddate)
-
+        else:
+            enddate = None
+        self._filterDates(startdate, enddate)
+        
         print('Done dates')
-
+        if not self._scores:
+            return self._scores
         if beds:
             self._filterBeds(int(beds))
         if bathrooms:
@@ -135,7 +138,7 @@ class Search():
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
-            #print('Check avail')
+            print(ad.get_dates())
             if (ad.isAvailable(startdate, enddate)):
                 result.append((ad_id, score))
 

@@ -32,6 +32,16 @@ def get_for_venue(uid):
         cursor.execute("SELECT * FROM Bookings WHERE venueid=?", uid)
         return cursor.fetchall()
 
+def get_for_venue_overlapping(venueid, startDate, endDate):
+    """
+    Return bookings where the give date range overlaps even partially
+    with the existing booking date range.
+    """
+    with dbCursor() as cursor:
+        cursor.execute("""SELECT * FROM Bookings WHERE
+        endDate >= ? AND startDate <= ? AND venueid=?""", (startDate, endDate, venueid))
+        return cursor.fetchall()
+
 def insert(venueid, userid, startDate, endDate):
     """
     Add a booking record. Must use an existing venueid and userid.

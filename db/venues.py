@@ -34,6 +34,13 @@ def get(id):
         cursor.execute("SELECT * FROM Venues WHERE venueid=?", id)
         return cursor.fetchone()
 
+def get_for_owner(ownerid):
+    """
+    Return all venues associated with the given owner.
+    """
+    with dbCursor() as cursor:
+        cursor.execute("SELECT * FROM Venues WHERE ownerid=?", ownerid)
+        return cursor.fetchall()
 
 def get_availabilities(venueid):
     """
@@ -50,6 +57,8 @@ def get_overlapping_availability(venueid, startDate, endDate):
     Get availabilities that contain the given period in their
     start and end dates for a given venue id.
     Returns a list of availability rows.
+
+    Edge cases are included.
     """
     with dbCursor() as cursor:
         cursor.execute("SELECT * FROM Availabilities WHERE \
