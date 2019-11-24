@@ -47,7 +47,7 @@
                 {% endif %}
                 {% set venue = ac.get_acc(b.venueid) %}
                 {% set images = venue.get_images() %}
-                <div class="card">
+                <div class="card" style="width:100%">
                     <div class="card-image">
                         <i href="/book/{{b.venueid}}">
                             {% if images|length > 0 %}
