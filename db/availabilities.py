@@ -29,6 +29,15 @@ def get_overlapping(startDate, endDate):
             startDate<? AND endDate>?", (startDate, endDate))
         return cursor.fetchall()
 
+def get_for_venue(venueid):
+    """Return all availabilities for a given venue"""
+    with dbCursor() as cursor:
+        cursor.execute("SELECT * FROM Availabilities WHERE venueid=?", venueid)
+        return cursor.fetchall()
+
+# def get_for_venue_date(venueid, date):
+#     """Return all availabilities for a given venue that
+#     cross the given date."""
 
 def insert(venueid, startDate, endDate):
     """

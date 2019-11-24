@@ -52,11 +52,11 @@
           </div><div class="row"> <!-- Start a new row -->
           {% endif %}
         {% endfor %}
+      </div>
     {% endif %}
-    </div>
 
     <!-- Header -->
-    <div class="header" align="center">
+    <div class="center-align header">
         <h1 style="font-style: oblique; font-size: 60px;">{{acc.name}}</h1>
         {% if acc.external_url %}
         <i>This ad was found at <a href="{{acc.external_url}}">{{acc.display_url}}</a></i>
@@ -108,20 +108,31 @@
         <div class="w3-row w3-large">
           <div class="w3-col s9 w3-left">
             <h3>Rental</h3>
-            <h3>${{"%.2f" % acc.rate}}</h3>
-            <h6>per night</h6>
+            <h3>${{"%.2f" % acc.rate}}  
+              <label>per night</label>
+            </h3>
             {% if acc.external_url %}
               <input type="button" value="Please book on {{acc.url_base}}" onclick="window.location.href = '{{acc.external_url}}';"/>
             {% else %}
-              <p class = "good_msg w3-left">This place is currently available!</p>
+              <!-- <p class = "good_msg w3-left">This place is currently available!</p> -->
               <form name='book_acc' method='POST'>
-                  <input type="text"  id="dateRange required" value="Booking Dates" class="calendar" align="center" onfocus="getDates({{acc.get_dates()}})">
+                  <div class="input-field col s12 m6">
+                    <input type="text"  id="dateRange required" class="calendar"  onfocus="getDates({{acc.get_dates()}})">
+                    <label>Booking dates</label>
+                  </div>
                   <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
-
                   <p><input name = "book_start" type = "hidden" id="book_start"></p>
                   <p><input name = "book_end" type = hidden id="book_end"></p>
-                  <input class="btn" type="submit" value="Book this room">
-
+                  <!-- <button class="btn waves-effect waves-light light-blue" type="submit" id="bookbutton" name="bookbutton">
+                    Book this room
+                  </button> -->
+                  {% if session['id'] %}
+                  <button class="btn tooltipped waves-effect waves-light light-blue" 
+                    data-position="bottom" data-tooltip="Select dates"
+                    type="submit">Book this room</button>
+                  {% else %}
+                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>To make a booking please login.</a>
+                  {% endif %}
               </form>
             {% endif %}
           </div>
@@ -169,15 +180,7 @@
 <div class="w3-row w3-large">
            <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
 </div>
-
-
 </div>
-
-
-
-<div></div>
-
-
 
 <script>
 function getDates(dates) {
@@ -273,6 +276,9 @@ function showDivs(n) {
   x[slideIndex-1].style.display = "block";
   dots[slideIndex-1].className += " w3-opacity-off";
 }
+$(document).ready(function () {
+  $('.tooltipped').tooltip();
+});
 </script>
 
     <!-- <p class = "bad_msg"> Sorry, this accommodation has already been booked. </p> -->
