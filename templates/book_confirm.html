@@ -12,7 +12,7 @@
         <b>Check-out:</b> {{booking.end_date.strftime('%d %B, %Y')}}
     </div>
     <br>
-    <p> The owner ({{owner[1]}}) will be in contact with you shortly. If you need any further details, please contact them on {{owner[4]}}</p>
+    <p> The owner ({{owner.name}}) will be in contact with you shortly. If you need any further details, please contact them on {{owner[4]}}</p>
     <br>
     <div style="text-align: center">
         <a href = {{url_for('home')}}> Homepage </a>
