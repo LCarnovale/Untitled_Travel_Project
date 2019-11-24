@@ -69,6 +69,7 @@
           <div class="w3-col s6 w3-left">
             <p><i class="fa fa-fw fa-bed"></i> Bedrooms: {{acc.bed_count}}</p>
             <p><i class="fa fa-fw fa-bath"></i> Bathrooms: {{acc.bath_count}}</p>
+            <p><i class="fa fa-fw fa-car"></i> Parking spaces: {{acc.car_count}}</p>
           </div>
           <div class="w3-col s6">
             <div id="map" style="width:30vw;height:30vw"></div>
@@ -84,6 +85,16 @@
         <p align="left">Address: {{acc.address.street_address}}</p>
         <input type = 'hidden' id = 'lat' value = '{{acc.address.lat}}'>
         <input type = 'hidden' id = 'lng' value = '{{acc.address.lng}}'>
+      </div>
+    </div>
+
+    <hr>
+    <!-- Extr desc Section -->
+    <h4><strong>Additional details</strong></h4>
+    <div class="w3-row w3-large">
+      <div class="w3-col s12">
+        <p align="left">{{acc.details}}</p>
+      </div>
     </div>
 
     <hr>
