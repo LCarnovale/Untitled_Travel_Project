@@ -77,7 +77,8 @@ def home():
                 print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
-                enddate = None
+                enddate = datetime.today().strftime('%d/%m/%Y')
+                print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
 
             location = request.form.get('geocodedvalue')
             distance = request.form.get('radiusval')

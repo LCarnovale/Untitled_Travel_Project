@@ -35,6 +35,7 @@ class Search():
 
         print('Done region')
 
+        '''
         if startdate:
             startdate = datetime.strptime(startdate, '%d/%m/%Y')
         else:
@@ -44,6 +45,7 @@ class Search():
         else:
             enddate = None
         self._filterDates(startdate, enddate)
+        '''
         
         print('Done dates')
         if not self._scores:
@@ -65,16 +67,19 @@ class Search():
                 else:
                     score-= 1.0
                 print((review._recommends))
+        '''
         if location:
             if not distance:
                 distance = '2000'
             distance = int(distance)
             self._filterLocation(location, distance)
+        '''
 
-        print('Done search.')
-        print(self._scores)
+        print('Sorting')
+        #print(self._scores)
         self._scores = sorted(self._scores,key = lambda score: score[1],reverse = True)
-        print(self._scores)
+        #print(self._scores)
+        print('Done search.')
         return [x[0] for x in self._scores]
 
     def _keywordSearch(self, search):
@@ -192,6 +197,8 @@ class Search():
                 score+=currentscore
                 currentscore -= step
                 result.append((ad_id, score))
+            else:
+                print('Nope loc')
 
         self._scores = result
 
