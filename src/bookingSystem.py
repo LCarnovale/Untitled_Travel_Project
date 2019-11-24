@@ -14,6 +14,7 @@ class BookingSystem:
 
     def add_booking(self, booking_id, booking):
         self._bookings[booking_id] = booking
+        booking._id = booking_id
 
     def create_booking(self, venueid, userid, startDate, endDate):
         """

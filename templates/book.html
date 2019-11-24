@@ -119,7 +119,7 @@
               {% endif %}
               <form name='book_acc' method='POST'>
                   <div class="input-field col s12 m6">
-                    <input type="text"  id="dateRange required" class="calendar"  onfocus="getDates({{acc.get_dates()}})">
+                    <input type="text"  id="dateRange" class="calendar" onchange="changeDates()" onblur="checkDateField()"  onfocus="getDates({{acc.get_dates()}})" required="true">
                     <label>Booking dates</label>
                   </div>
                   <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
@@ -127,9 +127,8 @@
                   <p><input name = "book_end" type = hidden id="book_end"></p>
  
                   {% if session['login_type'] == 'user' %}
-                  <button class="btn tooltipped waves-effect waves-light light-blue" 
-                    data-position="bottom" data-tooltip="Select dates"
-                    type="submit">Book this room</button>
+                  <button class="btn waves-effect waves-light light-blue" 
+                    id="book_btn" disabled type="submit">Book this room</button>
                   {% elif session['login_type'] == 'owner' %}
                   <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>You're currently logged in as a host. Click here to login as a user to make a booking.</a>
                   {% else %}
@@ -185,6 +184,26 @@
 </div>
 
 <script>
+function checkDateField() {
+  // Clears the date field input if a date hasn't been properly picked
+  // so the user knows they haven't clicked 'apply' in the picker
+  var dateInp = document.getElementById('dateRange');
+  var dateVal = document.getElementById('book_start');
+  if (!dateVal.value) {
+    dateInp.value = '';
+  }
+}
+  
+function changeDates() {
+  var dateInp = document.getElementById('dateRange');
+  var bookBtn = document.getElementById('book_btn');
+  if (dateInp.value) {
+    bookBtn.disabled = false;
+  } else {
+    bookBtn.disabled = true;
+  }
+}
+
 function getDates(dates) {
     var availDateSize = {{acc.get_dates()|length}};
     var minStay = {{acc.min_stay}};
@@ -201,8 +220,8 @@ function getDates(dates) {
         isInvalidDate: function(date) {
             var startDate = $('.calendar').data('daterangepicker').startDate.format('DD/MM/YYYY');
             var minDate = moment(startDate).add(minStay, 'days');
-            console.log("BOOK START");
-            console.log(startDate);
+            // console.log("BOOK START");
+            // console.log(startDate);
             // Date range between min and max
             if (date < minDate) {
                 return true;
@@ -225,6 +244,7 @@ function getDates(dates) {
     });
 
     $('.calendar').on('cancel.daterangepicker', function(ev, picker) {
+        document.getElementById('book_start').value = '';
         $('.calendar').val('');
     });
 
@@ -273,8 +293,8 @@ function showDivs(n) {
   for (i = 0; i < dots.length; i++) {
     dots[i].className = dots[i].className.replace(" w3-opacity-off", "");
   }
-  console.log(slideIndex);
-  console.log(x[slideIndex-1].style);
+  // console.log(slideIndex);
+  // console.log(x[slideIndex-1].style);
   x[slideIndex-1].style.display = "block";
   dots[slideIndex-1].className += " w3-opacity-off";
 }

@@ -2,7 +2,7 @@ import db
 
 class Booking:
 
-    #_bookingID = -1
+    _id = -1
     '''
         acc is the accommodation
         period is the time period for the booking
@@ -44,6 +44,10 @@ class Booking:
     @property
     def end_date(self):
         return self._end_date
+
+    @property
+    def id(self):
+        return self._id
          
 
 

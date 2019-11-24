@@ -284,16 +284,21 @@ def editprofile():
 '''
 View Bookings page
 '''
-@app.route('/bookings/', methods=['GET', 'POST'])
+@app.route('/bookings/', methods=['GET'])
 def view_bookings():
-    if request.method == 'POST':
-        pass
-    elif request.method == 'GET':
+    if request.method == 'GET':
         # get current user
         user  = userSystem.get_user(session['id'])
-
+        bookings = user.get_bookings()
+        if len(bookings) > 3:
+            # reorder to appear as increasing left to right by date
+            bookings = [
+                *bookings[0::3],
+                *bookings[1::3],
+                *bookings[2::3]
+            ]
         return render_template('view_bookings.html',
-                               bookings=user.get_bookings(), ac=accSystem)
+                               bookings=bookings, ac=accSystem)
 
 
 '''
@@ -331,13 +336,12 @@ Message: {str(e)}""")
             except ValueError as e:
                 print("*** Booking date error: ***")
                 print(e)
-                return render_template('book.html', **kwargs, err_msg="Please enter a valid date range")
+                return render_template('book.html', booking_fail="Please enter a valid date range", **kwargs)
             except BS.BookingError as e:
                 print("*** Booking failed, error: ***")
                 print(e)
                 return render_template('book.html', **kwargs, 
-                    booking_fail=e.msg,
-                    err_msg="The booking could not be made.")
+                    booking_fail=e.msg)
 
             return render_template('book_confirm.html', booking=booking, **kwargs)
         # else:
