@@ -117,7 +117,10 @@ Search result viewing
 def view_search(page=1):
     print(request.form)
     page = int(page)
-    kwargs = {'page_num':page, 'page_count':len(_results) // RESULTS_PER_PAGE}
+    kwargs = {
+        'page_num':page, 
+        'page_count':(len(_results) // RESULTS_PER_PAGE) + (1 if (len(_results) % RESULTS_PER_PAGE) else 0)
+    }
     if request.method == 'GET':
         start = (page - 1) * RESULTS_PER_PAGE
         end = start + RESULTS_PER_PAGE

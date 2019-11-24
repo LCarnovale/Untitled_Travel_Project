@@ -37,13 +37,17 @@
         <form method="POST" name="page-nav">
             <div class="row">
                 <div class="col s4 center-align">
+                    {% if page_num > 1 %}
                     <button type="submit" class="btn" name="prev" value="prev">Previous</button>
+                    {% endif %}
                 </div>
                 <div class="col s4 center-align">
                     <a>Page {{page_num}} out of {{page_count}}</a>
                 </div>
                 <div class="col s4 center-align">
+                    {% if page_num < page_count %}
                     <button type="submit" class="btn" name="next" value="next">Next</button>
+                    {% endif %}
                 </div>
             </div>
         </form>
@@ -92,13 +96,17 @@
             <form method="POST" name="page-nav">
                 <div class="row">
                     <div class="col s4 center-align">
+                        {% if page_num > 1 %}
                         <button type="submit" class="btn" name="prev" value="prev">Previous</button>
+                        {% endif %}
                     </div>
                     <div class="col s4 center-align">
                         <a>Page {{page_num}} out of {{page_count}}</a>
                     </div>
                     <div class="col s4 center-align">
+                        {% if page_num < page_count %}
                         <button type="submit" class="btn" name="next" value="next">Next</button>
+                        {% endif %}
                     </div>
                 </div>
             </form>
