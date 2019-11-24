@@ -22,7 +22,7 @@ class Search():
         else:
             self._scores = [(x,0.0) for x in self._items]
             #print(self._scores)
-
+        print(self._items)
         # If the search term looks like a location, don't require the search in the name
         if text_bounds:
             self._scores = [(x,0.0) for x in self._items]
@@ -78,7 +78,7 @@ class Search():
         print('Sorting')
         #print(self._scores)
         self._scores = sorted(self._scores,key = lambda score: score[1],reverse = True)
-        #print(self._scores)
+        print(self._scores)
         print('Done search.')
         return [x[0] for x in self._scores]
 
@@ -107,9 +107,7 @@ class Search():
                 if len(desc) != 0:
                     body_score += (1/3) * desc.count(keyword)/len(desc)
 
-            if title_score + body_score != 0:
-                print('ADD')
-                scores.append((ad_id, title_score + body_score))
+            scores.append((ad_id, title_score + body_score))
 
         self._scores = scores
 
@@ -220,7 +218,7 @@ class Search():
 
         for ad_id in self._items:
             ad = self._items[ad_id]
-
+            print(ad_id)
             title_score = 0.0
             body_score = 0.0
 
