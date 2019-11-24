@@ -35,7 +35,7 @@ class Search():
 
         print('Done region')
 
-        '''
+        
         if startdate:
             startdate = datetime.strptime(startdate, '%d/%m/%Y')
         else:
@@ -45,7 +45,7 @@ class Search():
         else:
             enddate = None
         self._filterDates(startdate, enddate)
-        '''
+        
         
         print('Done dates')
         if not self._scores:
@@ -67,13 +67,13 @@ class Search():
                 else:
                     score-= 1.0
                 print((review._recommends))
-        '''
+        
         if location:
             if not distance:
                 distance = '2000'
             distance = int(distance)
             self._filterLocation(location, distance)
-        '''
+        
 
         print('Sorting')
         #print(self._scores)
