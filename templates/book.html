@@ -120,7 +120,7 @@
               {% endif %}
               <form name='book_acc' method='POST'>
                   <div class="input-field col s12 m6">
-                    <input type="text"  id="dateRange required" class="calendar"  onfocus="getDates({{acc.get_dates()}})">
+                    <input {% if session['login_type'] == 'owner' and session['id']|int == acc.ownerid %}disabled{% endif %} type="text"  id="dateRange required" class="calendar"  onfocus="getDates({{acc.get_dates()}})">
                     <label>Booking dates</label>
                   </div>
                   <p>Min Nights: {{acc.min_stay}}, Max Nights: {{acc.max_stay}}</p>
@@ -132,7 +132,11 @@
                     data-position="bottom" data-tooltip="Select dates"
                     type="submit">Book this room</button>
                   {% elif session['login_type'] == 'owner' %}
-                  <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login as a user to make a booking.</a>
+                    {% if session['id']|int == acc.ownerid %}
+                    <a class ="btn" href={{url_for('owner_view_bookings', venue_id=acc.id)}}>Bookings</a>
+                    {% else %}
+                    <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login as a user to make a booking.</a>
+                    {% endif %}
                   {% else %}
                   <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login to make a booking.</a>
                   {% endif %}
@@ -180,9 +184,11 @@
     {% endif %}
 
 <!--        <h3 align="center"> Write a Reviews </h3>-->
+{% if session['login_type'] != 'owner' or session['id']|int != acc.ownerid %}
 <div class="w3-row w3-large">
            <button onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>
 </div>
+{% endif %}
 </div>
 
 <script>

@@ -2,6 +2,7 @@ import db
 import datetime
 import src
 from datetime import datetime, timedelta, time
+from booking import Booking
 
 class NegativeNumberError(Exception):
     pass
@@ -134,6 +135,10 @@ class Accommodation:
         images = db.images.get_for_venue(self.id)
         temp = [img[2] for img in images]
         return [image.replace("\\","/") for image in temp]
+
+    def get_bookings(self):
+        booking_rows = db.bookings.get_for_venue(self._id)
+        return sorted([Booking(*row[1:]) for row in booking_rows], key=lambda x: x.start_date)
 
     '''
     Properties

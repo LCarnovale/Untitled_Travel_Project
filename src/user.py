@@ -25,7 +25,7 @@ class User:
 
     def get_bookings(self):
         booking_rows = db.bookings.get_for_user(self._id)
-        return [Booking(*row[1:]) for row in booking_rows]
+        return sorted([Booking(*row[1:]) for row in booking_rows], key=lambda x: x.start_date)
 
 
     def todict(self):
