@@ -77,7 +77,12 @@
         </div>
         {% else %}
         <br>
-       <h2> Couldn't find places</h2>
+            {% if reason and reason == 'owner_ads' %}
+            <p>When you post accommodation, it will show up here.</p>
+            {% else %}
+            <h3> No results were found for your search terms. </h3>
+            <a href="{{url_for('home')}}">Home</a>
+            {% endif %}
         {% endif %}
    <!-- </div> -->
 {% endblock %}

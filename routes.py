@@ -171,7 +171,7 @@ Manage ads
 @app.route('/manage', methods=['GET', 'POST'])
 def manage():
     ads = accSystem.get_for_owner(session['id'])
-    return render_template('search_results.html', results=ads)
+    return render_template('search_results.html', results=ads, reason='owner_ads')
 
 '''
 Owner Signup
@@ -300,6 +300,22 @@ def view_bookings():
         return render_template('view_bookings.html',
                                bookings=bookings, ac=accSystem)
 
+'''
+View Bookings for a venue
+'''
+@app.route('/bookings/<venue_id>', methods=['GET', 'POST'])
+def owner_view_bookings(venue_id):
+    if request.method == 'POST':
+        pass
+    elif request.method == 'GET':
+        # get the venue
+        venue = accSystem.get_acc(venue_id)
+        if int(session['id']) != venue.ownerid:
+            abort(404) # You don't own this accommodation
+
+        return render_template('view_bookings.html',
+                               bookings=venue.get_bookings(), ac=accSystem,
+                               reason="owner", acc = venue, us = userSystem)
 
 '''
 Main Booking page
