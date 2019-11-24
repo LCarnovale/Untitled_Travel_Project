@@ -107,6 +107,9 @@
         {% elif owner %}
         <p align="left"> Name: {{owner.name}} </p>
         <p align="left"> Have any questions? Contact the owner at {{owner.mobile}}</p>
+        {% if owner.desc %}
+          <p>About the owner: {{owner.desc}}</p>
+        {% endif %}
         {% endif %}
       </div>
     </div>
