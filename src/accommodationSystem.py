@@ -45,7 +45,6 @@ class AccommodationSystem:
         If id is a list of id's, returns a list of corresponding objects.
         '''
         # Try the stored list:
-        print('GET', id)
         if type(id) == str:
             id = int(id)
         else:
