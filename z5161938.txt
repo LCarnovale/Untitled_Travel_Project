@@ -183,3 +183,48 @@ Bryan: Variable distance slider, search scores/ranking backend, testing
 
 
 Over the weekend, we plan to just test and write the report, as well as plan our demonstration based on the marking criteria.
+
+
+
+Week 11
+
+The website came together quite nicely, albeit with a couple of features thrown in at the last minute.
+
+There were a couple features left undone, like advanced search highlighting and detection of duplicates in the web crawler. There were also some extra features we had to add at the end, like the ability to see the bookings for a user and the ability for an owner to see who has booked their venue.
+
+The presentation went well, considering how things were a bit rushed leading up to it - we had to make some last minute fixes to our search functionality in order to be able to present, as it had somehow broken.
+
+
+As of writing, we are about to submit the final code and report. They seem to have gone well, we found a few bugs we didn't know about before and have ironed them out. Also, we have spent a lot of time cleaning up the code:
+
+Leo: base folder level python code and db/*
+Ian: src/* (all other python code)
+Ince: templates/* (all html code)
+Bryan: static/* and templates/* (all javascript code)
+
+The code is much nicer/easier to read now, and the majority of python functions have docstrings.
+
+
+As for the final report, work was divided as follows:
+
+Overview and Architecture (Ian)
+
+Functionality/Challenges
+ - Advertising module (Ince)
+ - Booking module (Ince)
+ - Search module (Bryan)
+ - Review module (Bryan)
+ - Crawler module (Ian)
+ - Database module (Leo)
+
+User Documentation and Manual
+ - Setting up local server (Ian)
+ - Using the site (Bryan)
+ - Hosting on azure (Leo)
+ - File structure (Ince)
+ - File reference table (Ince)
+
+Bibliography and Third-Party Software documentation (All)
+
+
+I believe this has been quite a successful group project, and I am glad to have experienced it as a scrum master. Needing to organise the group brought its own set of non-coding challenges, and I am glad to say that for the most part, I overcame them.
