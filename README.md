@@ -130,9 +130,13 @@ PASSWORD = "password1!"
 ```
 
 If you choose to use the existing database, we will need to add your IP to the whitelist. Please email any of us with your IP and we give you access to the database:
+
 Ian Thorvaldson: i.thorvaldson@unsw.edu.au
+
 Leo Carnovale: l.carnovale@unsw.edu.au
+
 Kittipat Sangdao: k.sangdao@student.unsw.edu.au
+
 Bryan Liauw: b.liauw@unsw.edu.au
 
 **NOTE:** The program is able to detect if a firewall has blocked your ip address, and will raise an exception 
