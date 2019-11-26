@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 	<script type =text/javascript src = "{{ url_for('static',filename = 'new_ad.js')}}"></script>
-	<style>#map {
+	<style>#map2 {
         height: 400px;
 		width: 400px;
 		margin-left: auto;
@@ -46,7 +46,7 @@
 {% block content %}
 
 <body onload="createTable()">
-<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+<link rel="stylesheet" href = "{{url_for('static',filename = 'new_ad.css')}}">
 
 <h2> Please enter the details of your accommodation: </h2>
 <form name='post_ad' id = "regForm" method='POST' formaction='submit()' enctype="multipart/form-data">
@@ -98,7 +98,7 @@
 					<label>Location</label>
 				</div>
 				<input name="acc_location" id="hiddenlocation" class="required" type="hidden">
-				<div id="map"></div>
+				<div id="map2"></div>
 			</div>
 		</li>
 		<li>
@@ -143,48 +143,6 @@
 	<!-------------------------- Scripts \/ /\ HTML --------------------------------->
 	
 	<script type="text/javascript">
-		var map;
-		var markerlist = [];
-		var geocoder;
-		function initMap() {
-			map = new google.maps.Map(
-				document.getElementById('map'), {
-					center: {lat: -33.91538902145825 , lng: 151.11207767686824},
-					zoom: 13
-				}
-			);
-			geocoder = new google.maps.Geocoder;
-			google.maps.event.addListener(
-				map, 'click', function( event ) {
-					document.getElementById("hiddenlocation").value = event.latLng.lat() + ", " + event.latLng.lng();
-					for (i = 0;i<markerlist.length;i++){
-						markerlist[i].setMap(null);
-					}
-					markerlist.length = 0;
-					var marker = new google.maps.Marker({position: event.latLng, map: map});
-					markerlist.push(marker);
-					geocoder.geocode({'location': event.latLng}, function(results, status) {
-						if (status === 'OK') {
-							if (results[0]) {
-								document.getElementById("hiddenaddress").value = results[0].formatted_address;
-							} 
-							else {
-								alert('No results found');
-							}
-						} 
-						else {
-							alert('Geocoder failed due to: ' + status);
-						}
-					});
-				}
-			);
-		}
-
-
-			//function submit() {
-		 	//window.prompt("prompt");
-		 	//console.log("Submitting");
-			//}
 	var imagelen = 0;
 	function addImage() {
 		var imagetemp = document.getElementsByName('acc_image-'+imagelen)
@@ -257,40 +215,11 @@
 	}
 	var typingTimer;
 	var doneTypingInterval = 1000;
-	function getgeocode(){
-			
-			geocoder.geocode({
-				'address': document.getElementById("hiddenaddress").value,
-				'componentRestrictions': {
-					'country': 'AU'
-				}
-			}, function(results, status) {
-						if (status === 'OK') {
-							if (results[0] && results[0].geometry &&
-								results[0].geometry.bounds) {
-								for (i = 0;i<markerlist.length;i++){
-									markerlist[i].setMap(null);
-									circlelist[i].setMap(null);
-								}
-								document.getElementById("hiddenlocation").value = results[0].geometry.location.lat()+", "+results[0].geometry.location.lng();
-								var marker = new google.maps.Marker({position: results[0].geometry.location, map: map});
-								map.setCenter(results[0].geometry.location)
-								console.log(results[0].geometry.location)
-								markerlist.push(marker)
-							} else {
-								console.log('No results found');
-								//alert('No results found');
-							}
-						} else {
-							console.log('Geocoder failed due to: ' + status);
-							//alert('Geocoder failed due to: ' + status);
-						}
-					});
-		}
+	
 		document.getElementById('hiddenaddress').addEventListener('keyup', () => {
 			clearTimeout(typingTimer);
 			if (document.getElementById('hiddenaddress').value) {
-			typingTimer = setTimeout(getgeocode, doneTypingInterval);
+			typingTimer = setTimeout(getgeocode2, doneTypingInterval);
 			}
 		});
 	document.querySelector('#file-input').addEventListener("change", previewImage);
@@ -298,11 +227,12 @@
 		$('.collapsible').collapsible();
 	});
 	</script>
+	<script src = "/static/map.js"></script>
 	<!-- Actual link: -->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"async defer></script>
 	<!-- Use a wrong link when map isn't needed: -->
 	 <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4bDrnE2qSu7q1HiS0pWCsCJS7g&callback=initMap"></script> -->
-	<script type =text/javascript src = "{{ url_for('static',filename = 'formstep.js')}}"></script>
+
 
 
 {% endblock %}
