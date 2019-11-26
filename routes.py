@@ -38,6 +38,10 @@ def page_not_found(e):
 def server_error(e):
     return render_template('500.html')
 
+@app.errorhandler(403)
+def permission_denied(e):
+    return render_template('403.html')
+
 
 '''
 Landing page
@@ -48,11 +52,9 @@ def home():
     if request.method == 'POST':
         try:
             keyword = request.form.get('keyword')
-
             beds = request.form.get('beds') or None
             bathrooms = request.form.get('bathrooms') or None
             parking = request.form.get('parking') or None
-
             dates = request.form.get('dates').split(' - ')
             if len(dates) == 2:
                 startdate = dates[0]
@@ -60,7 +62,7 @@ def home():
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
                 enddate = datetime.today().strftime('%d/%m/%Y')
-
+                
             location = request.form.get('geocodedvalue')
             distance = request.form.get('radiusval')
 
@@ -70,7 +72,6 @@ def home():
 
             # Save the results for multi-page results
             session['results'] = results
-            print(results)
 
             # Redirect to results
             return redirect(url_for('view_search'))
@@ -92,8 +93,6 @@ Search result viewing
 @app.route('/results/', methods=['GET', 'POST'])
 @app.route('/results/<page>', methods=['GET', 'POST'])
 def view_search(page=1):
-    print(request.form)
-
     # User has modified url to search results without performing a search
     if 'results' not in session:
         session['results'] = []
@@ -113,7 +112,6 @@ def view_search(page=1):
         end = start + RESULTS_PER_PAGE
 
         results = accSystem.get_acc(results[start:end])
-        print(results)
 
         return render_template('search_results.html', 
             results=results, **kwargs)
@@ -202,16 +200,15 @@ def signup_owner():
         phone = form['phone_input']
         desc = form['desc_input']
 
-        # TODO: validate input.
-
         try:
             uid = userSystem.create_owner(
                 name, uname, pwd, email, phone, desc
             )
-        except Exception as e:
-            # TODO: Return errors properly
-            print(e)
-            return render_template('signup_owner.html', err_msg=str(e))
+        except US.UserCreateError as e:
+            if e.col == 'userName':
+                return render_template('signup.html', username_taken=True)
+            if e.col == 'email':
+                return render_template('signup.html', invalid_email=True)
         else:
             login(uid, 'owner')
             return redirect('/')
@@ -243,7 +240,7 @@ def signup():
             if e.col == 'email':
                 return render_template('signup.html', invalid_email=True)
         if uid is not None:
-            print("User successfully added.")
+            # User insertion was successful
             login(uid)
             return redirect('/')
         else:
@@ -287,9 +284,7 @@ def editprofile():
                 d = user.todict()
                 for k, v in zip(d.keys(), d.values()):
                     session[k] = v
-                # session['email'] = user.email
-                # session['phone'] = user.phone
-                # session['desc'] = user.desc
+
                 userSystem.update_user(uid, u_type=user.type)
             else:
                 print("Error user not found")
@@ -324,17 +319,15 @@ View Bookings for a venue
 '''
 @app.route('/bookings/<venue_id>', methods=['GET', 'POST'])
 def owner_view_bookings(venue_id):
-    if request.method == 'POST':
-        pass
-    elif request.method == 'GET':
+    if request.method == 'GET':
         # get the venue
         venue = accSystem.get_acc(venue_id)
         if int(session['id']) != venue.ownerid:
-            abort(404) # You don't own this accommodation
+            abort(403) # You don't own this accommodation
 
         return render_template('view_bookings.html',
                                bookings=venue.get_bookings(), ac=accSystem,
-                               reason="owner", acc = venue, us = userSystem)
+                               reason="owner", acc=venue, us=userSystem)
 
 '''
 Main Booking page
@@ -369,20 +362,13 @@ Message: {str(e)}""")
                 )
                 booking = bookingSystem.get_booking(bid)
             except ValueError as e:
-                print("*** Booking date error: ***")
-                print(e)
                 return render_template('book.html', booking_fail="Please enter a valid date range using the calendar.", **kwargs)
             except BS.BookingError as e:
-                print("*** Booking failed, error: ***")
-                print(e)
                 return render_template('book.html', **kwargs, 
                     booking_fail=e.msg)
 
             return render_template('book_confirm.html', booking=booking, **kwargs)
-        # else:
-        #     global send_to
-        #     send_to = url_for('book_main', id=id)
-    
+
     return render_template('book.html', **kwargs)
 
 
@@ -397,7 +383,6 @@ def review(id):
         abort(404)
 
     if request.method == 'POST':
-        print(request.form)
         reccommend = True if request.form.get('recc') == 'yes' else False
         issues = request.form.get('issues')
         good = request.form.get('good')
@@ -418,12 +403,8 @@ def ad_main():
     if request.method == "POST":
         form = request.form
         # Find owner:
-        # (We haven't asked for enough info, pick a test owner)
         if session['login_type'] == 'owner':
             owner = db.owners.get(session['id'])
-        else:
-            #TODO we should either fix owner signup or have this.
-            return render_template('/login', err_msg="Please login as an owner.") 
         
         # Create Address info:
         lat, lng = form['acc_location'].split(",")
@@ -439,18 +420,13 @@ def ad_main():
             int(form['max_stay']), form['details']
         )
 
-        print(request.files)
         for i in (request.files):
             f = request.files[i]
             if not f: continue 
             dir = 'static/'+app.config['UPLOAD_FOLDER']
             f.save(os.path.join(dir, f.filename))
-            print(type(f))
             url = os.path.join(dir, f.filename)
             db.images.insert(venueid, '../' + url)
-
-        # Create associated date ranges
-        # This could be moved to another module?
 
         for i in range(0, int(form['dateCount'])):
             start, end = form[f'dateRange_{i}'].split(' - ')
@@ -459,7 +435,6 @@ def ad_main():
             db.availabilities.insert(
                 venueid, start, end
             )
-        # Done
         return render_template('ad_confirm.html', id=venueid)
 
     return render_template('new_ad.html')

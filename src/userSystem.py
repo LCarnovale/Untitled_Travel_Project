@@ -100,22 +100,19 @@ class UserSystem:
         Return the new user's id on success.
         Return None on failure.
         """
-        # TODO: Verify user input in here
-        # Might not be needed since the setters in User() are already checking
-
-        args = (name, username, pwd, email, phone, description)
-
         try:
-            uid = db.users.insert(*args)
-        except db.InsertionError as e:
-            raise UserCreateError("Error creating user.", col=e.col, err=e.type)        
-        try:
-            self.get_user(uid) # Adds to the system.
+            _ = User(name, username, email, phone, description)
         except user.EmailError:
             raise UserCreateError("Error creating user.", col='email', err='invalid email')
-        # TODO: If the user has bad data, the insert might pass but the get_user()
-        # could fail, so we would want to remove the user from the database
-        # straight away. 
+        except Exception as e:
+            raise e
+        else:
+            try:
+                uid = db.users.insert(name, username, pwd, email, phone, description)
+            except db.InsertionError as e:
+                raise UserCreateError("Error creating user.", col=e.col, err=e.type)        
+            else:
+                self.get_user(uid) # Adds to the system.
         
         return uid
 
@@ -126,18 +123,21 @@ class UserSystem:
         Return the new owner's id on success.
         Return None on failure.
         """
-        # TODO: Verify user input in here
-        # Might not be needed since the setters in User() are already checking
+        try:
+            _ = User(name, username, email, phone, description)
+        except user.EmailError:
+            raise UserCreateError("Error creating user.", col='email', err='invalid email')
+        except Exception as e:
+            raise e
+        else:
+            try:
+                uid = db.owners.insert(name, username, pwd, email, phone, description)
+            except db.InsertionError as e:
+                raise UserCreateError("Error creating user.", col=e.col, err=e.type)        
+            else:
+                self.get_user(uid, 'owner') # Adds to the system.
 
-        args = (name, username, pwd, email, phone, description)
-
-        oid = db.owners.insert(*args)
-        self.get_owner(oid) # Adds to the system.
-        # TODO: If the user has bad data, the insert might pass but the get_user()
-        # could fail, so we would want to remove the user from the database
-        # straight away. 
-        
-        return oid
+        return uid
 
     def set_password(self, uid, new_password, u_type='user'):
         """

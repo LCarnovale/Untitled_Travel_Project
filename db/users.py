@@ -72,6 +72,13 @@ def insert(name, userName, password, email=None, phone=None, description=None):
         else:
             return None
 
+def delete(uid):
+    """
+    Delete a user with the matching id from the database.
+    """
+    with dbCursor() as cursor:
+        cursor.execute("DELETE FROM Users WHERE userid = ?", uid)
+
 def update(userid, **fields):
     """
     Update a user record. Takes the id of the user to be updated (userid)

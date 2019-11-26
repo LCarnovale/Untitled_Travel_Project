@@ -15,9 +15,11 @@
 						<div class="collapsible-body">
 							<div class="row">
 								<div class="col s12">
-									<label>
-										All fields are required.
-									</label>
+									<label>All fields are required.</label>
+									{% if invalid_email %}
+									<label style="color:red">Invalid email</label>
+									{% endif %}
+
 								</div>
 			
 								<div class="input-field col s12">
