@@ -4,6 +4,11 @@ from datetime import datetime
 import time
 
 class Airbnb_Navigator:
+    '''
+    This is a navigator class for Airbnb, use by the crawler.
+    Please see Crawler for definition of all functions
+    '''
+
     def seed_roots(self):
         return ['https://www.airbnb.com.au/s/New-South-Wales/homes']
 
@@ -15,8 +20,9 @@ class Airbnb_Navigator:
 
         return ['https://www.airbnb.com.au/s/New-South-Wales/homes?section_offset=5&items_offset=18']
 
-    # Unpack a search result page, getting the urls of all the results
+
     def read_pages_from_route(self, root_path):
+        '''Unpack a search result page, getting the urls of all the results'''
         landing = requests.get(root_path)
         html = str(landing.content)
 
@@ -31,13 +37,15 @@ class Airbnb_Navigator:
 
         return pages
 
-    # Go to a specific search result page, and get the info
+
     def visit_page(self, page_path):
+        '''Go to a specific search result page, and get the info'''
         print('Visiting page', page_path)
 
         landing = requests.get(page_path)
         html = str(landing.content)
 
+        # Ensure the location is not null
         i = 0
         while i < 10:
             if html.split('"lat":')[1].split(',')[0] != 'null':
@@ -49,10 +57,10 @@ class Airbnb_Navigator:
             html = str(landing.content)
 
             i += 1
-
         if i == 10:
             raise Exception('Couldn\'t get location')
 
+        # Get the name
         try:
             name = html.split('id="summary"')[1]
             name = name.split('</h1>')[0][:-7]
@@ -61,28 +69,29 @@ class Airbnb_Navigator:
             print('Newname')
             name = html.split('"listingTitle":"')[1].split('"')[0]
 
+        # Get the location
         try:
             location = html.split('data-location="')[1].split('"')[0]
         except:
             location = html.split(' for Rent in ')[1].split('"')[0]
-            #location = html.split('"id":"neighborhood-preview_')[1].split('"title":"')[1].split('"')[0]
 
+        # Get the url of the poster
         poster_url = 'https://www.airbnb.com.au'
         try:
             poster_url += html.split('id="summary"')[1].split('</a>')[0].split('href="')[1].split('"')[0]
         except:
             poster_url += '/users/' + html.split('href="/users/')[1].split('"')[0]
 
+        # Get the bed, bath and car count
         bedCount = re.search(r'>([0-9]+) beds?</div>', html)
         bedCount = bedCount.group(1) if bedCount else 0
-
 
         bathCount = re.search(r'>([0-9]+) baths?</div>', html)
         bathCount = bathCount.group(1) if bathCount else 0
 
-        # This could be better
         carCount = 1 if 'Free parking on premises' else 0
 
+        # Find the description
         description = 'Description not found'
         try:
             description = html.split('id="details"')[1].split('</span>')[0].split('<span>')[-1]
@@ -93,28 +102,33 @@ class Airbnb_Navigator:
             description = description.replace('\\\\u003c/b>', '')
             description = description.replace('\\\\u003cb>', '')
 
+        # Find the rate
         rate = re.search(r'for \$([0-9\.]+)\.', html)
         rate = rate.group(1) if rate else 0
 
-        # Airbnb places dont advertise a global max/min stay
+        # Placeholder min/max stay
         minStay = '1' 
         maxStay = '1000'
 
+        # Find the additional details
         try:
             details = html.split('"additional_house_rules":"')[1].split('","')[0]
             details = details.replace('\\\\n', '\n')
         except IndexError:
             details = ''
 
+        # Find the lat/long
         lat = html.split('"lat":')[1].split(',')[0]
         lng = html.split('"lng":')[1].split(',')[0]
 
+        # Find all images, but not user profile images
         images = []
         for img in html.split('<img')[1:]:
             img = img.split('>')[0].split('src="')[1].split('"')[0]
             if '/user' not in img:
                 images.append(img)
 
+        # Get the availabilities
         dates = []
         api_key = html.split('"api_config"')[1].split('"key":"')[1].split('"')[0]
         page_num = page_path.split('/rooms/')[1].split('?')[0]
@@ -131,7 +145,6 @@ class Airbnb_Navigator:
                     maxStay = int(date.split('"max_nights":')[1].split(',')[0]) + 1
 
                     date = date.split('"')[0]
-                    dates.append(datetime.strptime(date, '%Y-%m-%d'))
         
         return {
             'name':         name,
