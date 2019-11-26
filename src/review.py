@@ -15,6 +15,10 @@ def get_for_venue(venueid):
 
 class Review:
     def __init__(self, venueid, userid, postDateTime, recommends, reviewBad, reviewGood):
+        """
+        Holds attributes for a review based on the columns in the review
+        table in the database.
+        """
         self._venueid = venueid
         self._userid = userid
         self._postDateTime = postDateTime

@@ -13,6 +13,10 @@ class BookingSystem:
         self._bookings = {}
 
     def add_booking(self, booking_id, booking):
+        """
+        Add a booking to the system.
+        Sets the id of the booking to the given booking_id
+        """
         self._bookings[booking_id] = booking
         booking._id = booking_id
 

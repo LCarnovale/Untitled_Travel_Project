@@ -3,6 +3,7 @@ import json
 import db
 from booking import Booking
 class EmailError(Exception):
+    """Thrown when an email address is invalid."""
     def __init__(self, msg="Attempting to set email with invalid email address."):
         super().__init__(msg)
 
@@ -17,20 +18,20 @@ class User:
         self.email = email
         self.mobile = mobile
         self.desc = desc
+        # Set these directly
         self._pwdhash = pwdhash
         self._authenticated = False
-
         self._type = None
-        # self._bookings = [] Use this or use the database?
 
     def get_bookings(self):
+        """Get the bookings for this user from the database."""
         booking_rows = db.bookings.get_for_user(self._id)
         return sorted([Booking(*row[1:]) for row in booking_rows], key=lambda x: x.start_date)
 
 
     def todict(self):
         """
-        Return a dict object with attributes other than pwdhash.
+        Return a dict object with attributes of the user other than pwdhash.
         """
         return {
             'name': self.name,
@@ -38,7 +39,6 @@ class User:
             'email': self.email,
             'mobile': self.mobile,
             'desc': self.desc,
-        #   'pwdhash': self.pwdhash  # XXX: Will we need pwdhash ever?
         }
 
     '''
