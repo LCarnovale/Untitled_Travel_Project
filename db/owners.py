@@ -12,7 +12,8 @@ Table schema:
     6   pwdhash         bytes
 
 """
-from helpers import dbCursor
+from helpers import dbCursor, ArgumentException
+import pyodbc
 
 
 def get(id):

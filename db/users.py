@@ -11,7 +11,7 @@ Table schema:
     5   description     text
     6   pwdhash         bytes
 """
-from helpers import dbCursor, InsertionError
+from helpers import dbCursor, InsertionError, ArgumentException
 import pyodbc
 def get(id):
     """
@@ -49,13 +49,13 @@ def insert(name, userName, password, email=None, phone=None, description=None):
     #  email        varchar(100)
     #  phone        varchar(20)
     #  description  text
+    #  pwdhash      bytes 
 
     # Make sure username is unique:
     with dbCursor() as cursor:
         if (cursor.execute("SELECT * FROM users WHERE username = ?", userName).fetchone()):
             raise InsertionError(
                 "Username already exists in users table.", col='userName', _type='duplicate')
-        print(name,userName, password, email, phone, description)
         try:
             cursor.execute(
                 "INSERT INTO Users (name, userName, email, phone, description, pwdhash)   \
@@ -63,8 +63,8 @@ def insert(name, userName, password, email=None, phone=None, description=None):
                 (name, userName, email, phone, description, password)
             )
         except pyodbc.IntegrityError as e:
-            raise e
-            # raise InsertionError("SQL Integrity Error, likely a duplicate username on insert.")
+            print("Full Error:", e)
+            raise InsertionError("SQL Integrity Error, likely a duplicate username on insert.")
 
         res = cursor.fetchone()
         if res is not None:
