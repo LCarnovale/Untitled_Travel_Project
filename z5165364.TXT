@@ -76,3 +76,5 @@ Image hover not working properly, it only displays the 1st image as a large imag
 Worked on adding reviews on the accommodation viewing page.Fixed format on Review so it displays properly and the text is not directly beside the thumbs up/down image. Fixed this by adding margins to the text and adding extra divs to separate the image, username and review comment.
 
 
+26/11/19
+Worked on the final report (Booking and Advertisement Modules as well as file reference table and code structure). Also worked on polishing and commenting HTML pages.
