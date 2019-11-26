@@ -45,6 +45,18 @@ except:
 
 _glob_cnxn = None
 _glob_cnxn_open_time = CURSOR_MAX_OPEN_TIME + 1
+
+def close():
+    global _glob_cnxn
+    global _glob_cnxn_open_time
+
+    try:
+        _glob_cnxn.close()
+    except:
+        pass
+
+    _glob_cnxn_open_time = CURSOR_MAX_OPEN_TIME + 1
+
 class dbCursor:
     def __enter__(self):
         global _glob_cnxn
@@ -103,5 +115,3 @@ def execute(sql, *params):
 
     return out
 
-
-# dbc = dbCursor()
