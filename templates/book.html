@@ -104,6 +104,7 @@
             Contact Owner at <a href="{{acc.external_url}}">{{acc.display_url}}</a>
         {% elif owner %}
         <p align="left"> Name: {{owner.name}} </p>
+        <p align="left"> About the owner:<br>{{owner.desc}} </p>
         <p align="left"> Have any questions? Contact the owner at {{owner.mobile}}</p>
         {% endif %}
       </div>
@@ -166,7 +167,7 @@
       <!-- Review Section -->
       <div class="w3-row w3-large">
           <h4 class="w3-left w3-col s9"><strong>Reviews</strong></h4>
-          {% if session['login_type'] != 'owner' or session['id']|int != acc.ownerid %}
+          {% if session['login_type'] == 'user' or (session['login_type'] == 'owner' and session['id']|int != acc.ownerid) %}
           <br>
           <div class="w3-row w3-large">
                      <button class="btn waves-effect waves-light light-blue" onclick="window.location.href = '/review/{{id}}';"> Write your own review </button>

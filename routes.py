@@ -381,6 +381,9 @@ def review(id):
     if acc == None:
         abort(404)
 
+    if 'id' not in session:
+        abort(403)
+
     if request.method == 'POST':
         reccommend = True if request.form.get('recc') == 'yes' else False
         issues = request.form.get('issues')
