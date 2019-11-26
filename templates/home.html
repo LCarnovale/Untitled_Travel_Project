@@ -91,7 +91,7 @@
 								<p>Parking Spaces:</p>
 							</div>
 							<div class="col s4">
-								<input type="number" name="parking" max="99" min="1" value="1" step="1">
+								<input type="number" name="parking" max="99" min="0" value="1" step="1">
 							</div>
 						</div>
 					</div>
@@ -106,62 +106,63 @@
 </form>
 
 	
-    <script>
+<script>
 
-		
-		
-		
+function changeSearch(newval) {
+	if (newval == '') {
+		document.getElementById("searchBtn").disabled = true;
+	} else {
+		// if (document.getElementById("radiusval").value != null) {
+			document.getElementById("searchBtn").disabled = false;
+		// } else {
+		// 	document.getElementById("searchBtn").disabled = true;
+		// }
+	}
+	M.updateTextFields(); // Raise the label in the search box
 
-		function changeSearch(newval) {
-			if (newval == '') {
-				document.getElementById("searchBtn").disabled = true;
-			} else {
-				// if (document.getElementById("radiusval").value != null) {
-					document.getElementById("searchBtn").disabled = false;
-				// } else {
-				// 	document.getElementById("searchBtn").disabled = true;
-				// }
-			}
-			M.updateTextFields(); // Raise the label in the search box
+}
 
-		}
 
-		
-		var typingTimer;                //timer identifier
-		var doneTypingInterval = 1000;  //time in ms
-		
-		document.getElementById('searchgeocode').addEventListener('keyup', () => {
-			clearTimeout(typingTimer);
-			if (document.getElementById('searchgeocode').value) {
-			typingTimer = setTimeout(getgeocode, doneTypingInterval);
+var typingTimer;                //timer identifier
+var doneTypingInterval = 1000;  //time in ms
+
+document.getElementById('searchgeocode').addEventListener('keyup', () => {
+	clearTimeout(typingTimer);
+	if (document.getElementById('searchgeocode').value) {
+	typingTimer = setTimeout(getgeocode, doneTypingInterval);
     }
 });
-	</script>
-<script>
-	$(function() {
-		$('#dates').daterangepicker({
-			autoUpdateInput: false,
-			minDate: new Date(),
-			endDate: moment().add(60, 'days'),
-        	locale: {
-            	cancelLabel: 'Clear',
-            	format: 'DD/MM/YYYY'
-        	}
-		});
-	});
-	$('#dates').on('apply.daterangepicker', function(ev, picker) {
-      $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
-  	});
-	$('#dates').on('cancel.daterangepicker', function(ev, picker) {
-        $(this).val('');
-    });
-    $('#dates').on('apply.daterangepicker', function(ev, picker) {
-    	$(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
-	});
-	$(document).ready(function () {
-		$('.collapsible').collapsible();
-	});
+
 </script>
+
+
+<script>
+$(function() {
+	$('#dates').daterangepicker({
+		autoUpdateInput: false,
+		minDate: new Date(),
+		endDate: moment().add(60, 'days'),
+    	locale: {
+        	cancelLabel: 'Clear',
+        	format: 'DD/MM/YYYY'
+    	}
+	});
+});
+$('#dates').on('apply.daterangepicker', function(ev, picker) {
+  $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+	});
+$('#dates').on('cancel.daterangepicker', function(ev, picker) {
+    $(this).val('');
+});
+$('#dates').on('apply.daterangepicker', function(ev, picker) {
+	$(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+});
+$(document).ready(function () {
+	$('.collapsible').collapsible();
+});
+</script>
+
+
 	<!-- Actual link: -->	
 <script src = "static/map.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwnoTrb4bDrnE2qSu7q1HiS0pWCsCJS7g&libraries=geometry&callback=initMap" async defer></script>
