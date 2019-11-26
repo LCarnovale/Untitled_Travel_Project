@@ -147,6 +147,8 @@ Exception: Your ip (***.***.***.***) was denied.
 You will still be able to run the website, but any interactions with the database will raise this error.
 
 # Running the program
+Note: running a local server will not display images that were uploaded to the azure website, as images are stored locally.
+
 On windows, the most reliable way to run the server is to specify the current default python install which will
 use the virtual environment's python path:
 ```cmd
