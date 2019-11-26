@@ -9,6 +9,11 @@ class EmailError(Exception):
 
 
 class User:
+    '''
+    The User class stores a local copy of a user entry in the database.
+    It includes all info as per users.py, but also with some functions to assist with authentication.
+    It does not store the password, but does recieve a password hash.
+    '''
     def __init__(self, name, userName, email, mobile, desc=None, pwdhash=None):
         self._id = -1 # Will be set by userSystem
 
@@ -66,6 +71,7 @@ class User:
 
     @email.setter
     def email(self, email):
+        '''Verifies the email is in a valid email format'''
         if email:
             x = re.search(r'[\w\.-]+@[\w\.-]+(\.[\w])+', email)
             if x is not None:
@@ -82,7 +88,6 @@ class User:
 
     @mobile.setter
     def mobile(self, mobile):
-        # TODO validate mobile number??
         self._mobile = mobile
         
     @property

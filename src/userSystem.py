@@ -5,6 +5,7 @@ import user
 User = user.User
 
 class UserSystemError(Exception):
+    '''Error specific to the UserSystem'''
     def __init__(self, msg):
         super().__init__(msg)
 
