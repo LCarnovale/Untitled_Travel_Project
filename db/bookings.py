@@ -1,4 +1,4 @@
-from helpers import dbCursor
+from helpers import dbCursor, ArgumentException
 import pyodbc
 """
  id          int        Identity  PRIMARY KEY

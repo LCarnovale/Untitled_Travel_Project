@@ -4,15 +4,26 @@ import datetime
 import db
 
 class AccommodationSystem:
+    '''
+    The AccommodationSystem class is responsible for managing all Accommodation objects in (non-database) storage.
+    It is also responsible for high-level interaction with the database related to Accommodation objects.
+
+    This should be a global variable, and it will store a cached list of Accommodation objects, so as to
+     reduce the number of times the database needs to be called.
+    '''
     def __init__(self):
+        '''
+        Initialise the empty AccommodationSystem
+        '''
         self._accommodations = {}
 
     def add_acc(self, id, acc):
-        '''Adds accommodations into the system'''
+        '''Adds Accommodation objects into the system'''
         try:
             id = int(id)
         except ValueError:
             raise ValueError("Can not convert %s to an int." % id)
+
         acc._id = id
         self._accommodations[id] = acc
     
@@ -46,9 +57,9 @@ class AccommodationSystem:
                 return [self.get_acc(x) for x in id] 
                 
         if id in self._accommodations:
+            # Return the local copy
             return self._accommodations[id]
         else:
-            print('FETCHING')
             # Fetch from database
             acc = db.venues.get(id)
             if acc is not None:
@@ -62,8 +73,10 @@ class AccommodationSystem:
                             bathCount, carCount, description, rate, minStay, 
                             maxStay, details, url=None):
         """
-        Create an accomodation object.
-        Takes the arguments for a venue defined in dbTools.py, excluding venueid.        
+        Create an Accomodation object.
+        Takes the arguments for a venue defined in dbTools.py, excluding venueid.
+        Stores the created object in self._accommodations, with the generated id.
+        Returns the generated id.
         """
         args = (ownerid, addressid, name, bedCount,
                 bathCount, carCount, description, rate, 
@@ -137,17 +150,16 @@ class AccommodationSystem:
         `point` should be a lat-lon pair.
         """
         venues, addresses, dists = db.venues.search_area_circle(point, distance)
-        #print(venues)
+
         if refine:
             _refine(self._accommodations, [v[0] for v in venues],
                     venues, addresses, dists)
 
-            self.clean_system() # Might be better to specifically remove irrelevant venues?
+            self.clean_system()
         
         
         for v in venues:
-            # new_venue = Accommodation(*v[1:])
-            self.add_acc_row(v)#[0], new_venue)
+            self.add_acc_row(v)
         
         return [v[0] for v in venues]
 

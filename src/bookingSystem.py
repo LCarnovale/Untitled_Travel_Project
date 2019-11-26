@@ -4,21 +4,30 @@ from accommodationSystem import AccommodationSystem
 from accommodation import Accommodation
 
 class BookingError(Exception):
+    '''
+    Error specific to Booking objects.
+    '''
     def __init__(self, msg):
         self.msg = msg
         super().__init__(self, msg)
 
 class BookingSystem:
+    '''
+    The BookingSystem should be a global instance, with the responsibility of managing all Booking objects.
+
+    It stores a cache of booking objects, as well as interacting with the database when needed.
+    '''
+
     def __init__(self):
+        '''Creates an empty BookingSystem'''
         self._bookings = {}
 
     def add_booking(self, booking_id, booking):
         """
         Add a booking to the system.
-        Sets the id of the booking to the given booking_id
+        Stores the id of the booking with the given booking_id
         """
         self._bookings[booking_id] = booking
-        booking._id = booking_id
 
     def create_booking(self, venueid, userid, startDate, endDate):
         """
@@ -26,7 +35,9 @@ class BookingSystem:
         startDate, endDate should be type `datetime.date`
         """
 
-        # TODO: Verify the booking is allowed
+        # Verify the booking is allowed
+        # -----------------------------
+
         # Check that the booking is allowed for the venue.
         venue_avails = db.venues.get_overlapping_availability(venueid, startDate, endDate)
         if not venue_avails:
@@ -38,7 +49,9 @@ class BookingSystem:
         if clashes:
             raise BookingError("The venue is already booked for the requested period.")
         
-        # Otherwise we are good to go
+
+        # Booking is valid, insert into system
+        # ------------------------------------
         
         new_bookingid = db.bookings.insert(venueid, userid, startDate, endDate)
         new_booking = Booking(venueid, userid, startDate, endDate)
@@ -50,7 +63,7 @@ class BookingSystem:
         """
         Find a booking in the stored bookings or from the database.
 
-        Returns `None` if a booking cannot be found in the system or database
+        Returns `None` if a booking cannot be found in the system nor database
         """
         if bookid in self._bookings:
             return self._bookings[bookid]
