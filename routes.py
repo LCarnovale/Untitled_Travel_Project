@@ -4,7 +4,6 @@ from src.accommodation import Accommodation
 from src.accommodationSystem import AccommodationSystem
 from src.address import Address
 from src.user import User
-from src.stayDetails import StayDetails
 from src.booking import Booking
 import src
 import src.userSystem as US
