@@ -13,7 +13,7 @@ class UserCreateError(UserSystemError):
     """Thrown when a user cannot be created"""
     def __init__(self, msg, col=None, err=None):
         # col: column/field causing the error (eg. userName)
-        # err: err with the column
+        # err: error from the column
         if col is not None:
             msg += f"\nInvalid data in field: {col}"
         if err is not None:
@@ -92,8 +92,6 @@ class UserSystem:
             else:
                 return None
  
-            
-
     def create_user(self, name, username, pwd, email, phone, description):
         """
         Attempt to create a user.

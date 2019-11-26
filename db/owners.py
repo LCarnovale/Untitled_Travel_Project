@@ -12,7 +12,7 @@ Table schema:
     6   pwdhash         bytes
 
 """
-from helpers import dbCursor, ArgumentException
+from helpers import dbCursor, InsertionError, ArgumentException
 import pyodbc
 
 
@@ -52,8 +52,8 @@ def insert(name, userName, password, email=None, phone=None, description=None):
                 (name, userName, email, phone, description, password)
             )
         except pyodbc.IntegrityError as e:
-            print("Duplicate username on insert.")
-            raise e
+            raise InsertionError(
+                "SQL Integrity Error, likely a duplicate username on insert.", col='userName', _type="duplicate")
 
         res = cursor.fetchone()
         if res is not None:

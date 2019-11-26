@@ -63,8 +63,7 @@ def insert(name, userName, password, email=None, phone=None, description=None):
                 (name, userName, email, phone, description, password)
             )
         except pyodbc.IntegrityError as e:
-            print("Full Error:", e)
-            raise InsertionError("SQL Integrity Error, likely a duplicate username on insert.")
+            raise InsertionError("Unable to complete insert:\n %s" % e)
 
         res = cursor.fetchone()
         if res is not None:

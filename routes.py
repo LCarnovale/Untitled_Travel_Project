@@ -205,9 +205,9 @@ def signup_owner():
             )
         except US.UserCreateError as e:
             if e.col == 'userName':
-                return render_template('signup.html', username_taken=True)
+                return render_template('signup_owner.html', username_taken=True)
             if e.col == 'email':
-                return render_template('signup.html', invalid_email=True)
+                return render_template('signup_owner.html', invalid_email=True)
         else:
             login(uid, 'owner')
             return redirect('/')
@@ -234,6 +234,7 @@ def signup():
                 form['desc_input']
             )
         except US.UserCreateError as e:
+            print(e)
             if e.col == 'userName':
                 return render_template('signup.html', username_taken=True)
             if e.col == 'email':
