@@ -226,20 +226,7 @@ class AccommodationSystem:
             self.add_acc(v[0], new_venue)
         
         return [v[0] for v in venues]
-
-
-    def get_all_ads(self):
-        # TODO: UPDATE CHANGES
-        self.clean_system()
-
-        accs = db.venues.get_all()
-
-        for acc in accs:
-            new_acc = Accommodation(*acc[1:])
-            self.add_acc(acc[0], new_acc)
-            #print(new_acc._id)
-
-        #print(self._accommodations)
+        
 
 def _refine(existing, found, *lists):
     """
