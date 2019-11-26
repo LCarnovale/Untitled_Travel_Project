@@ -43,7 +43,7 @@ class AccommodationSystem:
             except:
                 pass
             else:
-                return [self._accommodations[x] for x in id] 
+                return [self.get_acc(x) for x in id] 
                 
         if id in self._accommodations:
             return self._accommodations[id]
@@ -73,22 +73,49 @@ class AccommodationSystem:
         self.add_acc(new_venueid, new_venue)
         return new_venueid
 
-
-    def keywordSearch(self, search):
-        s = Search(self._accommodations)
-        return s.keywordSearch(search)
-
-    def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
+    def advancedSearch(self, search, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
-        # self.get_like(name=f"%{search}%", details=f"{search}", description=f"{search}")
-        print('SEARCHING')
-        print(self._accommodations.keys())
+        '''
+        Perform an advanced search on the database
+
+        Firstly, advancedSearch will use database joins to efficiently filter out
+         all items outside the given date range and location.
+        It will then use the Search class to perform a search on the remaining items.
+
+        All arguments should be strings. Dates are in the form dd/mm/YYYY.
+        See Search.advancedSearch for a description of the arguments.
+
+        The only required arguments are the start and end date, which should be set to today if not specified.
+        All other options may be set to the empty string '' or None if they are not provided.
+        '''
+
+        # -----------------
+        # 1. Pre-processing
+        # -----------------
+
+        refine = False
+
+        if startdate and enddate:
+            self.get_available(startdate, enddate, refine=refine)
+            refine = True
+        else:
+            raise Exception('No dates were found when searching.')
+
+        if location:
+            self.get_near(location.split(', '), distance, refine=refine)
+            refine=True
+
+
+        # ------------
+        # 2. Searching
+        # ------------
+
         s = Search(self._accommodations)
-        result = s.advancedSearch(search, text_bounds, startdate, enddate, beds,
+        result = s.advancedSearch(search, startdate, enddate, beds,
                                   bathrooms, parking, location, distance)
-        print('AFTER')
-        print(self._accommodations.keys())
         return result
+
+
     def clean_system(self):
         """Remove all stored venues (Not from database)"""
         self._accommodations = {}

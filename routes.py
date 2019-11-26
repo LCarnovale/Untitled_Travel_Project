@@ -48,7 +48,6 @@ def home():
     if request.method == 'POST':
         try:
             keyword = request.form.get('keyword')
-            refine = False
 
             beds = request.form.get('beds') or None
             bathrooms = request.form.get('bathrooms') or None
@@ -58,30 +57,24 @@ def home():
             if len(dates) == 2:
                 startdate = dates[0]
                 enddate = dates[1]
-                accSystem.get_available(startdate, enddate, refine=refine)
-                refine = True
             else:
                 startdate = datetime.today().strftime('%d/%m/%Y')
                 enddate = datetime.today().strftime('%d/%m/%Y')
-                print("Filtering by dates:", accSystem.get_available(startdate, enddate, refine=refine)); refine = True
 
             location = request.form.get('geocodedvalue')
             distance = request.form.get('radiusval')
-            if location:
-                accSystem.get_near(location.split(', '), distance, refine=refine)
-                refine=True
-            # elif text_bounds:
-            # TODO: This is a bit dodgy the target location and search term should be separate
-            # if location: search = None
-            search = request.form['keyword']
-            results = accSystem.advancedSearch(search, None, startdate, enddate, beds,
+
+            # Perform the search
+            results = accSystem.advancedSearch(keyword, startdate, enddate, beds,
                                                bathrooms, parking, location, distance)
+
+            # Save the results for multi-page results
+            session['results'] = results
             print(results)
-            results = accSystem.get_acc(results)
-            # return render_template('search_results.html', results = results)
-            global _results
-            _results = results
+
+            # Redirect to results
             return redirect(url_for('view_search'))
+
         except db.OperationalError as e:
             return render_template('404.html', err_msg=rf"""Unable to connect to database.
 Message: {str(e)}""")
@@ -93,7 +86,6 @@ Message: {str(e)}""")
 
     return render_template('home.html')
 
-_results = []
 '''
 Search result viewing
 '''
@@ -101,16 +93,30 @@ Search result viewing
 @app.route('/results/<page>', methods=['GET', 'POST'])
 def view_search(page=1):
     print(request.form)
+
+    # User has modified url to search results without performing a search
+    if 'results' not in session:
+        session['results'] = []
+
+    results = session['results']
+
     page = int(page)
+    page_count = len(results) // RESULTS_PER_PAGE
+    page_count += 1 if (len(results) % RESULTS_PER_PAGE) else 0
+
     kwargs = {
-        'page_num':page, 
-        'page_count':(len(_results) // RESULTS_PER_PAGE) + (1 if (len(_results) % RESULTS_PER_PAGE) else 0)
+        'page_num': page, 
+        'page_count': page_count
     }
     if request.method == 'GET':
         start = (page - 1) * RESULTS_PER_PAGE
         end = start + RESULTS_PER_PAGE
+
+        results = accSystem.get_acc(results[start:end])
+        print(results)
+
         return render_template('search_results.html', 
-            results=_results[start:end], **kwargs)
+            results=results, **kwargs)
     
     elif request.method == 'POST':
         if 'next' in request.form:

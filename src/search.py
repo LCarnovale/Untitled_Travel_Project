@@ -5,85 +5,86 @@ import src.review
 from src.accommodation import Accommodation
 
 class Search():
+    '''
+    Search object for encapsulating search logic.
+    Usage:
+    x = Search(items) # See __init__
+    result = x.advancedSearch(...) # See advanced search for details
+    '''
+
     def __init__(self, items):
-        self._items = items   
+        '''
+        Initialise the Search class
+        items: a dictionary of id: Accommodation, as in AccommodationSystem._accommodations
+        '''
+        self._items = items
         self._scores = []    
         self._most_recent = [] 
 
-    def advancedSearch(self, search, text_bounds, startdate, enddate, beds,
+    def advancedSearch(self, search, startdate, enddate, beds,
                        bathrooms, parking, location, distance):
+        '''
+        Performs an advanced search on the items given in initialisation.
+
+        This works by giving each item a score, and then ranking them with the highest score first
+
+        All arguments should be strings, as follows:
+        search: Text representing the keyword search, can be set to '' or None if no keywords.
+        startdate: dd/mm/YYYY, represents the start of the period searched.
+        enddate: dd/mm/YYYY, represents the end of the period searched.
+        beds: Should be a positive number (as a string), representing number of bedrooms searched
+        bathrooms: As with beds, for bathrooms
+        parking: As with beds, for number of car spaces
+        location: Should be two comma-separated floats, representing latitude and longitude of location search
+        distance: Should be an integer representing the number of metres away from the location (radius) to search
+        '''
         self._scores = []
-        print('ADV search')
+
         if len(self._items) == 0:
             return []
 
+        # Generates scores based on the keyword search.
         if search:
             self._keywordSearch(search)
         else:
             self._scores = [(x,0.0) for x in self._items]
-            #print(self._scores)
-        print(self._items)
-        # If the search term looks like a location, don't require the search in the name
-        if text_bounds:
-            self._scores = [(x,0.0) for x in self._items]
-
-        print('Done keys')
-
-        if text_bounds:
-            print('text')
-            self._limitRegion(text_bounds)
-
-        print('Done region')
-
         
-        if startdate:
-            startdate = datetime.strptime(startdate, '%d/%m/%Y')
-        else:
-            startdate = datetime.today()
-        if enddate:
-            enddate = datetime.strptime(enddate, '%d/%m/%Y')
-        else:
-            enddate = startdate
-        print(startdate, enddate)
+        # Filter by date range
+        startdate = datetime.strptime(startdate, '%d/%m/%Y')
+        enddate = datetime.strptime(enddate, '%d/%m/%Y')
         self._filterDates(startdate, enddate)
         
-        
-        print('Done dates')
+        # Optimisation for early return if no results are found
         if not self._scores:
             return self._scores
+
+        # Filter by amenities.
         if beds:
             self._filterBeds(int(beds))
         if bathrooms:
             self._filterBaths(int(bathrooms))
         if parking:
             self._filterParking(int(parking))
-
-        print('Done half')
 		
-        for id,score in self._scores: 
-            reviews = src.review.get_for_venue(id)
-            for review in reviews:
-                if review._recommends:
-                    score+= 1.0 
-                else:
-                    score-= 1.0
-                print((review._recommends))
+        # Adding scores based on reviews
+        self._scoreReviews()
         
+        # Searching by distance
         if location:
             if not distance:
                 distance = '2000'
+
             distance = int(distance)
             self._filterLocation(location, distance)
-        
 
-        print('Sorting')
-        #print(self._scores)
-        self._scores = sorted(self._scores,key = lambda score: score[1],reverse = True)
-        print(self._scores)
-        print('Done search.')
+        # Sorting the results, highest score first
+        self._scores = sorted(self._scores,key = lambda score: score[1], reverse = True)
+
         return [x[0] for x in self._scores]
 
+
     def _keywordSearch(self, search):
+        '''Gives each result a score between 0 and 3 based on how well it matches the search'''
         search = self._cleanString(search)
         search = search.split(' ')
 
@@ -104,156 +105,127 @@ class Search():
 
             for keyword in search:
                 if len(name) != 0:
-                    title_score += (2/3) * name.count(keyword)/len(name)
+                    title_score += 2 * name.count(keyword)/len(name)
                 if len(desc) != 0:
-                    body_score += (1/3) * desc.count(keyword)/len(desc)
+                    body_score += 1 * desc.count(keyword)/len(desc)
 
             scores.append((ad_id, title_score + body_score))
 
         self._scores = scores
 
-    def _limitRegion(self, text_bounds):
-        southwest, northeast = text_bounds.split('+')
-        southwest = tuple(map(float, southwest.split(',')))
-        northeast = tuple(map(float, northeast.split(',')))
-
-        limited = []
-
-        for ad_id, score in self._scores:
-            ad = self._items[ad_id]
-            addr = ad.address
-            lat,lng = float(addr.lat), float(addr.lng)
-
-            if (southwest[0] < lat and
-                southwest[1] < lng and
-                northeast[0] > lat and
-                northeast[1] > lng):
-
-                # print('MATCH', southwest, northeast, lat, lng)
-                limited.append((ad_id, score))
-            else:
-                # print('NO MATCH', southwest, northeast, lat, lng)
-                pass
-
-        self._scores = limited
-
 
     def _filterDates(self, startdate, enddate):
+        '''Filters out all results which are unavailable/booked during the period specified'''
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
-            #print(ad.get_dates())
             dates = ad.get_dates()
+
             for start, end in dates:
-                #print(start, end)
-                #print(startdate, enddate)
                 start = datetime.strptime(start, '%d-%m-%Y')
                 end = datetime.strptime(end, '%d-%m-%Y')
-                if start <= startdate and end >= enddate:
-                    #print('YEP', ad_id)
-                    result.append((ad_id, score))
 
-            '''
-            if (ad.isAvailable(startdate, enddate)):
-                print('YEP', ad_id)
-                result.append((ad_id, score))
-            '''
+                if start <= startdate and end >= enddate:
+                    result.append((ad_id, score))
 
         self._scores = result
 
 
     def _filterBeds(self, beds):
+        '''Filters out all results which don't have enough beds. +0.5 points if exact num of beds.'''
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
+
             if (ad.bed_count >= beds):
                 if ad.bed_count == beds:
                     score+=0.5
+
                 result.append((ad_id, score))
 
         self._scores = result
 
+
     def _filterBaths(self, baths):
+        '''Filters out all results which don't have enough bathrooms. +0.5 points if exact num of bathrooms.'''
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
+
             if (ad.bath_count >= baths):
                 if ad.bath_count == baths:
                     score+=0.5
+
                 result.append((ad_id, score))
 
         self._scores = result
 
+
     def _filterParking(self, spots):
+        '''Filters out all results which don't have enough parking. +0.5 points if exact num of car spots.'''
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
+
             if (ad.car_count >= spots):
                 if ad.car_count == spots:
                     score+=0.5
+
                 result.append((ad_id, score))
 
         self._scores = result
 
 
-    def _filterLocation(self, location, dist):
-        # print(location)
+    def _scoreReviews(self):
+        '''Adds 1 point for every positive review at the place, subtracts 1 for each negative review.'''
+        result = []
+        for id,score in self._scores:
+            reviews = src.review.get_for_venue(id)
+
+            for review in reviews:
+                if review._recommends:
+                    score+= 1.0 
+                else:
+                    score-= 1.0
+
+            result.append((id, score))
+
+        self._scores = result
+
+
+    def _filterLocation(self, location, max_dist):
+        '''
+        Filters out every location outside of the given radius max_dist
+        Ranks the results based on distance, and gives equally spaced
+         points between 2 and 0 based on proximity
+        '''
+
         result = []
         lat = float(location.split(',')[0])
         lon = float(location.split(',')[1])
-        currentscore = 2.0
-        step = 2.0/(len(self._scores))
+
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
-            if (geodesic((lat, lon), (ad.address.lat, ad.address.lng)).km <= dist/1000):
-                score+=currentscore
-                currentscore -= step
-                result.append((ad_id, score))
-            else:
-                print('Nope loc')
+            dist = geodesic((lat, lon), (ad.address.lat, ad.address.lng)).km
+
+            if (dist <= max_dist/1000):
+                result.append((ad_id, score, dist))
+
+        # Order results and score accordingly
+        result.sort(key = lambda x: x[2])
+        final = []
+        currentscore = 2.0
+        step = 2.0/(len(self._scores))
+        for ad_id, score, dist in result:
+            final.append((ad_id, score + currentscore))
+            currentscore -= step
 
         self._scores = result
 
-    # Replaces all contiguous non-alphanumeric characters with a space
-    # And converts to lower case
+
     def _cleanString(self, string):
+        '''
+        Replaces all contiguous non-alphanumeric characters with a space
+        And converts to lower case
+        '''
         return re.sub(r'[\W_]+', ' ', string).lower()
-
-    # Returns a list of all ads mentioning at least one keyword in the search
-    # Ordered by increasing score:
-    #  score = sum of [(2/3) * frequency of keyword in name +
-    #                  (1/3) * frequency of keyword in description]
-    #          over all keywords
-    def keywordSearch(self, search):
-        search = self._cleanString(search)
-        search = search.split(' ')
-
-        scores = []
-
-        for ad_id in self._items:
-            ad = self._items[ad_id]
-            print(ad_id)
-            title_score = 0.0
-            body_score = 0.0
-
-            name = ad.name
-            name = self._cleanString(name)
-            name = name.split(' ')
-
-            desc = ad.description
-            desc = self._cleanString(desc)
-            desc = desc.split(' ')
-
-            for keyword in search:
-                if len(name) != 0:
-                    title_score += (2/3) * name.count(keyword)/len(name)
-                if len(desc) != 0:
-                    body_score += (1/3) * desc.count(keyword)/len(desc)
-
-            if title_score + body_score != 0:
-                scores.append((ad_id, title_score + body_score))
-
-        scores.sort(key=lambda x: -x[1])
-
-        self._most_recent = scores
-        return [x[0] for x in scores]
