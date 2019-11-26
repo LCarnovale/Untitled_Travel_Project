@@ -1,3 +1,8 @@
+# Hosted Azure website
+**This website is also available online at [http://untitled-travel.azurewebsites.net/](http://untitled-travel.azurewebsites.net/)**. This is automatically hosting the server for the master branch of this respository, updating every few minutes, and you **do not need to clone this repository or run any code** to access it.
+
+The following instructions are for running the website locally, or for hosting the website on a different azure instance/third-party hosting service.
+
 # Virtual Environment Setup
 This project makes use of a virtual environment to keep
 the modules being used consistent across locations.
@@ -78,7 +83,7 @@ To deactivate the virtual environment, run the following command:
 (project_venv) deactivate
 ```
 
-# Giving the backend access to the database
+# Giving the backend access to a database
 This step is required to allow the program to access a database.
 Also required is an ODBC Driver for SQL servers, available for Windows 
 [here](https://www.microsoft.com/en-us/download/details.aspx?id=56567).
@@ -114,8 +119,28 @@ Attempting connection (no output on success)
 ```
 **For a new database** use the script [here](#dbgen) to create a database that can be used by the program.
 
-The program is able to detect if a firewall has blocked your ip address, and will raise an exception 
-giving your ip address, and saying that it has been blocked.
+**If you want to use our existing database** (for marking purposes), use the following values:
+
+```python
+DRIVER = "{ODBC Driver 17 for SQL Server}" # Change the version number from 17 if necessary
+SERVER = "tcp:untitledtestserver.database.windows.net,1433"
+DATABASE = "testVenueDB"
+UNAME = "admin1"
+PASSWORD = "password1!"
+```
+
+If you choose to use the existing database, we will need to add your IP to the whitelist. Please email any of us with your IP and we give you access to the database:
+Ian Thorvaldson: i.thorvaldson@unsw.edu.au
+Leo Carnovale: l.carnovale@unsw.edu.au
+Kittipat Sangdao: k.sangdao@student.unsw.edu.au
+Bryan Liauw: b.liauw@unsw.edu.au
+
+**NOTE:** The program is able to detect if a firewall has blocked your ip address, and will raise an exception 
+giving your ip address, and saying that it has been blocked:
+```
+Exception: Your ip (***.***.***.***) was denied.
+```
+You will still be able to run the website, but any interactions with the database will raise this error.
 
 # Running the program
 On windows, the most reliable way to run the server is to specify the current default python install which will
@@ -128,6 +153,13 @@ On posix systems:
 ```bash
 (project_venv) ./run.py
 ```
+
+If you recieve an error including the following text:
+```
+Can't open lib 'ODBC Driver 17 for SQL Server'
+```
+You have an error with the ODBC Driver for SQL servers, mentioned in the section "Giving the backend access to the database".
+
 
 # Running the crawler
 The crawler can be run the same way as the main program, but with `runcrawler.py`. 
