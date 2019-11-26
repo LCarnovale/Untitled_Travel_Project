@@ -9,11 +9,20 @@ def get_for_venue(venueid):
     """
     Get a list of review objects for a given venue.
     Returns a list of Reviews.
+
+    Unlike similar classes, reviews are not cached as they are too numerous.
+    Because of this, there is no class to store them, just a function.
     """
     reviews = db.reviews.get_for_venue(venueid)
     return [Review(*x[1:]) for x in reviews]
 
+
+
 class Review:
+    """
+    Holds attributes for a review based on the columns in the review
+    table in the database.
+    """
     def __init__(self, venueid, userid, postDateTime, recommends, reviewBad, reviewGood):
         """
         Holds attributes for a review based on the columns in the review

@@ -6,9 +6,15 @@ from booking import Booking
 import json
 
 class NegativeNumberError(Exception):
+    '''
+    Specific Exception for when a negative number is provided where it should be positive.
+    '''
     pass
 
 class NumberError(Exception):
+    '''
+    Basically a custom ValueError when the input expected a number, but got something else.
+    '''
     def __init__(self, msg="Invalid number given"):
         super().__init__(msg)
 
@@ -39,7 +45,7 @@ class Accommodation:
         self._details,         \
         self._url     =     args
 
-        ### Data validation  ### TODO: Add more tests?
+        ### Data validation
         if self._bed_count < 0:
             raise NegativeNumberError("Invalid bed count")
         if self._bath_count < 0:
@@ -94,14 +100,14 @@ class Accommodation:
                         continue
                         # case 3, bookStart > startAvail and bookEnd < endAvail
                     elif bookStart > startAvail and bookEnd < endAvail:
-                            availableDates.pop(j)
-                            availableDates.insert(j,[startAvail, (bookStart - timedelta(days=1))])
-                            availableDates.insert(j+1,[(bookEnd + timedelta(days=1)), endAvail])
-                            continue
+                        availableDates.pop(j)
+                        availableDates.insert(j,[startAvail, (bookStart - timedelta(days=1))])
+                        availableDates.insert(j+1,[(bookEnd + timedelta(days=1)), endAvail])
+                        continue
                         # case 4, bookStart = startAvail and bookEnd = endAvail
                     elif bookStart == startAvail and bookEnd == endAvail:
-                            # then the available range is unavailable
-                            continue
+                        # then the available range is unavailable
+                        continue
 
         availableDates = [[x[0].strftime('%d-%m-%Y'), x[1].strftime('%d-%m-%Y')] for x in availableDates]
         print(availableDates)
@@ -155,7 +161,6 @@ class Accommodation:
 
     @aid.setter
     def aid(self, aid):
-        # TODO: Verify this is a valid address id?
         self._aid = aid
 
     @property
@@ -165,7 +170,6 @@ class Accommodation:
 
     @ownerid.setter
     def ownerid(self, ownerid):
-        # TODO: Verify this is a valid owner id?
         self._ownerid = ownerid
 
     @property
@@ -184,6 +188,7 @@ class Accommodation:
 
     @bed_count.setter
     def bed_count(self, bed_count):
+        '''Sets the number of bedrooms, ensuring the correct integer form'''
         try:
             bed_count = int(bed_count)
         except ValueError:
@@ -200,6 +205,7 @@ class Accommodation:
 
     @bath_count.setter
     def bath_count(self, bath_count):
+        '''Sets the number of bathrooms, ensuring the correct integer form'''
         try:
             bath_count = int(bath_count)
         except ValueError:
@@ -216,6 +222,7 @@ class Accommodation:
 
     @car_count.setter
     def car_count(self, car_count):
+        '''Sets the number of parking spaces, ensuring the correct integer form'''
         try:
             car_count = int(car_count)
         except ValueError:
@@ -241,6 +248,7 @@ class Accommodation:
 
     @rate.setter
     def rate(self, rate):
+        '''Sets the number of rate, ensuring the correct decimal form'''
         try:
             rate = float(rate)
         except ValueError:
@@ -257,6 +265,7 @@ class Accommodation:
 
     @min_stay.setter
     def min_stay(self, min_stay):
+        '''Sets the minimum stay, ensuring the correct integer form'''
         try:
             min_stay = int(min_stay)
         except ValueError:
@@ -273,6 +282,7 @@ class Accommodation:
 
     @max_stay.setter
     def max_stay(self, max_stay):
+        '''Sets the maximum stay, ensuring the correct integer form'''
         try:
             max_stay = int(max_stay)
         except ValueError:

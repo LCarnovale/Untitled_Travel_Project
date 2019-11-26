@@ -12,7 +12,8 @@ Table schema:
     6   pwdhash         bytes
 
 """
-from helpers import dbCursor
+from helpers import dbCursor, ArgumentException
+import pyodbc
 
 
 def get(id):
@@ -60,6 +61,10 @@ def insert(name, userName, password, email=None, phone=None, description=None):
         else:
             return None
 
+def delete(uid):
+    """Delete an owner with the specified uid from the database."""
+    with dbCursor() as cursor:
+        cursor.execute("DELETE FROM Owners WHERE ownerid=?", uid)
 
 def update(ownerid, **fields):
     """

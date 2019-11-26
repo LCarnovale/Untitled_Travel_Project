@@ -6,7 +6,6 @@ from src.bookingSystem import BookingSystem
 
 from src.address import Address
 from src.user import User
-from src.stayDetails import StayDetails
 from src.accommodation import Accommodation
 
 USE_DATABASE = True
