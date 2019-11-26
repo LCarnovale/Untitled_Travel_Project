@@ -35,6 +35,8 @@
      <!-- Booking for owner -->
 {% if reason and reason == 'owner' %}
     <h2>Bookings for {{acc.name}}:</h2>
+{% else %}
+    <h2>Your bookings:</h2>
 {% endif %}
 <!-- If there are bookings, display them -->
 {% if bookings %}
@@ -42,7 +44,7 @@
     <div class="row">
     <!-- Adjust the size of the cards-->
     {% if bookings|length > 3 %}
-        <div class="col s12 cards-container" style="column-count:3"> <
+        <div class="col s12 cards-container" style="column-count:3">
     {% endif %}
     {% for b in bookings %}
     {% if bookings|length <= 3 %}
