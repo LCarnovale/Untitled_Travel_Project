@@ -68,7 +68,6 @@ class Search():
 		
         # Adding scores based on reviews
         self._scoreReviews()
-        
         # Searching by distance
         if location:
             if not distance:
@@ -79,7 +78,6 @@ class Search():
 
         # Sorting the results, highest score first
         self._scores = sorted(self._scores,key = lambda score: score[1], reverse = True)
-
         return [x[0] for x in self._scores]
 
 
@@ -108,7 +106,6 @@ class Search():
                     title_score += 2 * name.count(keyword)/len(name)
                 if len(desc) != 0:
                     body_score += 1 * desc.count(keyword)/len(desc)
-
             scores.append((ad_id, title_score + body_score))
 
         self._scores = scores
@@ -196,8 +193,8 @@ class Search():
     def _filterLocation(self, location, max_dist):
         '''
         Filters out every location outside of the given radius max_dist
-        Ranks the results based on distance, and gives equally spaced
-         points between 2 and 0 based on proximity
+        Ranks the results based on distance, and gives points between 2 
+		and 0 based on proximity
         '''
 
         result = []
@@ -214,13 +211,10 @@ class Search():
         # Order results and score accordingly
         result.sort(key = lambda x: x[2])
         final = []
-        currentscore = 2.0
-        step = 2.0/(len(self._scores))
         for ad_id, score, dist in result:
-            final.append((ad_id, score + currentscore))
-            currentscore -= step
+            final.append((ad_id, score+ (max_dist-dist)/max_dist*2.0))
 
-        self._scores = result
+        self._scores = final
 
 
     def _cleanString(self, string):

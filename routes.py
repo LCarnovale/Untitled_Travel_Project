@@ -70,7 +70,6 @@ def home():
 
             # Save the results for multi-page results
             session['results'] = results
-            print(results)
 
             # Redirect to results
             return redirect(url_for('view_search'))
