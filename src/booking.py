@@ -1,21 +1,12 @@
 import db
 
 class Booking:
-
-    _id = -1
-    '''
-        acc is the accommodation
-        period is the time period for the booking
-        user is the user making the booking
-    '''
+    _id = -1 # Will be set by the bookingSystem
     def __init__(self, venueid, userid, startDate, endDate):
         self._venueid = venueid
         self._userid = userid
         self._start_date = startDate
         self._end_date = endDate
-
-        
-
 
     def checkOverlap(self, startDate, endDate):
         """

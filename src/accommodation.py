@@ -137,6 +137,9 @@ class Accommodation:
         return [image.replace("\\","/") for image in temp]
 
     def get_bookings(self):
+        """
+        Return a sorted list of all the bookings for this venue.
+        """
         booking_rows = db.bookings.get_for_venue(self._id)
         return sorted([Booking(*row[1:]) for row in booking_rows], key=lambda x: x.start_date)
 

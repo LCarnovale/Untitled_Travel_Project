@@ -9,6 +9,7 @@ class UserSystemError(Exception):
         super().__init__(msg)
 
 class UserCreateError(UserSystemError):
+    """Thrown when a user cannot be created"""
     def __init__(self, msg, col=None, err=None):
         # col: column/field causing the error (eg. userName)
         # err: err with the column
@@ -31,11 +32,19 @@ class UserSystem:
         self._owners = {}
 
     def add_user(self, uid, user):
+        """
+        Adds a user to the system
+        Sets the id of the user to the given uid.
+        """
         self._users[uid] = user
         user._id = uid
         user._type = 'user'
     
     def add_owner(self, oid, owner):
+        """
+        Adds an owner to the system
+        Sets the id of the owner to given oid
+        """
         self._owners[oid] = owner
         owner._id = oid
         owner._type = 'owner'
