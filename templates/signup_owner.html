@@ -15,11 +15,13 @@
 {% endblock %}
 
 {% block content %}
+<!-- Sign up as an owner-->
 <form method="POST">
     <div class="container">
         <a href="{{url_for('signup')}}">Sign up as a User</a>
         <ul class="collapsible">
             <li class="active">
+                <!-- Personal Information -->
                 <div class="collapsible-header"><i class="material-icons">person</i>Account Information</div>
                 <div class="collapsible-body">
                     <div class="row">
@@ -40,7 +42,7 @@
 						<div class="input-field col s12">
                             <input type="email" id="email_input" name="email_input" class="validate" required = "true">
                             <label for="email_input">Email</label>
-                            <span class="helper-text" data-error="Invalid email" data-success="Valid">
+                            <span class="helper-text" data-error="Invalid email" data-success="Valid"></span>
 						</div>
                         <div class="input-field col s12">
                             <input type="password" id="password_input" name="password_input" oninput="checkPassMatch()">
@@ -50,11 +52,12 @@
                             <input type="password" id="password_confirm_input" name="password_confirm_input" class="validate"
                                 oninput="checkPassMatch()">
                             <label for="password_confirm_input">Confirm Password</label>
-                            <span class="helper-text" data-error="Passwords must match">
+                            <span class="helper-text" data-error="Passwords must match"></span>
                         </div>
                     </div>
                 </div>
             </li>
+            <!-- Extra information -->
             <li>
                 <div class="collapsible-header"><i class="material-icons">info</i>Extra Information</div>
                 <div class="collapsible-body">
@@ -64,7 +67,6 @@
                             <label for="desc_input">Description (optional)</label>
                         </div>
 
-                        
                         <div class="input-field col s12 m12 l6">
                             <input type="tel" id="phone_input" name="phone_input">
                             <label for="phone_input">Phone Number</label>

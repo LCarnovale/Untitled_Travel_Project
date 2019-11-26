@@ -19,7 +19,7 @@
 		});
 	</script>
 
-	<style>
+<style>
 	#map {
 		height: 50vw;
 		width:  50vw;
@@ -38,6 +38,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col s12">
+				<!-- Search bar -->
 				<div class="input-field col s10">
 				<input type="text" id="searchgeocode" name="search" onkeydown="return (event.keyCode!=13);">
 				<label for="searchgeocode" id="searchlabel">Search by Location</label>
@@ -47,9 +48,10 @@
 				</div>
 			</div>
 		</div>
+		<!-- Google Maps -->
 		<input type = "hidden" name = "geocodedvalue" id = "geocodedvalue" readonly>
 		<input type="text" name="radiusval" id="radiusval" value = "2000" hidden>
-
+		<!-- Radius for circle in Google Maps-->
 		<div class="col s12">
 			<p class="range-field">
 				<input type="range" id="radiuschange" min="0" max="9" start="3" value="3" onchange="updateRadius(this.value)" oninput="changeCircle(this.value)"/>
@@ -60,6 +62,7 @@
 		</div>
 		<ul class="collapsible">
 			<li>
+				<!-- Advanced Search -->
 				<div class="collapsible-header"><i class="material-icons">add</i>Advanced Search</div>
 				<div class="collapsible-body">
 					<div class="row">
@@ -68,6 +71,7 @@
 							<label for="keywordinput">Keyword search</label>
 						</div>
 					</div>
+					<!-- Values to change in advanced search-->
 					<div class="row" id="advancesearch">
 						<input type="text" id="dates" name="dates" placeholder="Date Range..">
 						<div>
@@ -91,18 +95,16 @@
 							</div>
 						</div>
 					</div>
-					
 				</div>
 			</li>
 		</ul>
-
 			<br>
 			<div class="col s12">
 				<div id="map" class="center-align"></div>
 			</div>
-		</form>
 	</div>
 </form>
+
 	
     <script>
 

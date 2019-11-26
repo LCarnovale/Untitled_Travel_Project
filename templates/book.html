@@ -26,8 +26,6 @@
 {% block content %}
 <body>
 <!-- Content -->
-<!-- <div class="w3-main w3-white" style="margin-left:260px">
-    <div class="w3-hide-large" style="margin-top:80px"></div> -->
 
     <!-- Image SlideShow  Large image -->
     {% if images %}
@@ -142,15 +140,19 @@
                   <p><input name = "book_end" type = hidden id="book_end"></p>
  
                   {% if session['login_type'] == 'user' %}
+                  <!-- Normal users can book -->
                   <button class="btn waves-effect waves-light light-blue" 
                     id="book_btn" disabled type="submit">Book this room</button>
                   {% elif session['login_type'] == 'owner' %}
+                  <!-- If the owner posted the ad, then let them view who has booked their ad -->
                     {% if session['id']|int == acc.ownerid %}
                     <a class ="btn" href={{url_for('owner_view_bookings', venue_id=acc.id)}}>Bookings</a>
                     {% else %}
+                  <!-- Owner needs to login as a user in order to book -->
                     <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>You're currently logged in as a host. Click here to login as a user to make a booking.</a>
                     {% endif %}
                   {% else %}
+                  <!-- User needs to login in order to book -->
                   <a href={{url_for('login', send_to=url_for('book_main', id=acc.id)|replace('/', '%'))}}>Click here to login to make a booking.</a>
                   {% endif %}
               </form>

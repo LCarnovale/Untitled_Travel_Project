@@ -66,7 +66,7 @@ Worked on frontend with making grids for the search results. Added image carouse
 Worked on changing the date ranges in the DB when making a booking. Instead im modifying the get_dates function to get all available dates in the database and then get all the booking date ranges and return the new available date ranges for the venue. Main problem was working with changing datetime.datetime, datetime.date objects and strings.
 
 20/11/19
-Finished the booking dates. Working on the frontend for search results page.
+Finished the booking dates. Working on the frontend for search results page. Removed image carousel from search results because there is a noticeable delay when displaying for each venue.
 
 22/11/10
 Working on book.html page with better display, simpler format and a better image displaying method.

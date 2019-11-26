@@ -15,45 +15,49 @@
 <!--Let browser know website is optimized for mobile-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style type="text/css">
-    .myimage {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .cards-container {
-        column-break-inside: avoid;
-    }
-
-    .card {
-        display: inline-block;
-        overflow: visible;
-    }
+.myimage {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.cards-container {
+    column-break-inside: avoid;
+}
+.card {
+    display: inline-block;
+    overflow: visible;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <body>
-    <!-- <div class="container"> -->
+     <!-- Booking for owner -->
+{% if reason and reason == 'owner' %}
+    <h2>Bookings for {{acc.name}}:</h2>
+{% endif %}
+<!-- If there are bookings, display them -->
+{% if bookings %}
+    <!-- Cards for each booking -->
+    <div class="row">
+    <!-- Adjust the size of the cards-->
+    {% if bookings|length > 3 %}
+        <div class="col s12 cards-container" style="column-count:3"> <
+    {% endif %}
+    {% for b in bookings %}
+    {% if bookings|length <= 3 %}
+        <div class="col s12 m6 l4 cards-container">
+    {% endif %}
+        <!-- Get the venue information and images -->
+        {% set venue = ac.get_acc(b.venueid) %}
+        {% set images = venue.get_images() %}
+        <!-- If owner is logged in, set the user as owner-->
         {% if reason and reason == 'owner' %}
-        <h2>Bookings for {{acc.name}}:</h2>
+            {% set cur_user = us.get_user(b.userid) %}
         {% endif %}
-        {% if bookings %}
-        <!-- Cards for each booking -->
-        <div class="row">
-            {% if bookings|length > 3 %}
-            <div class="col s12 cards-container" style="column-count:3"> <!--Add style="column-count:2" to change width of cards-->
-            {% endif %}
-            {% for b in bookings %}
-                {% if bookings|length <= 3 %}
-                <div class="col s12 m6 l4 cards-container">
-                {% endif %}
-                {% set venue = ac.get_acc(b.venueid) %}
-                {% set images = venue.get_images() %}
-                {% if reason and reason == 'owner' %}
-                {% set cur_user = us.get_user(b.userid) %}
-                {% endif %}
+                <!-- Display venue cards -->
                 <div class="card" style="width:100%">
+                    <!-- Display image -->
                     <div class="card-image">
                         <i href="/book/{{b.venueid}}">
                             {% if images|length > 0 %}
@@ -63,13 +67,17 @@
                             {% endif %}
                         </i>
                     </div>
+                    <!-- Display content for venue-->
                     <div class="card-content">
+
                         {% if reason and reason == 'owner' %}
                         <p class="card-title activator grey-text text-darken-4">{{cur_user.name}}</p>
                         {% else %}
+                        <!-- If a normal user show link to venue-->
                         <a class="card-title activator grey-text text-darken-4" 
                             href="{{url_for('book_main', id=b.venueid)}}">{{venue.name}}</a>
                         {% endif %}
+                        <!-- Show the start and end dates of the booking -->
                         Start: {{b.start_date.strftime('%d %B, %Y')}} <br>
                         End: {{b.end_date.strftime('%d %B, %Y')}} <br>
                         {% set dt = (b.end_date - b.start_date).days %}
@@ -95,6 +103,7 @@
                         {% endif %}
                         
                     </div>
+                    <!-- Show contact details-->
                     {% if reason and reason == 'owner' %}
                     <div class="card-action">
                         <div class="row center-align">
@@ -102,11 +111,13 @@
                         </div>
                     </div>
                     {% else %}
+                    <!-- Go to  booking-->
                     <div class="card-action">
                         <div class="row center-align">
                             <div class="col s12 l6">
                                 <a class="btn" style="display: block" href="{{url_for('book_main', id=b.venueid)}}">Go to booking</a>
                             </div>
+                            <!-- Leave a review -->
                             {% if allow_review %}
                             <div class="col s12 l6">
                                 <a class="btn-flat" style="display: block" href="{{url_for('review', id=b.venueid)}}">review</a>
@@ -126,15 +137,16 @@
         </div>
         {% else %}
         <br>
+        <!-- If logged in as owner and there are no bookings for their venue-->
         {% if reason and reason == 'owner' %}
         <p>Noone has booked this place yet. Please check back later.</p>
         {% else %}
+        <!-- If logged in as user and they have not made a booking-->
         <p>When you make a booking, it will show up here.</p>
         {% endif %}
-        {% endif %}
+{% endif %}
         <!--JavaScript at end of body for optimized loading-->
-       
-    <!-- </div> -->
+
     </body>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/materialize.js')}}"></script>

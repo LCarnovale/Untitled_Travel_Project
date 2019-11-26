@@ -5,13 +5,16 @@
 
 {% block content %}
 	<link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
+	<!-- Form to sign up-->
 	<h2> Please enter your details: </h2>
 	<form method='POST'>
 		<div class="container">
-				<a href="{{url_for('signup_owner')}}">Signing up as a host? Click here!</a>
-				<ul class="collapsible">
-					<li class="active">
-						<div class="collapsible-header"><i class="material-icons">person</i>Account Information</div>
+			<!-- Link to signup as a host-->
+			<a href="{{url_for('signup_owner')}}">Signing up as a host? Click here!</a>
+			<ul class="collapsible">
+				<!-- Personal information-->
+				<li class="active">
+					<div class="collapsible-header"><i class="material-icons">person</i>Account Information</div>
 						<div class="collapsible-body">
 							<div class="row">
 								<div class="col s12">
@@ -19,34 +22,37 @@
 									{% if invalid_email %}
 									<label style="color:red">Invalid email</label>
 									{% endif %}
-
 								</div>
-			
+
 								<div class="input-field col s12">
 									<input type="text" id="name_input" name="name_input" required = "true" />
 									<label for="name_input">Full Name</label>
-			
 								</div>
+
 								{% if username_taken %}
 								<label style="color:red">Username is taken</label>
 								{% endif %}
+
 								<div class="input-field col s12">
 									<input type="text" id="uname_input" name="uname_input" required = "true"/>
 									<label for="uname_input">Username</label>
 								</div>
+
 								<div class="input-field col s12">
 									<input type="password" id="password_input" name="password_input" class="validate" oninput="checkPassMatch()">
 									<label for="password_input">Password</label>
 								</div>
+
 								<div class="input-field col s12">
 									<input type="password" id="password_confirm_input" name="password_confirm_input" class="validate"
 										oninput="checkPassMatch()">
 									<label for="password_confirm_input">Confirm Password</label>
-									<span class="helper-text" data-error="Passwords must match">
+									<span class="helper-text" data-error="Passwords must match"></span>
 								</div>
 							</div>
 						</div>
 					</li>
+					<!-- Extra info for User -->
 					<li>
 						<div class="collapsible-header"><i class="material-icons">info</i>Extra Information</div>
 						<div class="collapsible-body">
@@ -55,18 +61,17 @@
 									<textarea id="desc_input" name="desc_input" class="materialize-textarea"></textarea>
 									<label for="desc_input">Description (optional)</label>
 								</div>
-			
-								
+
 								<div class="input-field col s12 m12 l6">
 									<input type="tel" id="phone_input" name="phone_input">
 									<label for="phone_input">Phone Number</label>
 								</div>
+
 								<div class="input-field col s12 m12 l6">
 									<input type="email" id="email_input" name="email_input" class="validate" required="true">
 									<label for="email_input">Email</label>
-									<span class="helper-text" data-error="Invalid email" data-success="Valid">
+									<span class="helper-text" data-error="Invalid email" data-success="Valid"></span>
 								</div>
-								
 							</div>
 						</div>
 					</li>

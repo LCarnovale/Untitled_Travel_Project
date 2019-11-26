@@ -47,10 +47,10 @@
 
 <body onload="createTable()">
 <link rel="stylesheet" href = "{{url_for('static',filename = 'formstep.css')}}">
-
+<!-- Form to post an ad-->
 <h2> Please enter the details of your accommodation: </h2>
 <form name='post_ad' id = "regForm" method='POST' formaction='submit()' enctype="multipart/form-data">
-	<!-- <div class = "tab"> -->
+	<!-- First collapsible that stores information on the venue-->
 	<ul class="collapsible">
 		<li class="active">
 			<div class="collapsible-header"><i class="material-icons">information</i>Place Details</div>
@@ -79,6 +79,7 @@
 				</div>
 			</div>
 		</li>
+		<!-- Images for the venue-->
 		<li>
 			<div class="collapsible-header"><i class="material-icons">image</i>Images</div>
 			<div class="collapsible-body">
@@ -90,6 +91,7 @@
 				<div id="preview"></div>
 			</div>
 		</li>
+		<!-- Location for venue-->
 		<li>
 			<div class="collapsible-header"><i class="material-icons">location_on</i>Location</div>
 			<div class="collapsible-body">
@@ -101,6 +103,7 @@
 				<div id="map"></div>
 			</div>
 		</li>
+		<!-- Availability for venue-->
 		<li>
 			<div class="collapsible-header"><i class="material-icons">date_range</i>Availability</div>
 			<div class="collapsible-body">

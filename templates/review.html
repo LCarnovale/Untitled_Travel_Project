@@ -6,9 +6,8 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Make a review for a venue-->
     <h1> Make a review </h1>
-
-
     <div class="reviews_container">
         <form name="post_review" method="POST" style="width:100%;text-align:center">
             <input id = "return" name="return" value="" hidden>
@@ -17,6 +16,7 @@
                 <tr>
                     <td><h5>Would you recommend it to a friend?</h5></td>
                     <td>
+                        <!-- Selectable images for a good/bad venue-->
                         <img src="/static/thumbs_up_deselected.png" id="recc_thumb_up" onclick="thumb_up('recc');">
                         <img src="/static/thumbs_down_deselected.png" id="recc_thumb_down" onclick="thumb_down('recc');">
                     </td>
@@ -24,15 +24,16 @@
             </table>
             <br>
             <br>
+            <!-- Bad review -->
             <h5>Were there any issues with the accommodation?</h5>
             <textarea rows = "3" style="width:50%;" name = "issues"></textarea>
             <br>
             <br>
+            <!-- Good review -->
             <h5>What was good about the accommodation?</h5>
             <textarea rows = "3" style="width:50%;" name = "good"></textarea>
             <br>
             <br>
-
             <input class='btn' type="submit" id="review_submit" name="review_submit" value = "Post">
         </form>
     </div>
