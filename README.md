@@ -78,15 +78,56 @@ To deactivate the virtual environment, run the following command:
 (project_venv) deactivate
 ```
 
-# Running the program
-Currently the backend is configured to run in debug mode. Start the server by running `run.py`:
+# Giving the backend access to the database
+This step is required to allow the program to access a database.
+Also required is an ODBC Driver for SQL servers, available for Windows 
+[here](https://www.microsoft.com/en-us/download/details.aspx?id=56567).
 
-On windows:
+
+Once the repository has been cloned to your computer, create a new file in the top level of the repo
+called `connect_config.py`. Copy the following into that file:
+
+```python
+import pyodbc
+
+DRIVER = "{ODBC Driver 17 for SQL Server}" # Change the version number from 17 if necessary
+SERVER = "<server>"        # SQL Server name, eg: 'tcp:servername.database.net'
+DATABASE = "<database>"    # Database name
+UNAME = "<username>"       # Server's username
+PASSWORD = "<password>"    # Server's password
+
+def get_connection():
+	cnxn = pyodbc.connect(f"Driver={DRIVER};Server={SERVER};Database={DATABASE};Uid={UNAME};Pwd={PASSWORD};Encrypt=yes;")
+	return cnxn
+
+if __name__ == "__main__":
+	print("Attempting connection (no output on success)")
+	get_connection()
+```
+And use the target SQL server's name, database, username and password (and change the driver if necessary) 
+in the incomplete fields. You can check this works by running it in any environment that has pyodbc installed:
 ```cmd
-(project_venv) run.py
+(project_venv) connect_config.py
+Attempting connection (no output on success)
+
+(project_venv) 
+```
+
+The program is able to detect if a firewall has blocked your ip address, and will raise an exception 
+giving your ip address, and saying that it has been blocked.
+
+# Running the program
+On windows, the most reliable way to run the server is to specify the current default python install which will
+use the virtual environment's python path:
+```cmd
+(project_venv) python run.py
 ```
 
 On posix systems:
 ```bash
 (project_venv) ./run.py
 ```
+
+# Running the crawler
+The crawler can be run the same way as the main program, but with `runcrawler.py`. 
+Currently the crawler is configured to crawl AirBnb sites only.
