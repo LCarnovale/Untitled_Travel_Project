@@ -112,6 +112,7 @@ Attempting connection (no output on success)
 
 (project_venv) 
 ```
+**For a new database** use the script [here](#dbgen) to create a database that can be used by the program.
 
 The program is able to detect if a firewall has blocked your ip address, and will raise an exception 
 giving your ip address, and saying that it has been blocked.
@@ -131,3 +132,135 @@ On posix systems:
 # Running the crawler
 The crawler can be run the same way as the main program, but with `runcrawler.py`. 
 Currently the crawler is configured to crawl AirBnb sites only.
+
+# <a name="dbgen"></a>Creating a fresh database
+The following SQL script will create a fresh database including a sentinal external source owner:
+```sql
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- Create Addresses table --
+CREATE TABLE [dbo].[Addresses](
+	[aid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[location] [text] NULL,
+	[lat] [varchar](10) NULL,
+	[lng] [varchar](10) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Create Users table --
+CREATE TABLE [dbo].[Users](
+	[userid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[name] [varchar](100) NOT NULL,
+	[userName] [varchar](30) UNIQUE NOT NULL,
+	[email] [varchar](100) NULL,
+	[phone] [varchar](15) NULL,
+	[description] [text] NULL,
+	[pwdhash] [varbinary](512) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Create Owners table --
+CREATE TABLE [dbo].[Owners](
+	[ownerid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[name] [varchar](100) NOT NULL,
+	[userName] [varchar](30) UNIQUE NOT NULL,
+	[email] [varchar](100) NULL,
+	[phone] [varchar](15) NULL,
+	[description] [text] NULL,
+	[pwdhash] [varbinary](512) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+-- Add external source owner --
+SET IDENTITY_INSERT Owners ON
+INSERT INTO Owners (ownerid, name, userName)
+VALUES (-1, '_ExternalOwner', '_ExternalOwner')
+SET IDENTITY_INSERT Owners OFF
+GO
+
+-- Create Venues table --
+CREATE TABLE [dbo].[Venues](
+	[venueid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[ownerid] [int] NOT NULL,
+	[addressid] [int] NOT NULL,
+	[name] [varchar](200) NOT NULL,
+	[bedCount] [tinyint] NULL,
+	[bathCount] [tinyint] NULL,
+	[carCount] [tinyint] NULL,
+	[description] [text] NULL,
+	[rate] [smallmoney] NULL,
+	[minStay] [int] NULL,
+	[maxStay] [int] NULL,
+	[details] [text] NULL,
+	[ExtSource] [varchar](250) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Create Availabilities table --
+CREATE TABLE [dbo].[Availabilities](
+	[avId] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NULL,
+	[startDate] [date] NULL,
+	[endDate] [date] NULL
+) ON [PRIMARY]
+GO
+
+-- Create Bookings table --
+CREATE TABLE [dbo].[Bookings](
+	[bookid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NOT NULL,
+	[userid] [int] NOT NULL,
+	[startDate] [date] NOT NULL,
+	[endDate] [date] NOT NULL
+) ON [PRIMARY]
+GO
+
+-- Create Images table --
+CREATE TABLE [dbo].[Images](
+	[imId] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NULL,
+	[path] [nvarchar](250) NOT NULL
+) ON [PRIMARY]
+GO
+
+
+
+-- Create Reviews table --
+CREATE TABLE [dbo].[Reviews](
+	[revid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NOT NULL,
+	[userid] [int] NOT NULL,
+	[postDateTime] [datetime] NULL,
+	[recommends] [bit] NULL,
+	[reviewBad] [text] NULL,
+	[reviewGood] [text] NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Set References --
+ALTER TABLE [dbo].[Availabilities]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Bookings]  WITH CHECK ADD FOREIGN KEY([userid])
+REFERENCES [dbo].[Users] ([userid])
+GO
+ALTER TABLE [dbo].[Bookings]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Images]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Reviews]  WITH CHECK ADD FOREIGN KEY([userid])
+REFERENCES [dbo].[Users] ([userid])
+GO
+ALTER TABLE [dbo].[Reviews]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Venues]  WITH CHECK ADD FOREIGN KEY([addressid])
+REFERENCES [dbo].[Addresses] ([aid])
+GO
+ALTER TABLE [dbo].[Venues]  WITH CHECK ADD FOREIGN KEY([ownerid])
+REFERENCES [dbo].[Owners] ([ownerid])
+GO
+```
