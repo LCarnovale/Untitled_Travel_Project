@@ -1,7 +1,6 @@
 from pyodbc import OperationalError, ProgrammingError, IntegrityError
 import sys
 sys.path.append('db/')
-# from helpers import 
 
 from helpers import *
 
