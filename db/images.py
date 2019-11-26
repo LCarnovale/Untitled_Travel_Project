@@ -5,8 +5,7 @@ Images:
     path     varchar(250)
 """
 
-from helpers import dbCursor
-import helpers
+from helpers import dbCursor, InsertionError
 import pyodbc
 
 def get(id):
@@ -36,7 +35,7 @@ def insert(venueid, path):
                 VALUES (?, ?)", (venueid, path))
         except pyodbc.IntegrityError:
             print("Integrity error: venueid must refernce an existing venue.")
-            raise helpers.InsertionError("venueid must refernce an existing venue.", 
+            raise InsertionError("venueid must refernce an existing venue.", 
                 col='venueid')
         else:
             return cursor.fetchone()[0]
