@@ -84,3 +84,12 @@ Week 10:
 
     We are in the last phase of adding functionality to the frontend and are primarily now working
     on finding bugs and making small improvements to the user experience.
+
+Week 11:
+    We have completed the demo and finalized the program for submission.
+    In the end our program functions well and performs certain tasks reliably,
+    although there is plenty of room for expansion. Some bugs were found after
+    the demo but in general the site performed well in it. Either way, 
+    I am happy with our progress. 
+    
+    For the final report, I wrote mostly the database and azure related sections.
