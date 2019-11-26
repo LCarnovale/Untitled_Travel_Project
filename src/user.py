@@ -77,7 +77,6 @@ class User:
             if x is not None:
                 self._email = email
             else:
-                print(email, x)
                 raise EmailError
         else:
             self._email = email # Allow null emails

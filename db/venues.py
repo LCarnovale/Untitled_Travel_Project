@@ -181,8 +181,6 @@ def search_area_circle(centre, radius):
     Returns 3 lists: list of venue rows, list of matching addresses, and list of matching distances
     from centre (in metres)
     """
-    print('radius ' , radius)
-    print('centre ' , centre)
 	
     query = """
     SELECT *, geography::Point(lat, lng, 4326).STDistance(geography::Point(?, ?, 4326)) as distance From Venues 
@@ -280,8 +278,6 @@ def search(join='AND', **patterns):
     
     parts = f' {join} '.join(parts)
     query += ' ' + parts
-    
-    # print(query, subs)
 
     with dbCursor() as cursor:
         cursor.execute(query, subs)

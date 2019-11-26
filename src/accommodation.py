@@ -110,7 +110,6 @@ class Accommodation:
                         continue
 
         availableDates = [[x[0].strftime('%d-%m-%Y'), x[1].strftime('%d-%m-%Y')] for x in availableDates]
-        print(availableDates)
         return availableDates
 
     def isAvailable(self, startDate, endDate=None):
@@ -128,7 +127,6 @@ class Accommodation:
             endDate = startDate + timedelta(days=1)
         
         avails = db.venues.get_overlapping_availability(self._id, startDate, endDate)
-        #print(avails, startDate, endDate)
 
         if len(avails) >= 1:
             return True
