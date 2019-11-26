@@ -43,7 +43,8 @@ class Search():
         if enddate:
             enddate = datetime.strptime(enddate, '%d/%m/%Y')
         else:
-            enddate = None
+            enddate = startdate
+        print(startdate, enddate)
         self._filterDates(startdate, enddate)
         
         
@@ -141,9 +142,22 @@ class Search():
         result = []
         for ad_id, score in self._scores:
             ad = self._items[ad_id]
-            print(ad.get_dates())
+            #print(ad.get_dates())
+            dates = ad.get_dates()
+            for start, end in dates:
+                #print(start, end)
+                #print(startdate, enddate)
+                start = datetime.strptime(start, '%d-%m-%Y')
+                end = datetime.strptime(end, '%d-%m-%Y')
+                if start <= startdate and end >= enddate:
+                    #print('YEP', ad_id)
+                    result.append((ad_id, score))
+
+            '''
             if (ad.isAvailable(startdate, enddate)):
+                print('YEP', ad_id)
                 result.append((ad_id, score))
+            '''
 
         self._scores = result
 

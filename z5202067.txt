@@ -21,3 +21,12 @@ Worked on users logging in and google maps API. Mainly worked on displaying goog
 
 Week 8
 Worked on Photo Uploading to a folder and storing the url in database
+
+Week 9
+Worked on adding GMap in different pages and geolocation on main search.
+
+Week 10
+Worked on bug fix and implementing scoring to rank the search results based on criterias that the user provides
+
+Week 11
+Worked on the final report and testing

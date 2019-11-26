@@ -74,7 +74,7 @@ def home():
             # TODO: This is a bit dodgy the target location and search term should be separate
             # if location: search = None
             search = request.form['keyword']
-            results = accSystem.advancedSearch(search, None, None, None, beds,
+            results = accSystem.advancedSearch(search, None, startdate, enddate, beds,
                                                bathrooms, parking, location, distance)
             print(results)
             results = accSystem.get_acc(results)

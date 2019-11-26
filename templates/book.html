@@ -163,7 +163,6 @@
 
       <!-- Review Section -->
       <div class="w3-row w3-large">
-          {% if reviews%}
           <h4 class="w3-left w3-col s9"><strong>Reviews</strong></h4>
           {% if session['login_type'] != 'owner' or session['id']|int != acc.ownerid %}
           <br>
@@ -173,6 +172,7 @@
           {% endif %}
           <br>
           <br>
+          {% if reviews%}
           {% for review in reviews %}
               {% if review.recommends %}
               <!-- Good Reviews -->

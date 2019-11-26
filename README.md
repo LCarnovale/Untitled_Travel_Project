@@ -78,15 +78,189 @@ To deactivate the virtual environment, run the following command:
 (project_venv) deactivate
 ```
 
-# Running the program
-Currently the backend is configured to run in debug mode. Start the server by running `run.py`:
+# Giving the backend access to the database
+This step is required to allow the program to access a database.
+Also required is an ODBC Driver for SQL servers, available for Windows 
+[here](https://www.microsoft.com/en-us/download/details.aspx?id=56567).
 
-On windows:
+
+Once the repository has been cloned to your computer, create a new file in the top level of the repo
+called `connect_config.py`. Copy the following into that file:
+
+```python
+import pyodbc
+
+DRIVER = "{ODBC Driver 17 for SQL Server}" # Change the version number from 17 if necessary
+SERVER = "<server>"        # SQL Server name, eg: 'tcp:servername.database.net'
+DATABASE = "<database>"    # Database name
+UNAME = "<username>"       # Server's username
+PASSWORD = "<password>"    # Server's password
+
+def get_connection():
+	cnxn = pyodbc.connect(f"Driver={DRIVER};Server={SERVER};Database={DATABASE};Uid={UNAME};Pwd={PASSWORD};Encrypt=yes;")
+	return cnxn
+
+if __name__ == "__main__":
+	print("Attempting connection (no output on success)")
+	get_connection()
+```
+And use the target SQL server's name, database, username and password (and change the driver if necessary) 
+in the incomplete fields. You can check this works by running it in any environment that has pyodbc installed:
 ```cmd
-(project_venv) run.py
+(project_venv) connect_config.py
+Attempting connection (no output on success)
+
+(project_venv) 
+```
+**For a new database** use the script [here](#dbgen) to create a database that can be used by the program.
+
+The program is able to detect if a firewall has blocked your ip address, and will raise an exception 
+giving your ip address, and saying that it has been blocked.
+
+# Running the program
+On windows, the most reliable way to run the server is to specify the current default python install which will
+use the virtual environment's python path:
+```cmd
+(project_venv) python run.py
 ```
 
 On posix systems:
 ```bash
 (project_venv) ./run.py
+```
+
+# Running the crawler
+The crawler can be run the same way as the main program, but with `runcrawler.py`. 
+Currently the crawler is configured to crawl AirBnb sites only.
+
+# <a name="dbgen"></a>Creating a fresh database
+The following SQL script will create a fresh database including a sentinal external source owner:
+```sql
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- Create Addresses table --
+CREATE TABLE [dbo].[Addresses](
+	[aid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[location] [text] NULL,
+	[lat] [varchar](10) NULL,
+	[lng] [varchar](10) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Create Users table --
+CREATE TABLE [dbo].[Users](
+	[userid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[name] [varchar](100) NOT NULL,
+	[userName] [varchar](30) UNIQUE NOT NULL,
+	[email] [varchar](100) NULL,
+	[phone] [varchar](15) NULL,
+	[description] [text] NULL,
+	[pwdhash] [varbinary](512) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Create Owners table --
+CREATE TABLE [dbo].[Owners](
+	[ownerid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[name] [varchar](100) NOT NULL,
+	[userName] [varchar](30) UNIQUE NOT NULL,
+	[email] [varchar](100) NULL,
+	[phone] [varchar](15) NULL,
+	[description] [text] NULL,
+	[pwdhash] [varbinary](512) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+-- Add external source owner --
+SET IDENTITY_INSERT Owners ON
+INSERT INTO Owners (ownerid, name, userName)
+VALUES (-1, '_ExternalOwner', '_ExternalOwner')
+SET IDENTITY_INSERT Owners OFF
+GO
+
+-- Create Venues table --
+CREATE TABLE [dbo].[Venues](
+	[venueid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[ownerid] [int] NOT NULL,
+	[addressid] [int] NOT NULL,
+	[name] [varchar](200) NOT NULL,
+	[bedCount] [tinyint] NULL,
+	[bathCount] [tinyint] NULL,
+	[carCount] [tinyint] NULL,
+	[description] [text] NULL,
+	[rate] [smallmoney] NULL,
+	[minStay] [int] NULL,
+	[maxStay] [int] NULL,
+	[details] [text] NULL,
+	[ExtSource] [varchar](250) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Create Availabilities table --
+CREATE TABLE [dbo].[Availabilities](
+	[avId] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NULL,
+	[startDate] [date] NULL,
+	[endDate] [date] NULL
+) ON [PRIMARY]
+GO
+
+-- Create Bookings table --
+CREATE TABLE [dbo].[Bookings](
+	[bookid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NOT NULL,
+	[userid] [int] NOT NULL,
+	[startDate] [date] NOT NULL,
+	[endDate] [date] NOT NULL
+) ON [PRIMARY]
+GO
+
+-- Create Images table --
+CREATE TABLE [dbo].[Images](
+	[imId] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NULL,
+	[path] [nvarchar](250) NOT NULL
+) ON [PRIMARY]
+GO
+
+
+
+-- Create Reviews table --
+CREATE TABLE [dbo].[Reviews](
+	[revid] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[venueid] [int] NOT NULL,
+	[userid] [int] NOT NULL,
+	[postDateTime] [datetime] NULL,
+	[recommends] [bit] NULL,
+	[reviewBad] [text] NULL,
+	[reviewGood] [text] NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+-- Set References --
+ALTER TABLE [dbo].[Availabilities]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Bookings]  WITH CHECK ADD FOREIGN KEY([userid])
+REFERENCES [dbo].[Users] ([userid])
+GO
+ALTER TABLE [dbo].[Bookings]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Images]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Reviews]  WITH CHECK ADD FOREIGN KEY([userid])
+REFERENCES [dbo].[Users] ([userid])
+GO
+ALTER TABLE [dbo].[Reviews]  WITH CHECK ADD FOREIGN KEY([venueid])
+REFERENCES [dbo].[Venues] ([venueid])
+GO
+ALTER TABLE [dbo].[Venues]  WITH CHECK ADD FOREIGN KEY([addressid])
+REFERENCES [dbo].[Addresses] ([aid])
+GO
+ALTER TABLE [dbo].[Venues]  WITH CHECK ADD FOREIGN KEY([ownerid])
+REFERENCES [dbo].[Owners] ([ownerid])
+GO
 ```
