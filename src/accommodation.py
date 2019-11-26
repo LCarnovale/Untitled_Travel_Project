@@ -166,6 +166,7 @@ class Accommodation:
 
     @property
     def name(self):
+        """Name of the venue"""
         return self._name
 
     @name.setter
@@ -174,6 +175,7 @@ class Accommodation:
 
     @property
     def bed_count(self):
+        """Number of bedrooms the property has"""
         return self._bed_count
 
     @bed_count.setter
@@ -189,6 +191,7 @@ class Accommodation:
 
     @property
     def bath_count(self):
+        """Number of bathrooms the property has"""
         return self._bath_count
 
     @bath_count.setter
@@ -204,6 +207,7 @@ class Accommodation:
 
     @property
     def car_count(self):
+        """Number of parking spaces the property has"""
         return self._car_count
 
     @car_count.setter
@@ -219,6 +223,7 @@ class Accommodation:
 
     @property
     def description(self):
+        """Text description of the property"""
         return self._description
 
     @description.setter
@@ -227,6 +232,7 @@ class Accommodation:
 
     @property
     def rate(self):
+        """Rate (in $ per night) to book the place"""
         return self._rate
 
     @rate.setter
@@ -242,6 +248,7 @@ class Accommodation:
 
     @property
     def min_stay(self):
+        """Minimum number of days you can stay at the place"""
         return self._min_stay
 
     @min_stay.setter
@@ -257,6 +264,7 @@ class Accommodation:
 
     @property
     def max_stay(self):
+        """Maximum number of days you can stay at the place"""
         return self._max_stay
 
     @max_stay.setter
@@ -272,6 +280,7 @@ class Accommodation:
 
     @property
     def details(self):
+        """Additional rules for staying at the venue"""
         return self._details
 
     @details.setter
@@ -280,28 +289,32 @@ class Accommodation:
 
     @property
     def id(self):
+        """Id of the venue in the database. Preferrably use """
         return self._id
 
     @property
     def address(self):
-        # Get address for the venue
+        """Get address for the venue"""
         address = db.addresses.get(self.aid)
         return src.address.Address(*address[1:])
 
     @property
     def external_url(self):
+        """Url of the external site, as stored by the database"""
         return self._url
     
     @property
     def display_url(self):
+        """Url of the external site, but without any extra url args"""
         return self.external_url.split('?')[0]
 
     @property
     def url_base(self):
+        """Domain of the external site"""
         return self.external_url.split('//')[1].split('/')[0]
 
     @property
-
     def reviews(self):
+        """Get a list of Review classes related to the venue"""
         revs = db.reviews.get_for_venue(self._id)
         return [src.review.Review(*x[1:]) for x in revs]
