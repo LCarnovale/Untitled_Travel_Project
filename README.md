@@ -1,3 +1,6 @@
+## Note:
+This project was created for a course we did at UNSW in 2019. The Azure cloud subscription is no longer running so live websites and databases are also no longer running.
+
 # Hosted Azure website
 **This website is also available online at [http://untitled-travel.azurewebsites.net/](http://untitled-travel.azurewebsites.net/)**. This is automatically hosting the server for the master branch of this respository, updating every few minutes, and you **do not need to clone this repository or run any code** to access it.
 
